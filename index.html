@@ -316,6 +316,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{position:relative}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
+.why{font-size:.92rem;line-height:1.45;margin:8px 0 0}.why a{color:var(--ink);font-weight:700}
 .dir{color:var(--ink);font-weight:700;text-decoration:none}.dir span{font-weight:700;font-size:.85rem;margin-left:6px;padding:1px 6px;background:var(--signal);border:1px solid var(--ink);border-radius:2px;white-space:nowrap}
 .dir:hover span{background:var(--ink);color:var(--signal)}
 .tip-box .more{display:block;margin-top:8px;padding:0;border:0;background:none;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;color:var(--ink)}
@@ -947,18 +948,18 @@ function bind(){
   $("#foundForm").addEventListener("submit", e => {
     e.preventDefault();
     const p = R.places[$("#fWhere").value], law = LAW[p.c], off = R.offices[p.c];
-    const transport = /treno|bus|autopostale|ffs|trenord|tram|battello/i.test($("#fWhat").value);
+    const sug = suggestOffice($("#fWhat").value, $("#fWhere").value), transport = !!sug.src && ["ffs","apt","tpl","tno"].includes(sug.src);
     $("#foundOut").innerHTML = `
       <p class="eyebrow">Ufficio competente per ${esc(p.n)} · ${law.name}</p>
-      <div class="office"><b>${esc(off.n)}</b><span class="note">${esc(off.d)}</span></div>
-      ${transport ? `<div class="office" style="margin-top:8px"><b>Se l'hai trovato a bordo</b><span class="note">${esc(R.offices.transport[p.c])}</span></div>` : ""}
+      <div class="office"><b>${esc(sug.n)}</b><span class="note">${esc(sug.d)}</span></div>
+      <p class="why"><b>Perché:</b> ${sug.why}</p>
       ${ruleHTML($("#fCat").value)}
       <div class="legal" style="margin-top:12px"><b>${law.ref}.</b> ${law.text}</div>
       <p class="note">Annuncio in bozza: <b>${esc($("#fWhat").value)}</b>, ${esc(CATS[$("#fCat").value])}, ${esc(p.n)}. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
       <form class="handin" id="handin">
         <b>L'hai già consegnato?</b>
         <div class="row">
-          <label>A quale ufficio<select id="hOffice" required>${handinOffices(p, transport)}</select></label>
+          <label>A quale ufficio<select id="hOffice" required>${handinOffices(p, transport, sug.src)}</select></label>
           <label>Il giorno<input type="date" id="hDate" required max="2026-10-18" value="2026-10-18"></label>
         </div>
         <input id="hOther" placeholder="Nome dell'ufficio" hidden>
@@ -974,9 +975,32 @@ function bind(){
   });
 }
 /* uffici proposti per la consegna: prima quelli dello stesso paese del luogo, poi i trasporti se pertinenti */
-function handinOffices(p, transport){
+function handinOffices(p, transport, pick){
   const near = R.sources.filter(x => x.c === p.c && (transport || !["ffs","apt","tpl","tno"].includes(x.id)));
-  return `<option value="">Scegli…</option>` + near.map(x => `<option value="${x.id}">${esc(x.n)}</option>`).join("") + `<option value="altro">Altro ufficio</option>`;
+  return `<option value="">Scegli…</option>` + near.map(x => `<option value="${x.id}"${x.id===pick?" selected":""}>${esc(x.n)}</option>`).join("") + `<option value="altro">Altro ufficio</option>`;
+}
+/* ufficio suggerito in base a dove è stato trovato: mezzo o luogo di un servizio pubblico → sportello di quel servizio, altrimenti polizia/comune */
+function suggestOffice(text, placeId){
+  const p = R.places[placeId], t = text.toLowerCase();
+  const a720 = `<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>`;
+  const a927 = `<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>`;
+  const street = /fermata|marciapiede|strada|via |piazza|parco|parcheggio/.test(t) && !/\b(sul|sull'|nel|a bordo)\b.*(bus|treno|tram|autopostale)/.test(t);
+  const train = /treno|ffs|stazione|binario|\bre\d|\bs\d|tilo|trenord/.test(t), bus = /\bbus\b|autobus|autopostale|postale|tram|filobus/.test(t);
+  const place = /negozio|supermercato|ristorante|bar\b|museo|ospedale|scuola|ufficio|cinema|albergo|hotel|palestra/.test(t);
+  if(p.c === "CH" && !street && (train || bus)){
+    const op = train ? {src:"ffs", n:"FFS oggetti trovati", d:`Sportello in stazione a ${p.n} o personale del treno.`}
+      : /autopostale|postale/.test(t) || placeId !== "lugano" ? {src:"apt", n:"Azienda del bus (es. AutoPostale)", d:"Consegnalo all'autista o allo sportello dell'azienda che gestisce la linea."}
+      : {src:"tpl", n:"TPL Lugano", d:"Consegnalo all'autista o allo sportello TPL."};
+    return {...op, why:`l'hai trovato su un mezzo o in un luogo di un servizio di trasporto pubblico: va consegnato al personale di quel servizio, non alla polizia (${a720} cpv. 3).`};
+  }
+  if(p.c === "CH" && !street && place)
+    return {src:null, n:"Il personale del luogo", d:"Il gestore del negozio, dell'ufficio o della struttura dove l'hai trovato.", why:`in un luogo aperto al pubblico va consegnato a chi lo gestisce (${a720} cpv. 3).`};
+  if(p.c === "IT" && !street && (train || bus))
+    return {src: train ? "tno" : null, n: train ? "Trenord, oggetti smarriti" : "Azienda del trasporto locale", d: train ? "Personale di bordo o ufficio in stazione." : "Consegnalo all'autista o all'ufficio oggetti smarriti dell'azienda.", why:`le aziende di trasporto hanno propri uffici oggetti smarriti per i loro mezzi e stazioni. In alternativa vale la consegna al sindaco del comune (${a927}).`};
+  const off = R.offices[p.c], src = R.sources.find(x => x.c === p.c && x.n.toLowerCase().includes(p.n.toLowerCase()) && !["ffs","apt","tpl","tno"].includes(x.id));
+  return {src: src ? src.id : null, n: src ? src.n : off.n, d: off.d,
+    why: p.c === "CH" ? `${street ? "strade, piazze e fermate all'aperto sono suolo pubblico, quindi vale la regola normale: " : ""}chi trova un oggetto e non conosce il proprietario avvisa la polizia o l'ufficio designato dal cantone (${a720}).`
+      : `${street ? "strade, piazze e fermate all'aperto sono suolo pubblico: " : ""}l'oggetto va consegnato al sindaco del comune in cui l'hai trovato (${a927}).`};
 }
 function ruleHTML(cat){
   if(!cat) return "";
