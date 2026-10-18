@@ -413,10 +413,11 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 #enti .roadmap .step.now .eyebrow{color:var(--ink)}
 .mode-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
 .mode-row .mode{margin-bottom:12px}
-.mode-row .ex{margin:0 0 4px;position:relative;top:7px;line-height:1.1;border:0;background:none;color:var(--ink);font:inherit;font-size:.95rem;font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:2px 0;cursor:pointer;white-space:nowrap}
+.mode-row .ex{margin:0 9px 4px 0;position:relative;top:7px;line-height:1.1;border:0;background:none;color:var(--ink);font:inherit;font-size:.95rem;font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:2px 0;cursor:pointer;white-space:nowrap}
 .mode-row .ex:hover{text-decoration-thickness:2px}
 .bigq textarea{align-self:center!important;padding:6px 8px!important}
 .map-legend .showall{margin-left:auto;border:0;background:none;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.reward .more{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
@@ -516,7 +517,6 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
   <div>
     <div class="res-head">
       <h2 id="resTitle">▼ Ultimi oggetti trovati</h2>
-      <button class="btn ghost" id="toAlert" type="button">Crea un avviso con questa ricerca</button>
     </div>
     <!-- Fonti nascoste finché gli uffici non sono collegati davvero: si riattivano togliendo hidden -->
     <details class="src-d" hidden><summary>Fonti consultate: <span id="srcCount"></span></summary><div class="sources" id="sources" aria-label="Fonti consultate"></div></details>
@@ -571,23 +571,10 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 <section class="band" id="avvisi">
   <div class="wrap">
     <p class="eyebrow">Per chi ha perso</p>
-    <h2>Non c'è ancora? Lascia un avviso.</h2>
-    <p class="lead">Molti oggetti vengono registrati giorni dopo. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
-    <div class="two">
-      <form class="panel form" id="alertForm">
-        <label>Cosa hai perso, e dove <span class="note">Scrivilo con parole tue, ma resta sul generico: i dettagli particolari ti serviranno per dimostrare che è tuo.</span><textarea id="aWhat" rows="2" required placeholder="es. occhiali da sole, persi sabato a Locarno"></textarea></label>
-        <div class="understood" id="aUnderstood" aria-live="polite" style="padding:0"></div>
-        <div class="row">
-          <label hidden>Categoria<select id="aCat"></select></label>
-          <label class="askwhere" hidden>In che zona? <span class="note">Non lo abbiamo capito dal testo.</span><select id="aWhere"></select></label>
-        </div>
-        <label>Email per l'avviso<input id="aMail" type="email" placeholder="nome@esempio.ch"></label>
-        <button class="btn" type="submit">Crea avviso</button>
-      </form>
-      <div class="panel">
-        <h3 style="font-size:1.1rem">I tuoi avvisi</h3>
-        <div class="alerts" id="alerts"></div>
-      </div>
+    <h2>I tuoi avvisi</h2>
+    <p class="lead">Per creare un avviso cerca l'oggetto qui sopra e lascia la tua email sotto i risultati. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
+    <div class="panel" style="max-width:760px">
+      <div class="alerts" id="alerts"></div>
     </div>
   </div>
 </section>
@@ -765,9 +752,9 @@ function fillSelects(){
   const ch = placeOpts.filter(p => p[1].c==="CH").map(([k,p]) => `<option value="${k}">${esc(p.n)}</option>`).join("");
   const it = placeOpts.filter(p => p[1].c==="IT").map(([k,p]) => `<option value="${k}">${esc(p.n)}</option>`).join("");
   const placeHtml = `<option value="">Tutta la zona</option><optgroup label="Svizzera · Ticino">${ch}</optgroup><optgroup label="Italia · Como, Varese, VCO">${it}</optgroup>`;
-  $("#cat").innerHTML = catOpts; $("#aCat").innerHTML = catOpts;
+  $("#cat").innerHTML = catOpts;
   $("#fCat").innerHTML = catOpts.replace('<option value="">Tutte</option>', "");
-  $("#where").innerHTML = placeHtml; $("#aWhere").innerHTML = placeHtml;
+  $("#where").innerHTML = placeHtml;
   $("#fWhere").innerHTML = placeHtml.replace('<option value="">Tutta la zona</option>', '<option value="">Scegli il luogo</option>');
   $("#sources").insertAdjacentHTML("beforeend", R.sources.map(s =>
     `<label class="chip"><input type="checkbox" checked data-src="${s.id}"><span class="flag ${s.c}"></span>${esc(s.n)}</label>`).join(""));
@@ -946,9 +933,11 @@ function openItem(id){
       ${direct ? `
       <label class="check"><input type="checkbox" required> Dichiaro che l'oggetto è mio e che i dettagli indicati sono veri.</label>
       <p class="note" style="margin:0">A tutela di chi l'ha trovato, RITROVO conserva questa dichiarazione scritta con data e ora. Alla consegna confermate entrambi con una ricevuta digitale.</p>` : ""}
+      <p class="note reward" style="margin:0">Se è tuo, a chi l'ha trovato spetta per legge una ricompensa. <button class="more" type="button" data-law>Leggi di più…</button></p>
       <button class="btn" type="submit">Invia la richiesta ${to}</button>
     </form>`}`;
   $("#dlg").showModal();
+  const lawBtn = $("#claim [data-law]"); if(lawBtn) lawBtn.addEventListener("click", openLaw);
   $("#claim").addEventListener("submit", e => {
     e.preventDefault();
     e.target.outerHTML = it.reported && !direct
@@ -1046,7 +1035,6 @@ function bind(){
     if(changed) $(".refine-d").open = true;
   });
   ["#cat","#where","#when"].forEach(s => $(s).addEventListener("input", render));
-  aUpdate = smartField({input:$("#aWhat"), chips:$("#aUnderstood"), cat:$("#aCat"), where:$("#aWhere")});
   smartField({input:$("#fWhat"), chips:$("#fUnderstood"), cat:$("#fCat"), where:$("#fWhere")});
   $("#sources").addEventListener("change", e => { const id = e.target.dataset.src; if(!id) return; e.target.checked ? enabledSrc.add(id) : enabledSrc.delete(id); render(); });
   $("#list").addEventListener("click", e => { const b = e.target.closest(".item"); if(b) openItem(b.dataset.id); });
@@ -1056,10 +1044,6 @@ function bind(){
   $("#dlg").addEventListener("close", () => { selected = null; render(); });
   document.querySelectorAll(".langs button").forEach(b => b.addEventListener("click", () => { if(b.textContent !== "IT") toast(`Versione ${b.textContent} in preparazione. Il prototipo è solo in italiano.`); }));
 
-  $("#toAlert").addEventListener("click", () => {
-    $("#aWhat").value = $("#q").value; aUpdate();
-    $("#avvisi").scrollIntoView({behavior:"smooth"}); setTimeout(() => $("#aWhat").focus(), 400);
-  });
   /* contatti: email con dominio, oppure telefono con almeno 9 cifre dove è ammesso */
   const okContact = (v, any) => /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v) || (any && /^\+?[\d\s().\/-]+$/.test(v) && v.replace(/\D/g, "").length >= 9);
   document.addEventListener("input", e => {
@@ -1068,7 +1052,7 @@ function bind(){
     e.target.setCustomValidity(!v || okContact(v, c === "any") ? "" : c === "any" ? "Scrivi un'email o un numero di telefono valido." : "Scrivi un'email valida.");
   });
   /* categoria e zona si ricavano dal testo; la zona si chiede solo se il testo non la dice */
-  [["#fWhat","#fWhere"],["#aWhat","#aWhere"]].forEach(([t, w]) => {
+  [["#fWhat","#fWhere"]].forEach(([t, w]) => {
     const lab = $(w).closest("label"); let picked = false;
     $(w).addEventListener("change", () => { picked = true; });
     $(w).addEventListener("invalid", () => { lab.hidden = false; setTimeout(() => $(w).focus()); });
@@ -1090,13 +1074,6 @@ function bind(){
     const f = e.target; f.classList.add("done");
     f.innerHTML = `<p class="qa-t">Fatto. Ti abbiamo mandato un link per confermare.</p><p class="qa-n">In ogni avviso trovi il link per disattivarlo. In questo prototipo nulla viene inviato.</p>`;
     render();
-  });
-  $("#alertForm").addEventListener("submit", e => {
-    e.preventDefault();
-    alerts = alerts.filter(a => !a.example);
-    alerts.unshift({what:$("#aWhat").value, cat:$("#aCat").value, where:$("#aWhere").value});
-    store.set(alerts); e.target.reset(); aUpdate(); renderAlerts(); render();
-    toast("Avviso creato. Gli oggetti compatibili sono segnati in verde nei risultati.");
   });
   $("#alerts").addEventListener("click", e => {
     const i = e.target.dataset.del; if(i === undefined) return;
@@ -1173,7 +1150,7 @@ function renderAlerts(){
     const n = ITEMS.filter(it => (!a.cat || a.cat === it.cat) && (!a.where || a.where === it.p || R.places[a.where].c === R.places[it.p].c) && score(it, words(a.what)) >= .5).length;
     return `<div class="alert-row"><div><b>${esc(a.what)}</b>${a.example?' <span class="pill held">esempio</span>':""}<div class="note">${esc(CATS[a.cat]||"Tutte le categorie")} · ${esc(a.where?R.places[a.where].n:"tutta la zona")} · ${n ? `<span class="yes">${n} compatibil${n===1?"e":"i"}</span>` : "nessuno per ora"}</div></div>
       <button class="btn ghost" type="button" data-del="${i}" aria-label="Elimina avviso">Elimina</button></div>`;
-  }).join("") : `<p class="note">Nessun avviso. Creane uno a sinistra.</p>`;
+  }).join("") : `<p class="note">Nessun avviso per ora.</p>`;
 }
 /* illustrazione hero: scaffale di pittogrammi come le caselle di un ufficio oggetti trovati */
 function drawTiles(){
