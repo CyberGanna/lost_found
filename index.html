@@ -497,7 +497,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <div class="list" id="list"></div>
     <form class="qalert" id="qAlert" hidden>
       <p class="qa-t" id="qaT">Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.</p>
-      <div class="qa-row"><input id="qaMail" required autocomplete="email" placeholder="Email o numero di telefono" aria-label="Email o numero di telefono"><button class="btn" type="submit">Avvisami</button></div>
+      <div class="qa-row"><input id="qaMail" type="email" required autocomplete="email" placeholder="La tua email" aria-label="La tua email"><button class="btn" type="submit">Avvisami</button></div>
       <p class="qa-n">Non serve registrarsi.</p>
     </form>
   </div>
@@ -911,7 +911,7 @@ function openItem(id){
     ${it.reported && !direct ? `<form class="steps" id="claim">
       <b>È tuo? Ti avvisiamo quando arriva all'ufficio</b>
       <p class="note" style="margin:0">Per ora l'oggetto è ancora presso chi l'ha trovato. Appena ${esc(s.n)} lo registra ti scriviamo: allora potrai chiederne il ritiro rispondendo a due domande. Porta un documento d'identità.</p>
-      <label class="q">Email o numero di telefono<input id="c4" required autocomplete="email"></label>
+      <label class="q">La tua email<input id="c4" type="email" required autocomplete="email"></label>
       <button class="btn" type="submit">Avvisami quando arriva all'ufficio</button>
     </form>` : `<form class="steps" id="claim">
       <b>${direct ? "È tuo? Descrivilo per iscritto" : "È tuo? Rispondi a due domande"}</b>
