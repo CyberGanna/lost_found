@@ -316,10 +316,12 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{position:relative}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
-.bigq{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"q go" "ex go";align-items:start;row-gap:0}
-.bigq textarea{grid-area:q;align-self:start}
-.bigq .ex{grid-area:ex;justify-self:start;align-self:end;padding:0 8px 4px;font-size:.85rem}
-.bigq .btn.go{grid-area:go;align-self:stretch;max-height:none;min-height:56px}
+.bigq{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"q x go" "ex x go";align-items:start;row-gap:0;column-gap:4px}
+.bigq textarea{grid-area:q;align-self:start;padding:6px 8px 0!important}
+.bigq .ex{grid-area:ex;justify-self:start;align-self:end;padding:0 8px 2px;font-size:.8rem}
+.bigq .clr{grid-area:x;align-self:center;border:0;background:none;font-size:1.6rem;line-height:1;color:var(--muted);cursor:pointer;padding:4px 8px}
+.bigq .clr:hover{color:var(--ink)}
+.bigq .btn.go{grid-area:go;align-self:stretch;max-height:none;min-height:48px}
 .bigq textarea{resize:none;overflow:hidden;font-family:inherit;line-height:1.35;align-self:center;color:var(--ink);outline:none}
 .bigq{align-items:flex-end}.bigq .btn.go{align-self:stretch;max-height:64px}
 .bigq .btn.go{padding:0;width:56px;min-width:56px;display:grid;place-items:center}
@@ -398,6 +400,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
         <div class="bigq">
           <label for="q" class="sr">Descrivi l'oggetto</label>
           <textarea id="q" rows="1" placeholder="Scrivi qui, es. portafoglio marrone a Como" autocomplete="off" enterkeyhint="go"></textarea>
+          <button class="clr" type="button" id="qClr" aria-label="Cancella il testo" title="Cancella" hidden>×</button>
           <button class="ex" type="button" id="qEx" title="Compila con un esempio">Esempio</button>
           <button class="btn go" type="submit" id="qGo" aria-label="Cerca" title="Cerca"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button>
         </div>
@@ -952,7 +955,10 @@ function bind(){
     const empty = !qa.value; if(empty) qa.value = qa.placeholder;   // misura anche il segnaposto, che su telefono va a capo
     qa.style.height = "auto"; qa.style.height = qa.scrollHeight + "px"; if(empty) qa.value = "";
   };
-  qa.addEventListener("input", grow); window.addEventListener("resize", grow); grow();
+  qa.addEventListener("input", grow);
+  const clr = $("#qClr"), showClr = () => { clr.hidden = !qa.value; grow(); };
+  qa.addEventListener("input", showClr);
+  clr.addEventListener("click", () => { qa.value = ""; qa.dispatchEvent(new Event("input", {bubbles:true})); qa.focus(); }); window.addEventListener("resize", grow); grow();
   qa.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); $("#searchForm").requestSubmit(); } });
   smartField({input:$("#q"), chips:$("#qUnderstood"), cat:$("#cat"), where:$("#where"), when:$("#when"), onChange:render});
   ["#cat","#where","#when"].forEach(s => $(s).addEventListener("input", render));
