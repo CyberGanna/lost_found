@@ -199,7 +199,6 @@ footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px sol
 @media (max-width:480px){
   .form .row{grid-template-columns:1fr}
   .item{grid-template-columns:44px minmax(0,1fr)}
-  .item .pill{grid-column:2;justify-self:start}
   .ico{width:44px;height:44px}
   .top-tools{width:100%}
   select.region{flex:1;max-width:none;min-width:0}
@@ -311,6 +310,10 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .disc{font-size:.95rem;max-width:62ch}
 .how .note{font-size:1rem}
 .how b{font-size:1.25rem}
+
+.state{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.since{font-size:.75rem;color:var(--muted);white-space:nowrap}
+@media (max-width:480px){ .item .state{grid-column:2;align-items:flex-start} }
 </style>
 </head>
 <body>
@@ -622,7 +625,7 @@ const ITEMS = [
   {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio rosso con cerniera", desc:"Portafoglio piccolo rosso, chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
   {id:"FFS-26-117950", cat:"bici", t:"Bicicletta da città nera", desc:"Bici olandese nera con cestino anteriore, lucchetto tagliato.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
   {id:"VA-RIN-2026-0221", cat:"occhiali", t:"Occhiali da vista con montatura tartarugata", desc:"Montatura tonda tartarugata, astuccio blu.", p:"luino", spot:"Mercato del mercoledì", src:"var", days:6}
-].map(it => ({...it, date:d(it.days)}));
+].map((it,i) => { const lag = Math.min(it.days, i % 3); return {...it, date:d(it.days), custody:d(it.days - lag)}; });
 
 /* ---------- STATO ---------- */
 const R = REGIONS.ticino;
@@ -718,7 +721,7 @@ function render(){
       <span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[it.cat]}</svg></span>
       <span style="min-width:0"><h3>${esc(it.t)}</h3>
         <span class="meta"><span><span class="flag ${p.c}" style="display:inline-block;width:10px;height:7px;border-radius:1px"></span> ${esc(p.n)}, ${esc(it.spot)}</span><span>${ago(it.days)}</span><span>${esc(s.n)}</span></span></span>
-      ${pill}</button>`;
+      <span class="state">${pill}<span class="since">in custodia dal ${fmtDate(it.custody)}</span></span></button>`;
   }).join("") : `<div class="empty">Nessun oggetto corrisponde, per ora. Gli uffici registrano spesso con qualche giorno di ritardo.<br><br><button class="btn signal" type="button" onclick="document.getElementById('toAlert').click()">Avvisami quando compare</button></div>`;
   drawMap(res);
 }
@@ -791,8 +794,9 @@ function openItem(id){
     <p>${esc(it.desc)}</p>
     <dl class="facts">
       <dt>Trovato</dt><dd>${esc(it.spot)}, ${esc(p.n)} (${law.name})</dd>
-      <dt>Data</dt><dd>${fmtDate(it.date)} 2026, ${ago(it.days)}</dd>
-      <dt>In custodia presso</dt><dd>${esc(s.n)} <span class="note">· fonte: ${esc(s.via)}</span></dd>
+      <dt>Trovato il</dt><dd>${fmtDate(it.date)} 2026, ${ago(it.days)}</dd>
+      <dt>Consegnato in custodia</dt><dd>${fmtDate(it.custody)} 2026</dd>
+      <dt>In custodia presso</dt><dd>${esc(s.n)}</dd>
       <dt>Reclamabile per</dt><dd>${law.keep}</dd>
     </dl>
     <div class="legal"><b>${law.name}, ${law.ref}.</b> ${law.text}</div>
