@@ -315,6 +315,10 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{position:relative}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
+.tip-box .more{display:block;margin-top:8px;padding:0;border:0;background:none;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;color:var(--ink)}
+.lawdoc h3{font-family:var(--display);text-transform:uppercase;font-size:1.05rem;margin:18px 0 6px}
+.lawdoc p,.lawdoc li{line-height:1.5;margin:0 0 8px}.lawdoc ul{padding-left:20px;margin:0 0 8px}
+.lawdoc a{color:var(--ink);font-weight:700}
 .check{display:flex;gap:8px;align-items:flex-start;font-size:.92rem}.check input{margin-top:3px;width:auto}
 .handin{display:grid;gap:10px;margin:16px 0 12px;padding:14px;border:2px solid var(--ink);border-radius:2px;background:var(--surface)}
 .handin label{display:grid;gap:4px;font-weight:700;font-size:.9rem}
@@ -445,7 +449,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
   <div class="wrap">
     <p class="eyebrow">Per chi trova</p>
     <h2>Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
-    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non conosce il proprietario</b> deve avvisare l'autorità: in Svizzera la polizia (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>; i cantoni possono designare un altro ufficio, esclusi gli oggetti di poco valore), in Italia consegnarlo al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Se il proprietario si fa avanti puoi restituirglielo direttamente, <b>solo se</b> è un oggetto comune (non chiavi, documenti, telefoni, gioielli o altri oggetti di valore) e chi lo reclama ne descrive per iscritto su Ritrovo i dettagli nascosti. Negli altri casi consegnalo all'ufficio.</span><span>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
+    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non conosce il proprietario</b> deve avvisare l'autorità: in Svizzera la polizia (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>; i cantoni possono designare un altro ufficio, esclusi gli oggetti di poco valore), in Italia consegnarlo al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
     <div class="two">
       <form class="panel form" id="foundForm">
         <label>Cosa hai trovato, e dove<textarea id="fWhat" rows="2" required placeholder="es. zaino blu con dei libri, sul bus a Bellinzona"></textarea></label>
@@ -852,6 +856,36 @@ function openItem(id){
   });
 }
 
+function openLaw(){
+  const ch = n => `<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_${n}" target="_blank" rel="noopener">art. ${n} CC</a>`;
+  const it = n => `<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art${n}.html" target="_blank" rel="noopener">art. ${n} c.c.</a>`;
+  $("#dlgBody").innerHTML = `
+    <div class="dlg-head"><div><p class="eyebrow">Cosa dice la legge</p><h2>Hai trovato un oggetto: cosa devi fare</h2></div>
+      <button class="x" type="button" aria-label="Chiudi" data-close>×</button></div>
+    <div class="lawdoc">
+      <h3>Se conosci il proprietario</h3>
+      <p>Restituiscilo a lui. In Svizzera e in Italia l'obbligo di avvisare o consegnare all'autorità vale solo se il proprietario <b>non</b> è noto.</p>
+      <h3>Se non lo conosci</h3>
+      <p><b>Svizzera</b> (${ch(720)}): avvisa la polizia o l'ufficio designato dal cantone (in Ticino la polizia comunale). Per gli oggetti di valore inferiore a 10 franchi l'avviso non è obbligatorio. Se trovi l'oggetto in una casa abitata, in un negozio o su un mezzo di trasporto, consegnalo al gestore (per esempio FFS, AutoPostale o il negozio).</p>
+      <p><b>Italia</b> (${it(927)}): consegnalo senza ritardo al sindaco del comune dove l'hai trovato, di solito tramite la polizia locale. Il comune lo pubblica all'albo pretorio (${it(928)}).</p>
+      <h3>Quando puoi restituirlo direttamente con Ritrovo</h3>
+      <p>Se il proprietario si fa avanti su Ritrovo puoi restituirglielo tu, <b>solo se</b> sono vere tutte queste condizioni:</p>
+      <ul>
+        <li>è un oggetto comune (abbigliamento, borse, occhiali, biciclette e simili);</li>
+        <li>chi lo reclama ha descritto per iscritto su Ritrovo i dettagli che l'annuncio non mostra, e corrispondono;</li>
+        <li>alla consegna confermate entrambi e si genera una ricevuta digitale.</li>
+      </ul>
+      <p>Ritrovo non verifica l'identità: la dichiarazione scritta ti tutela, ma la decisione di restituire resta tua. Se hai dubbi, consegnalo all'ufficio.</p>
+      <h3>Sempre all'ufficio</h3>
+      <p>Chiavi, documenti, portafogli, telefoni, gioielli e altri oggetti di valore. L'ufficio verifica l'identità di chi li reclama e tiene un registro.</p>
+      <h3>Il compenso per chi trova</h3>
+      <p><b>Svizzera</b> (${ch(722)}): se il proprietario non lo reclama entro 5 anni, l'oggetto diventa tuo. Se lo reclama, hai diritto al rimborso delle spese e a una ricompensa adeguata, di solito circa il 10% del valore.</p>
+      <p><b>Italia</b> (${it(929)}, ${it(930)}): se nessuno lo reclama entro un anno dalla pubblicazione, l'oggetto diventa tuo. Se il proprietario lo ritira, ti spetta un premio del 10% del valore (5% sulla parte oltre 5'164,57 euro).</p>
+      <h3>Privacy</h3>
+      <p>Non pubblicare documenti, foto di persone o dati personali. Descrivi l'oggetto senza i dettagli che lo identificano: servono per riconoscere il vero proprietario.</p>
+    </div>`;
+  $("#dlg").showModal();
+}
 /* ---------- EVENTI ---------- */
 function bind(){
   $("#searchForm").addEventListener("submit", e => {
@@ -959,7 +993,7 @@ function drawTiles(){
 let tt; function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 3200); }
 
 document.querySelectorAll(".tip").forEach(t => {
-  t.addEventListener("click", e => { e.stopPropagation(); if(!e.target.closest("a")) t.classList.toggle("open"); });
+  t.addEventListener("click", e => { e.stopPropagation(); if(e.target.closest("[data-law]")){ t.classList.remove("open"); openLaw(); return; } if(!e.target.closest("a")) t.classList.toggle("open"); });
   t.addEventListener("keydown", e => { if(e.key === "Escape"){ t.classList.remove("open"); t.blur(); } });
 });
 document.addEventListener("click", () => document.querySelectorAll(".tip.open").forEach(t => t.classList.remove("open")));
