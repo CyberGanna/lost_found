@@ -316,6 +316,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{position:relative}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
+#resTitle,#trovato,#avvisi{scroll-margin-top:calc(var(--top,110px) + 12px)}
 .why{font-size:.92rem;line-height:1.45;margin:8px 0 0}.why a{color:var(--ink);font-weight:700}
 .dir{color:var(--ink);font-weight:700;text-decoration:none}.dir span{font-weight:700;font-size:.85rem;margin-left:6px;padding:1px 6px;background:var(--signal);border:1px solid var(--ink);border-radius:2px;white-space:nowrap}
 .dir:hover span{background:var(--ink);color:var(--signal)}
@@ -399,7 +400,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       <ul class="trust"><li>Gratis</li><li>Senza registrazione</li><li>Svizzera e Italia</li></ul>
       <div class="disc">
         <p><b>Ritrovo non sostituisce l'ufficio oggetti trovati.</b></p>
-        <p>Chi trova un oggetto e non conosce il proprietario deve avvisare l'autorità: in Svizzera la polizia o, se l'ha trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, il personale di quel servizio (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In Italia va consegnato al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
+        <p>Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità. In Svizzera va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In Italia va consegnato al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
         <p>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</p>
       </div>
     </div>
@@ -454,7 +455,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
   <div class="wrap">
     <p class="eyebrow">Per chi trova</p>
     <h2>Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
-    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non conosce il proprietario</b> deve avvisare l'autorità: in Svizzera la polizia o, se l'ha trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, il personale di quel servizio (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In Italia va consegnato al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
+    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità. In Svizzera va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In Italia va consegnato al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
     <div class="two">
       <form class="panel form" id="foundForm">
         <label>Cosa hai trovato, e dove<textarea id="fWhat" rows="2" required placeholder="es. zaino blu con dei libri, sul bus a Bellinzona"></textarea></label>
@@ -789,7 +790,7 @@ function drawPins(res){
     const p = R.places[k], n = list.length, size = 22 + Math.min(n,5)*4, sel = list.some(i => i.id === selected);
     const icon = L.divIcon({className:"", html:`<div class="pin ${p.c} ${sel?"sel":""}" style="width:${size}px;height:${size}px">${n}</div>`, iconSize:[size,size], iconAnchor:[size/2,size/2]});
     L.marker([p.lat,p.lon], {icon, title:`${n} oggetti a ${p.n}`, keyboard:true}).addTo(lpins)
-      .on("click", () => { $("#where").value = k; render(); $("#list").scrollIntoView({behavior:"smooth",block:"start"}); });
+      .on("click", () => { $("#where").value = k; render(); $("#resTitle").scrollIntoView({behavior:"smooth",block:"start"}); });
   });
 }
 
@@ -906,7 +907,7 @@ function bind(){
       const f = $("#fWhat"); f.value = $("#q").value; f.dispatchEvent(new Event("input"));
       $("#trovato").scrollIntoView({behavior:"smooth"}); return;
     }
-    render(); $("#list").scrollIntoView({behavior:"smooth",block:"start"});
+    render(); $("#resTitle").scrollIntoView({behavior:"smooth",block:"start"});
   });
   document.querySelectorAll(".mode input").forEach(r => r.addEventListener("change", () => {
     $("#q").placeholder = r.value === "perso" ? "Scrivi qui, es. portafoglio marrone a Como" : "Scrivi qui, es. chiavi trovate sul bus a Lugano";
@@ -921,7 +922,7 @@ function bind(){
   smartField({input:$("#fWhat"), chips:$("#fUnderstood"), cat:$("#fCat"), where:$("#fWhere")});
   $("#sources").addEventListener("change", e => { const id = e.target.dataset.src; if(!id) return; e.target.checked ? enabledSrc.add(id) : enabledSrc.delete(id); render(); });
   $("#list").addEventListener("click", e => { const b = e.target.closest(".item"); if(b) openItem(b.dataset.id); });
-  $("#map").addEventListener("click", e => { const g = e.target.closest(".m-pin"); if(g){ $("#where").value = g.dataset.place; render(); $("#list").scrollIntoView({behavior:"smooth",block:"start"}); } });
+  $("#map").addEventListener("click", e => { const g = e.target.closest(".m-pin"); if(g){ $("#where").value = g.dataset.place; render(); $("#resTitle").scrollIntoView({behavior:"smooth",block:"start"}); } });
   $("#map").addEventListener("keydown", e => { if(e.key === "Enter" && e.target.closest(".m-pin")) e.target.closest(".m-pin").dispatchEvent(new MouseEvent("click",{bubbles:true})); });
   $("#dlg").addEventListener("click", e => { if(e.target.hasAttribute("data-close") || e.target === $("#dlg")) $("#dlg").close(); });
   $("#dlg").addEventListener("close", () => { selected = null; render(); });
