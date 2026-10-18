@@ -300,6 +300,17 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .how .scroll-cue:hover{background:var(--signal)}
 @media (prefers-reduced-motion:no-preference){ .scroll-cue span{display:inline-block;animation:nudge 1.6s ease-in-out infinite} @keyframes nudge{0%,100%{transform:translateY(-2px)}50%{transform:translateY(4px)}} }
 
+
+/* titolo molto grande e testi della hero più leggibili */
+.hero h1{font-size:clamp(3.6rem,10vw,8.5rem);line-height:.9}
+.hero h1 span{display:inline-block;margin-top:.06em}
+.bigq input{font-size:1.25rem}
+.mode span{font-size:1.1rem}
+.refine-d summary{font-size:1rem}
+.trust{font-size:1.05rem}
+.disc{font-size:.95rem;max-width:62ch}
+.how .note{font-size:1rem}
+.how b{font-size:1.25rem}
 </style>
 </head>
 <body>
