@@ -7,6 +7,7 @@
 <title>Ritrovo Ticino</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 html,body{margin:0}[hidden]{display:none!important}img{max-width:100%}
@@ -282,6 +283,22 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .fold{display:flex;flex-direction:column;min-height:calc(100svh - var(--top,110px) - env(safe-area-inset-top,0px))}
 .fold .hero{flex:1;display:flex;align-items:center}
 .fold .hero > .wrap{width:100%}
+
+/* carta swisstopo (Leaflet); se le tessere non arrivano resta la mappa schematica */
+#lmap{height:min(68vh,560px);width:100%;border:2px solid var(--ink)}
+.pin{display:grid;place-items:center;border-radius:50%;color:#fff;font:700 12px/1 var(--body);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.pin.CH{background:var(--ch)} .pin.IT{background:var(--it)}
+.pin.sel{outline:3px solid var(--ink)}
+.leaflet-container{font-family:var(--body)}
+@media (max-width:900px){ #lmap{height:340px} }
+
+.fold .hero{flex-direction:column;justify-content:center}
+.cue-row{display:flex;justify-content:flex-end;margin-top:24px}
+.fold .hero > .hero-grid{margin-block:auto}
+.scroll-cue{display:inline-flex;align-items:center;gap:10px;border:3px solid var(--ink);background:var(--surface);color:var(--ink);text-decoration:none;font-family:var(--display);font-weight:800;font-stretch:85%;text-transform:uppercase;letter-spacing:.03em;padding:10px 18px}
+.scroll-cue:hover{background:var(--ink);color:var(--signal)}
+@media (prefers-reduced-motion:no-preference){ .scroll-cue span{display:inline-block;animation:nudge 1.6s ease-in-out infinite} @keyframes nudge{0%,100%{transform:translateY(-2px)}50%{transform:translateY(4px)}} }
+@media (max-width:900px){ .cue-row{justify-content:flex-start} }
 </style>
 </head>
 <body>
@@ -355,6 +372,8 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       </svg>
     </div>
   </div>
+  <div class="wrap cue-row"><a class="scroll-cue" href="#risultati"><span aria-hidden="true">▼</span> Scorri per vedere gli ultimi oggetti trovati</a>
+  </div>
 </section>
 
 <section class="how" aria-label="Come funziona">
@@ -376,11 +395,12 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <div class="list" id="list"></div>
   </div>
   <aside class="mapbox" aria-label="Mappa">
+    <div id="lmap" hidden role="region" aria-label="Carta nazionale swisstopo con gli oggetti trovati"></div>
     <svg id="map" viewBox="0 0 400 600" role="img" aria-label="Mappa schematica di Ticino, Como, Varese e Verbano con gli oggetti trovati"></svg>
     <div class="map-legend">
       <span><span class="flag CH chip-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ch)"></span> Ufficio svizzero</span>
       <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--it)"></span> Ufficio italiano</span>
-      <span>- - - confine (schematico)</span>
+      <span id="mapNote">- - - confine (schematico)</span>
     </div>
   </aside>
 </section>
@@ -471,6 +491,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 <div class="toast" id="toast" hidden></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ---------- CONFIGURAZIONE REGIONI ----------
    Per aggiungere una regione: un nuovo oggetto in REGIONS con luoghi, fonti e (se serve) un riquadro mappa.
@@ -691,7 +712,37 @@ function render(){
 
 /* ---------- MAPPA SCHEMATICA ---------- */
 function line(pts){ return pts.map((p,i) => { const q = proj({lon:p[0],lat:p[1]}); return `${i?"L":"M"}${q.x.toFixed(1)} ${q.y.toFixed(1)}`; }).join(" "); }
+/* Carta nazionale della Confederazione (swisstopo, WMTS in Web Mercator). Copre la Svizzera e le zone di confine. */
+const SWISSTOPO = "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg";
+let lmap = null, lpins = null, lastRes = [];
+function initSwissMap(){
+  if(!window.L) return;
+  const box = $("#lmap"), svg = $("#map");
+  box.hidden = false; svg.style.display = "none";
+  lmap = L.map(box, {scrollWheelZoom:false, attributionControl:true}).fitBounds([[45.62,8.45],[46.56,9.32]]);
+  let ok = false;
+  const tiles = L.tileLayer(SWISSTOPO, {maxZoom:18, attribution:'© <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener">swisstopo</a>'}).addTo(lmap);
+  tiles.on("tileload", () => { if(!ok){ ok = true; $("#mapNote").textContent = "Carta nazionale © swisstopo"; } });
+  setTimeout(() => { if(!ok){ lmap.remove(); lmap = null; box.hidden = true; svg.style.display = ""; } }, 5000);
+  lpins = L.layerGroup().addTo(lmap);
+  drawPins(lastRes);
+}
+function drawPins(res){
+  if(!lmap) return;
+  lpins.clearLayers();
+  const byPlace = {};
+  res.forEach(it => (byPlace[it.p] = byPlace[it.p] || []).push(it));
+  Object.entries(byPlace).forEach(([k,list]) => {
+    const p = R.places[k], n = list.length, size = 22 + Math.min(n,5)*4, sel = list.some(i => i.id === selected);
+    const icon = L.divIcon({className:"", html:`<div class="pin ${p.c} ${sel?"sel":""}" style="width:${size}px;height:${size}px">${n}</div>`, iconSize:[size,size], iconAnchor:[size/2,size/2]});
+    L.marker([p.lat,p.lon], {icon, title:`${n} oggetti a ${p.n}`, keyboard:true}).addTo(lpins)
+      .on("click", () => { $("#where").value = k; render(); $("#list").scrollIntoView({behavior:"smooth",block:"start"}); });
+  });
+}
+
 function drawMap(res){
+  lastRes = res;
+  if(lmap) drawPins(res);
   const lakes = [
     [[8.82,46.18],[8.76,46.13],[8.72,46.05],[8.74,46.00],[8.66,45.93],[8.58,45.90],[8.56,45.84],[8.58,45.76]],
     [[8.86,45.965],[8.90,45.98],[8.95,46.005],[9.00,46.02],[9.08,46.03],[9.13,46.04]],
@@ -824,6 +875,7 @@ function drawTiles(){
 let tt; function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 3200); }
 
 fillSelects(); bind(); renderAlerts(); render();
+try{ initSwissMap(); }catch(e){ lmap = null; $("#lmap").hidden = true; $("#map").style.display = ""; }
 </script>
 </body>
 </html>
