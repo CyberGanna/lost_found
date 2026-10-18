@@ -454,7 +454,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
         <p><span class="imp">Nota importante</span><br><b>RITROVO non sostituisce l'ufficio oggetti trovati.</b></p>
         <p>Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità. In <span class="mid">Svizzera</span> va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
         <p>Se il proprietario si fa avanti su RITROVO, per gli oggetti comuni puoi restituirlo direttamente, dopo esserti accertato che sia davvero suo.</p>
-        <p>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</p>
+        <p>Non scrivere dati personali né numeri di documenti. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</p>
       </div>
     </div>
     <div class="hero-visual">
@@ -522,14 +522,13 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
           <label>Categoria <span class="note">affina</span><select id="fCat"></select></label>
           <label>Dove <span class="note">affina</span><select id="fWhere"></select></label>
         </div>
-        <label>Foto <span class="note">Facoltativa. Nascondi documenti e dati personali prima di caricarla.</span><input type="file" id="fPhoto" accept="image/*"></label>
         <div id="fRule" aria-live="polite"></div>
         <label>Dettagli che solo il proprietario conosce <span class="note">Non vengono pubblicati. Servono a verificare chi lo reclama.</span><input id="fSecret" placeholder="es. colore, marca, cosa c'è dentro, un segno particolare"></label>
         <button class="btn" type="submit">Trova l'ufficio competente</button>
       </form>
       <div class="panel" id="foundOut">
         <ol class="flow">
-          <li><div><b>Descrivi l'oggetto</b><span class="note">Foto e luogo bastano. I dati sensibili restano nascosti.</span></div></li>
+          <li><div><b>Descrivi l'oggetto</b><span class="note">Tipo di oggetto e luogo bastano. I dati sensibili restano nascosti.</span></div></li>
           <li><div><b>Ti indichiamo l'ufficio</b><span class="note">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.</span></div></li>
           <li><div><b>Consegni e ricevi la ricevuta</b><span class="note">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti. Obbligatorio per chiavi, documenti e oggetti di valore; gli oggetti comuni puoi anche restituirli tu.</span></div></li>
           <li><div><b>Il proprietario riceve un avviso</b><span class="note">Se ha creato un avviso compatibile, lo informiamo subito.</span></div></li>
@@ -957,7 +956,7 @@ function openLaw(){
       <p><b>Svizzera</b> (${ch(722)}): se il proprietario non lo reclama entro 5 anni, l'oggetto diventa tuo. Se lo reclama, hai diritto al rimborso delle spese e a una ricompensa adeguata, di solito circa il 10% del valore.</p>
       <p><b>Italia</b> (${it(929)}, ${it(930)}): se nessuno lo reclama entro un anno dalla pubblicazione, l'oggetto diventa tuo. Se il proprietario lo ritira, ti spetta un premio del 10% del valore (5% sulla parte oltre 5'164,57 euro).</p>
       <h3>Privacy</h3>
-      <p>Non pubblicare documenti, foto di persone o dati personali. Descrivi l'oggetto senza i dettagli che lo identificano: servono per riconoscere il vero proprietario.</p>
+      <p>Non scrivere dati personali né numeri di documenti. Descrivi l'oggetto senza i dettagli che lo identificano: servono per riconoscere il vero proprietario.</p>
     </div>`;
   $("#dlg").showModal();
 }
