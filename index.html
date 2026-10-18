@@ -616,7 +616,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     <p class="lead"><span data-i18n="trovato.3">La</span> <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge"><span data-i18n="trovato.4">legge</span><span class="tip-box" role="tooltip" id="tipLegge"><span data-i18n="tipLegge.1">Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità.</span><span data-i18n="tipLegge.2">In <span class="mid">Svizzera</span> si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</span><span data-i18n="tipLegge.3">In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span data-i18n="tipLegge.4">Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law data-i18n="tipLegge.5">Leggi di più…</button></span></span></span> <span data-i18n="trovato.5">chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</span></p>
     <div class="two">
       <form class="panel form" id="foundForm">
-        <p class="f3-lab"><b data-i18n="foundForm.1">Che oggetto è, e dove l'hai trovato</b> <span class="note" data-i18n="foundForm.2">Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.</span></p>
+        <p class="f3-lab"><b data-i18n="foundForm.1">Che oggetto è, e dove l'hai trovato</b> <span class="note" data-i18n="foundForm.2">Pubblichiamo solo il tipo di oggetto, il luogo e il giorno. Colore, marca e contenuto non scriverli: servono a riconoscere il vero proprietario.</span></p>
         <div class="q3 f3">
           <label class="qf qf-what"><span class="ql" data-i18n="q3.cosa">Cosa</span><textarea id="fWhat" rows="1" required role="combobox" aria-autocomplete="list" aria-controls="fSug" aria-expanded="false" placeholder="es. occhiali da sole" data-i18n-placeholder="attr.7" autocomplete="off"></textarea><ul class="qsug" id="fSug" role="listbox" hidden></ul></label>
           <label class="qf"><span class="ql" data-i18n="q3.dove">Dove</span><input id="fPlace" required autocomplete="off" placeholder="es. sul bus a Lugano" data-i18n-placeholder="f3.dove.ph"></label>
@@ -629,7 +629,6 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
           <label class="askwhere" hidden><span data-i18n="foundForm.4">Dove l'hai trovato?</span> <span class="note" data-i18n="foundForm.5">Non lo abbiamo capito dal testo.</span><select id="fWhere" required></select></label>
         </div>
         <div id="fRule" aria-live="polite"></div>
-        <label><span data-i18n="foundForm.6">Dettagli che solo il proprietario conosce</span> <span class="note" data-i18n="foundForm.7">Non vengono pubblicati. Servono a verificare chi lo reclama.</span><input id="fSecret" placeholder="es. colore, marca, cosa c'è dentro, un segno particolare" data-i18n-placeholder="attr.22"></label>
         <button class="btn" type="submit" data-i18n="foundForm.8">Trova l'ufficio competente</button>
       </form>
       <div class="panel" id="foundOut">
@@ -738,12 +737,10 @@ const STRINGS = { it: {
  "trovato.5": "chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.",
  "f3.dove.ph": "es. sul bus a Lugano",
  "foundForm.1": "Che oggetto è, e dove l'hai trovato",
- "foundForm.2": "Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.",
+ "foundForm.2": "Pubblichiamo solo il tipo di oggetto, il luogo e il giorno. Colore, marca e contenuto non scriverli: servono a riconoscere il vero proprietario.",
  "foundForm.3": "Categoria",
  "foundForm.4": "Dove l'hai trovato?",
  "foundForm.5": "Non lo abbiamo capito dal testo.",
- "foundForm.6": "Dettagli che solo il proprietario conosce",
- "foundForm.7": "Non vengono pubblicati. Servono a verificare chi lo reclama.",
  "foundForm.8": "Trova l'ufficio competente",
  "foundOut.1": "<b>Descrivi l'oggetto<\/b><span class=\"note\">Tipo di oggetto e luogo bastano. I dati sensibili restano nascosti.<\/span>",
  "foundOut.2": "<b>Ti indichiamo l'ufficio<\/b><span class=\"note\">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.<\/span>",
@@ -795,7 +792,6 @@ const STRINGS = { it: {
  "attr.19": "Carta nazionale swisstopo con gli oggetti trovati",
  "attr.20": "Mappa schematica di Ticino, Como, Varese e Verbano con gli oggetti trovati",
  "attr.21": "es. zaino, sul bus a Bellinzona",
- "attr.22": "es. colore, marca, cosa c'è dentro, un segno particolare"
 } };
 function applyStrings(lang){
   const S = Object.assign({}, STRINGS.it, STRINGS[lang] || {});
@@ -1321,7 +1317,7 @@ function bind(){
       <p class="why"><b>Perché:</b> ${sug.why}</p>
       ${ruleHTML($("#fCat").value)}
       <div class="legal" style="margin-top:12px"><b>${law.ref}.</b> ${law.text}</div>
-      <p class="note">Annuncio in bozza: <b>${esc(CATS[$("#fCat").value])}, ${esc(p.n)}, ${esc($("#fWhen").selectedOptions[0].text.toLowerCase())}</b>. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
+      <p class="note">Annuncio in bozza: <b>${esc(CATS[$("#fCat").value])}, ${esc(p.n)}, ${esc($("#fWhen").selectedOptions[0].text.toLowerCase())}</b>. Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
       <form class="handin" id="handin">
         <b>L'hai già consegnato?</b>
         <div class="row">
@@ -1373,7 +1369,7 @@ function ruleHTML(cat){
   if(cat === "animale") return `<div class="rule">Animale domestico: avvisa la polizia o porta l'animale da un veterinario, che legge il microchip e rintraccia il proprietario.</div>`;
   return OFFICE_ONLY.has(cat)
     ? `<div class="rule office-only"><b>Va consegnato all'ufficio.</b> Chiavi, documenti e oggetti di valore non si restituiscono direttamente: l'ufficio verifica l'identità di chi li reclama.</div>`
-    : `<div class="rule direct"><b>Puoi restituirlo tu.</b> Se il proprietario risponde correttamente al dettaglio nascosto vi mettiamo in contatto. RITROVO non verifica l'identità e la restituzione resta sotto la tua responsabilità; se preferisci, consegnalo all'ufficio.</div>`;
+    : `<div class="rule direct"><b>Puoi restituirlo tu.</b> Chi lo reclama descrive per iscritto dettagli che solo il proprietario conosce: li confronti tu con l'oggetto e, se corrispondono, vi mettiamo in contatto. RITROVO non verifica l'identità e la restituzione resta sotto la tua responsabilità; se preferisci, consegnalo all'ufficio.</div>`;
 }
 function renderAlerts(){
   $("#alerts").innerHTML = alerts.length ? alerts.map((a,i) => {
