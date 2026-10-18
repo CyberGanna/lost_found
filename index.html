@@ -435,14 +435,13 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       <a href="#enti">Per comuni e aziende</a>
     </nav>
     <div class="top-tools">
-      <select class="region" id="region" aria-label="Regione"></select>
+      <select class="region" id="region" aria-label="Regione" hidden></select>
       <div class="langs" role="group" aria-label="Lingua">
         <button aria-pressed="true">IT</button><button aria-pressed="false">DE</button><button aria-pressed="false">FR</button><button aria-pressed="false">EN</button>
       </div>
     </div>
   </div>
 </header>
-<div class="mockbar"><div class="wrap"><b>Prototipo.</b> Oggetti, uffici e numeri di pratica sono dati di esempio, non collegati alle fonti reali.</div></div>
 
 <main>
 <div class="fold">
@@ -746,6 +745,7 @@ const proj = p => ({ x:(p.lon - R.bbox.lon0) * R.bbox.kx, y:(R.bbox.lat1 - p.lat
 /* ---------- SELECT ---------- */
 function fillSelects(){
   const regionSel = $("#region");
+  regionSel.hidden = Object.values(REGIONS).filter(r => r.active).length < 2;   // il selettore compare solo con più regioni attive
   regionSel.innerHTML = Object.entries(REGIONS).map(([k,r]) => `<option value="${k}" ${r.active?"":"disabled"}>${esc(r.label)}</option>`).join("");
   const catOpts = `<option value="">Tutte</option>` + Object.entries(CATS).map(([k,v]) => `<option value="${k}">${esc(v)}</option>`).join("");
   const placeOpts = Object.entries(R.places).sort((a,b) => a[1].c.localeCompare(b[1].c) || a[1].n.localeCompare(b[1].n));
@@ -1007,7 +1007,7 @@ function bind(){
     const q = $("#q"); q.value = list[exI[m]]; q.dispatchEvent(new Event("input", {bubbles:true})); q.focus();
   });
   drawTiles();
-  const setTop = () => document.documentElement.style.setProperty("--top", (document.querySelector("header.top").offsetHeight + document.querySelector(".mockbar").offsetHeight) + "px");
+  const setTop = () => document.documentElement.style.setProperty("--top", (document.querySelector("header.top").offsetHeight) + "px");
   setTop(); window.addEventListener("resize", setTop);
   const upd = () => $("#srcCount").textContent = `${enabledSrc.size} di ${R.sources.length}`; upd(); $("#sources").addEventListener("change", upd);
   /* campo su più righe: cresce col testo, Invio cerca, Maiusc+Invio va a capo */
