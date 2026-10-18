@@ -4,11 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>RITROVO Ticino</title>
+<title>RITROVATO Ticino</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/leaflet/leaflet.css">
+<link rel="stylesheet" href="assets/fonts.css">
 <style>
 html,body{margin:0}[hidden]{display:none!important}img{max-width:100%}
 /* Layout: barra sticky + ricerca unica in alto, poi risultati a sinistra e mappa schematica del confine a destra; sezioni "ho trovato", "avvisi", "per enti" sotto. */
@@ -460,6 +459,7 @@ html.locked #gate{display:grid;place-items:center;min-height:100vh;background:va
 .q3.f3 .qf:last-child{border-right:0;border-bottom:0}
 #foundForm .row:not(:has(label:not([hidden]))){display:none}
 @media (max-width:640px){ .q3.f3{grid-template-columns:1fr} }
+.legal-links{margin-top:10px}.legal-links a{color:var(--muted)}.qalert .qa-n a{color:inherit}
 </style>
 </head>
 <body>
@@ -468,7 +468,7 @@ html.locked #gate{display:grid;place-items:center;min-height:100vh;background:va
 <script>try{ if(localStorage.getItem("ritrovo-ok") !== "789f0da840ca59e0d9314a276aacf482c4bfe91685f0404abf28b79da757a051") document.documentElement.classList.add("locked"); }catch(e){ document.documentElement.classList.add("locked"); }</script>
 <div id="gate" role="dialog" aria-modal="true" aria-labelledby="gateT">
   <form id="gateForm">
-    <p class="gate-logo">RITROVO</p>
+    <p class="gate-logo">RITROVATO</p>
     <h1 id="gateT">Sito di prova</h1>
     <p>Inserisci la password per entrare.</p>
     <div class="gate-row"><input id="gatePw" type="password" autocomplete="current-password" aria-label="Password" placeholder="Password" required><button class="btn go" type="submit" aria-label="Entra"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button></div>
@@ -486,9 +486,9 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
 </script>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#cerca" aria-label="Ritrovo, home" data-i18n-aria-label="attr.1">
+    <a class="brand" href="#cerca" aria-label="Ritrovato, home" data-i18n-aria-label="attr.1">
       <span class="brand-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2a2200" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M7.8 10.6l2 2 3.6-4"/></svg></span>
-      <span><b data-i18n="pagina.1">Ritrovo</b><small id="brandRegion"><span data-i18n="brandRegion.1">Ticino e zona di confine</span></small></span>
+      <span><b data-i18n="pagina.1">Ritrovato</b><small id="brandRegion"><span data-i18n="brandRegion.1">Ticino e zona di confine</span></small></span>
     </a>
     <nav class="main" aria-label="Sezioni" data-i18n-aria-label="attr.2" data-i18n="pagina.2">
       <a href="#cerca">Cerca</a>
@@ -543,11 +543,11 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
       </form>
       <ul class="trust"><li data-i18n="cerca.2">Gratis</li><li data-i18n="cerca.3">Senza registrazione</li><li data-i18n="cerca.4">Svizzera e Italia</li></ul>
       <div class="disc">
-        <p data-i18n="cerca.5"><b>RITROVO non sostituisce l'ufficio oggetti trovati.</b></p>
+        <p data-i18n="cerca.5"><b>RITROVATO non sostituisce l'ufficio oggetti trovati.</b></p>
         <p data-i18n="cerca.6a">Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità.</p>
         <p data-i18n="cerca.6b">In <span class="mid">Svizzera</span> si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</p>
         <p data-i18n="cerca.6c">In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
-        <p data-i18n="cerca.6d">Se il proprietario si fa avanti su RITROVO, per gli oggetti comuni puoi <span class="mid">restituirlo direttamente</span>, dopo esserti accertato che sia davvero suo.</p>
+        <p data-i18n="cerca.6d">Se il proprietario si fa avanti su RITROVATO, per gli oggetti comuni puoi <span class="mid">restituirlo direttamente</span>, dopo esserti accertato che sia davvero suo.</p>
         <p data-i18n="cerca.6e">Non scrivere dati personali né numeri di documenti. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama, chiedendo i dettagli dell'oggetto e un documento d'identità.</p>
       </div>
     </div>
@@ -594,7 +594,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     <form class="qalert" id="qAlert" hidden>
       <p class="qa-t" id="qaT" data-i18n="qaT.1">Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.</p>
       <div class="qa-row"><input id="qaMail" type="email" data-contact="email" required autocomplete="email" placeholder="La tua email" data-i18n-placeholder="attr.16" aria-label="La tua email" data-i18n-aria-label="attr.17"><button class="btn" type="submit" data-i18n="qAlert.1">Avvisami</button></div>
-      <p class="qa-n" data-i18n="qAlert.2">Non serve registrarsi.</p>
+      <p class="qa-n" data-i18n="qAlert.2">Non serve registrarsi. Ti scriviamo solo per questo avviso. <a href="privacy.html">Privacy</a></p>
     </form>
   </div>
   <aside class="mapbox" aria-label="Mappa" data-i18n-aria-label="attr.18">
@@ -613,7 +613,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
   <div class="wrap">
     <p class="eyebrow" data-i18n="trovato.1">Per chi trova</p>
     <h2 data-i18n="trovato.2">Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
-    <p class="lead"><span data-i18n="trovato.3">La</span> <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge"><span data-i18n="trovato.4">legge</span><span class="tip-box" role="tooltip" id="tipLegge"><span data-i18n="tipLegge.1">Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità.</span><span data-i18n="tipLegge.2">In <span class="mid">Svizzera</span> si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</span><span data-i18n="tipLegge.3">In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span data-i18n="tipLegge.4">Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law data-i18n="tipLegge.5">Leggi di più…</button></span></span></span> <span data-i18n="trovato.5">chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</span></p>
+    <p class="lead"><span data-i18n="trovato.3">La</span> <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge"><span data-i18n="trovato.4">legge</span><span class="tip-box" role="tooltip" id="tipLegge"><span data-i18n="tipLegge.1">Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità.</span><span data-i18n="tipLegge.2">In <span class="mid">Svizzera</span> si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</span><span data-i18n="tipLegge.3">In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span data-i18n="tipLegge.4">Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law data-i18n="tipLegge.5">Leggi di più…</button></span></span></span> <span data-i18n="trovato.5">chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVATO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</span></p>
     <div class="two">
       <form class="panel form" id="foundForm">
         <p class="f3-lab"><b data-i18n="foundForm.1">Che oggetto è, e dove l'hai trovato</b> <span class="note" data-i18n="foundForm.2">Pubblichiamo solo il tipo di oggetto, il luogo e il giorno. Colore, marca e contenuto non scriverli: servono a riconoscere il vero proprietario.</span></p>
@@ -659,7 +659,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     <p class="eyebrow" data-i18n="enti.1">Per comuni, polizie e aziende di trasporto</p>
     <h2 data-i18n="enti.2">Un solo annuncio, visto su entrambi i lati del confine.</h2>
     <p class="lead" data-i18n="enti.3">Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.</p>
-    <p class="cta-enti"><span data-i18n="enti.4">Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVO?</span> <button class="btn signal" type="button" id="contactUs" data-i18n="contactUs.1">Contattateci</button></p>
+    <p class="cta-enti"><span data-i18n="enti.4">Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVATO?</span> <button class="btn signal" type="button" id="contactUs" data-i18n="contactUs.1">Contattateci</button></p>
     <div class="grid3">
       <div class="panel"><h3 data-i18n="enti.5">Aggregatore</h3><p class="note" data-i18n="enti.6">Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono, in Svizzera e in Italia.</p></div>
       <div class="panel"><h3 data-i18n="enti.7">Registro per piccoli comuni</h3><p class="note" data-i18n="enti.8">Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (1 anno in Italia, 5 in Svizzera).</p></div>
@@ -671,18 +671,18 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
 </section>
 </main>
 
-<footer><div class="wrap" data-i18n="pagina.10">RITROVO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).</div></footer>
+<footer><div class="wrap" data-i18n="pagina.10">RITROVATO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).</div><nav class="wrap legal-links" aria-label="Informazioni legali"><a href="privacy.html">Privacy</a> · <a href="note-legali.html">Note legali</a> · <a href="condizioni-uso.html">Condizioni d'uso</a></nav></footer>
 
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 <div class="toast" id="toast" hidden></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="assets/leaflet/leaflet.js"></script>
 <script>
 /* ---------- TESTI DELL'INTERFACCIA ----------
    Tutti i testi fissi della pagina, per lingua. Per tradurre: aggiungere STRINGS.de / .fr / .en con le stesse chiavi;
    le chiavi mancanti restano in italiano. data-i18n sostituisce il contenuto, data-i18n-<attributo> l'attributo. */
 const STRINGS = { it: {
- "pagina.1": "Ritrovo",
+ "pagina.1": "Ritrovato",
  "brandRegion.1": "Ticino e zona di confine",
  "pagina.2": "\n      <a href=\"#cerca\">Cerca<\/a>\n      <a href=\"#trovato\">Ho trovato qualcosa<\/a>\n      <a href=\"#avvisi\">I miei avvisi<\/a>\n      <a href=\"#enti\">Per comuni e aziende<\/a>\n    ",
  "pagina.3": "IT",
@@ -702,11 +702,11 @@ const STRINGS = { it: {
  "cerca.2": "Gratis",
  "cerca.3": "Senza registrazione",
  "cerca.4": "Svizzera e Italia",
- "cerca.5": "<b>RITROVO non sostituisce l'ufficio oggetti trovati.<\/b>",
+ "cerca.5": "<b>RITROVATO non sostituisce l'ufficio oggetti trovati.<\/b>",
  "cerca.6a": "Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità.",
  "cerca.6b": "In <span class=\"mid\">Svizzera<\/span> si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href=\"https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720\" target=\"_blank\" rel=\"noopener\">art. 720 CC<\/a>).",
  "cerca.6c": "In <span class=\"mid\">Italia<\/span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href=\"https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html\" target=\"_blank\" rel=\"noopener\">art. 927 c.c.<\/a>).",
- "cerca.6d": "Se il proprietario si fa avanti su RITROVO, per gli oggetti comuni puoi <span class=\"mid\">restituirlo direttamente<\/span>, dopo esserti accertato che sia davvero suo.",
+ "cerca.6d": "Se il proprietario si fa avanti su RITROVATO, per gli oggetti comuni puoi <span class=\"mid\">restituirlo direttamente<\/span>, dopo esserti accertato che sia davvero suo.",
  "tileTip.1": "<b class=\"tt-ok\">Oggetto comune:<\/b> chi lo trova può restituirlo direttamente al proprietario, dopo essersi accertato che sia davvero suo.",
  "tileTip.2": "<b class=\"tt-no\">Oggetto personale o di valore:<\/b> va sempre consegnato a un ufficio pubblico, come la polizia o il Comune.",
  "petNew": "NOVITÀ",
@@ -720,7 +720,7 @@ const STRINGS = { it: {
  "risultati.1": "Fonti consultate:",
  "qaT.1": "Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.",
  "qAlert.1": "Avvisami",
- "qAlert.2": "Non serve registrarsi.",
+ "qAlert.2": "Non serve registrarsi. Ti scriviamo solo per questo avviso. <a href=\"privacy.html\">Privacy<\/a>",
  "risultati.2": "<span class=\"flag CH chip-dot\" style=\"display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ch)\"><\/span> Ufficio svizzero",
  "risultati.3": "<span style=\"display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--it)\"><\/span> Ufficio italiano",
  "mapNote.1": "- - - confine (schematico)",
@@ -734,7 +734,7 @@ const STRINGS = { it: {
  "tipLegge.3": "In <span class=\"mid\">Italia<\/span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href=\"https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html\" target=\"_blank\" rel=\"noopener\">art. 927 c.c.<\/a>).",
  "tipLegge.4": "Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.",
  "tipLegge.5": "Leggi di più…",
- "trovato.5": "chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.",
+ "trovato.5": "chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVATO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.",
  "f3.dove.ph": "es. sul bus a Lugano",
  "foundForm.1": "Che oggetto è, e dove l'hai trovato",
  "foundForm.2": "Pubblichiamo solo il tipo di oggetto, il luogo e il giorno. Colore, marca e contenuto non scriverli: servono a riconoscere il vero proprietario.",
@@ -752,7 +752,7 @@ const STRINGS = { it: {
  "enti.1": "Per comuni, polizie e aziende di trasporto",
  "enti.2": "Un solo annuncio, visto su entrambi i lati del confine.",
  "enti.3": "Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.",
- "enti.4": "Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVO?",
+ "enti.4": "Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVATO?",
  "contactUs.1": "Contattateci",
  "enti.5": "Aggregatore",
  "enti.6": "Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono, in Svizzera e in Italia.",
@@ -761,8 +761,8 @@ const STRINGS = { it: {
  "enti.9": "Verifica del proprietario",
  "enti.10": "Domande sui dettagli nascosti prima della restituzione, per ridurre truffe e falsi proprietari. Conforme a nLPD e GDPR.",
  "enti.11": "Dove arriviamo",
- "pagina.10": "RITROVO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).",
- "attr.1": "Ritrovo, home",
+ "pagina.10": "RITROVATO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).",
+ "attr.1": "Ritrovato, home",
  "attr.2": "Sezioni",
  "attr.3": "Regione",
  "attr.4": "Lingua",
@@ -1124,7 +1124,7 @@ function openItem(id){
       <button class="btn" type="submit">Avvisami quando arriva all'ufficio</button>
     </form>` : `<form class="steps" id="claim">
       <b>${direct ? "È tuo? Descrivilo per iscritto" : "È tuo? Rispondi a due domande"}</b>
-      <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (colore, contenuto, segni particolari). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " RITROVO non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
+      <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (colore, contenuto, segni particolari). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " RITROVATO non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
       <label class="q">Descrivi uno o più dettagli dell'oggetto<input id="c1" required placeholder="es. il colore, cosa c'era dentro, un segno particolare"></label>
       <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12" value="${direct ? esc($("#qWhere").value.trim()) : ""}"></label>
       <div class="row">
@@ -1133,7 +1133,7 @@ function openItem(id){
       </div>
       ${direct ? `
       <label class="check"><input type="checkbox" required> Dichiaro che l'oggetto è mio e che i dettagli indicati sono veri.</label>
-      <p class="note" style="margin:0">A tutela di chi l'ha trovato, RITROVO conserva questa dichiarazione scritta con data e ora. Alla consegna confermate entrambi con una ricevuta digitale.</p>` : ""}
+      <p class="note" style="margin:0">A tutela di chi l'ha trovato, RITROVATO conserva questa dichiarazione scritta con data e ora. Alla consegna confermate entrambi con una ricevuta digitale.</p>` : ""}
       <p class="note reward" style="margin:0">Se è tuo, a chi l'ha trovato spetta per legge una ricompensa. <button class="more" type="button" data-law>Leggi di più…</button></p>
       <button class="btn" type="submit">Invia la richiesta ${to}</button>
     </form>`}`;
@@ -1163,14 +1163,14 @@ function openLaw(){
       <p><b>Mezzi e luoghi pubblici</b> (${ch(720)} cpv. 3): se lo trovi in una casa abitata o in un luogo destinato all'uso pubblico o ai trasporti, per esempio un bus, un treno, una stazione, un negozio o un ufficio, consegnalo al personale o allo sportello di quel servizio, non alla polizia. Una fermata del bus in strada invece è suolo pubblico: vale la regola normale, polizia o ufficio del comune.</p>
       <p><b>Italia</b> (${it(927)}): consegnalo senza ritardo al sindaco del comune dove l'hai trovato, di solito tramite la polizia locale. Il comune lo pubblica all'albo pretorio (${it(928)}).</p>
       <p>Le aziende di trasporto (per esempio Trenord o ATM) hanno propri uffici oggetti smarriti per i loro mezzi e le loro stazioni.</p>
-      <h3>Quando puoi restituirlo direttamente con RITROVO</h3>
-      <p>Se il proprietario si fa avanti su RITROVO puoi restituirglielo tu, <b>solo se</b> sono vere tutte queste condizioni:</p>
+      <h3>Quando puoi restituirlo direttamente con RITROVATO</h3>
+      <p>Se il proprietario si fa avanti su RITROVATO puoi restituirglielo tu, <b>solo se</b> sono vere tutte queste condizioni:</p>
       <ul>
         <li>è un oggetto comune (abbigliamento, borse, occhiali, biciclette e simili);</li>
-        <li>chi lo reclama ha descritto per iscritto su RITROVO i dettagli che l'annuncio non mostra, e corrispondono;</li>
+        <li>chi lo reclama ha descritto per iscritto su RITROVATO i dettagli che l'annuncio non mostra, e corrispondono;</li>
         <li>alla consegna confermate entrambi e si genera una ricevuta digitale.</li>
       </ul>
-      <p>RITROVO non verifica l'identità: la dichiarazione scritta ti tutela, ma la decisione di restituire resta tua. Se hai dubbi, consegnalo all'ufficio.</p>
+      <p>RITROVATO non verifica l'identità: la dichiarazione scritta ti tutela, ma la decisione di restituire resta tua. Se hai dubbi, consegnalo all'ufficio.</p>
       <h3>Sempre all'ufficio</h3>
       <p>Chiavi, documenti, portafogli, telefoni, gioielli e altri oggetti di valore. L'ufficio verifica l'identità di chi li reclama e tiene un registro.</p>
       <h3>Il compenso per chi trova</h3>
@@ -1369,7 +1369,7 @@ function ruleHTML(cat){
   if(cat === "animale") return `<div class="rule">Animale domestico: avvisa la polizia o porta l'animale da un veterinario, che legge il microchip e rintraccia il proprietario.</div>`;
   return OFFICE_ONLY.has(cat)
     ? `<div class="rule office-only"><b>Va consegnato all'ufficio.</b> Chiavi, documenti e oggetti di valore non si restituiscono direttamente: l'ufficio verifica l'identità di chi li reclama.</div>`
-    : `<div class="rule direct"><b>Puoi restituirlo tu.</b> Chi lo reclama descrive per iscritto dettagli che solo il proprietario conosce: li confronti tu con l'oggetto e, se corrispondono, vi mettiamo in contatto. RITROVO non verifica l'identità e la restituzione resta sotto la tua responsabilità; se preferisci, consegnalo all'ufficio.</div>`;
+    : `<div class="rule direct"><b>Puoi restituirlo tu.</b> Chi lo reclama descrive per iscritto dettagli che solo il proprietario conosce: li confronti tu con l'oggetto e, se corrispondono, vi mettiamo in contatto. RITROVATO non verifica l'identità e la restituzione resta sotto la tua responsabilità; se preferisci, consegnalo all'ufficio.</div>`;
 }
 function renderAlerts(){
   $("#alerts").innerHTML = alerts.length ? alerts.map((a,i) => {
