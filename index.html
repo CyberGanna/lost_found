@@ -916,7 +916,7 @@ function openItem(id){
     </form>` : `<form class="steps" id="claim">
       <b>${direct ? "È tuo? Descrivilo per iscritto" : "È tuo? Rispondi a due domande"}</b>
       <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (colore, contenuto, segni particolari). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " RITROVO non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
-      <label class="q">Descrivi un dettaglio che non è nell'annuncio<input id="c1" required placeholder="es. il colore, cosa c'era dentro, un segno particolare"></label>
+      <label class="q">Descrivi uno o più dettagli dell'oggetto<input id="c1" required placeholder="es. il colore, cosa c'era dentro, un segno particolare"></label>
       <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12"></label>
       ${direct ? `<div class="row">
         <label class="q">Nome e cognome<input id="c3" required autocomplete="name"></label>
