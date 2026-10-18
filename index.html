@@ -419,7 +419,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
         </div>
         <div class="bigq">
           <label for="q" class="sr">Descrivi l'oggetto</label>
-          <textarea id="q" rows="1" placeholder="Scrivi qui, es. occhiali da sole graduati persi ieri sera in centro a Lugano" autocomplete="off" enterkeyhint="go"></textarea>
+          <textarea id="q" rows="1" placeholder="Cosa, dove, quando: scrivilo come lo diresti a un amico" autocomplete="off" enterkeyhint="go"></textarea>
           <button class="clr" type="button" id="qClr" aria-label="Cancella il testo" title="Cancella" hidden>×</button>
           <button class="ex" type="button" id="qEx" title="Compila con un esempio">Esempio</button>
           <button class="btn go" type="submit" id="qGo" aria-label="Cerca" title="Cerca"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button>
@@ -953,7 +953,7 @@ function bind(){
     render(); $("#resTitle").scrollIntoView({behavior:"smooth",block:"start"});
   });
   document.querySelectorAll(".mode input").forEach(r => r.addEventListener("change", () => {
-    $("#q").placeholder = r.value === "perso" ? "Scrivi qui, es. occhiali da sole graduati persi ieri sera in centro a Lugano" : "Scrivi qui, es. occhiali da sole graduati trovati ieri sera in centro a Lugano"; $("#q").dispatchEvent(new Event("input"));
+    $("#q").placeholder = r.value === "perso" ? "Cosa, dove, quando: scrivilo come lo diresti a un amico" : "Cosa, dove, quando: scrivilo come lo diresti a un amico"; $("#q").dispatchEvent(new Event("input"));
     $("#qHint").hidden = r.value !== "perso";
     const lbl = r.value === "perso" ? "Cerca" : "Avanti"; $("#qGo").setAttribute("aria-label", lbl); $("#qGo").title = lbl;
   }));
