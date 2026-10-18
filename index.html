@@ -263,6 +263,20 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .m-pin.sel circle{stroke:var(--ink)}
 @media (max-width:900px){ .hero-grid{grid-template-columns:minmax(0,1fr)} .hero-visual{max-width:420px} }
 @media (max-width:480px){ .bigq{flex-direction:column} .mode span{padding:8px 14px} }
+
+/* prima schermata: hero + "come funziona" stanno in uno schermo; sotto parte l'elenco */
+.hero{padding-block:28px 24px}
+.hero h1{font-size:clamp(2.6rem,6vw,4.2rem)}
+.mode{margin:18px 0 10px}
+.hero-visual svg{max-height:360px}
+.disc{margin-top:14px;font-size:.78rem}
+.trust{margin-top:12px}
+.how-grid{padding-block:16px}
+.results{padding-top:24px}
+#resTitle{font-size:clamp(1.6rem,3vw,2.2rem)}
+.src-d{margin:0 0 12px;font-size:.88rem}
+.src-d summary{cursor:pointer;font-weight:700;color:var(--muted);width:max-content}
+.src-d .sources{margin-top:8px}
 </style>
 </head>
 <body>
@@ -345,13 +359,13 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
   </div>
 </section>
 
-<section class="wrap results" aria-label="Risultati">
+<section class="wrap results" id="risultati" aria-label="Ultimi oggetti trovati">
   <div>
     <div class="res-head">
-      <h2 id="resTitle">Oggetti trovati</h2>
+      <h2 id="resTitle">▼ Ultimi oggetti trovati</h2>
       <button class="btn ghost" id="toAlert" type="button">Crea un avviso con questa ricerca</button>
     </div>
-    <div class="sources" id="sources" aria-label="Fonti consultate"><span class="note">Cerchiamo in:</span></div>
+    <details class="src-d"><summary>Fonti consultate: <span id="srcCount"></span></summary><div class="sources" id="sources" aria-label="Fonti consultate"></div></details>
     <div class="list" id="list"></div>
   </div>
   <aside class="mapbox" aria-label="Mappa">
@@ -655,7 +669,7 @@ function matchesAlert(it){ return alerts.some(a => (!a.cat || a.cat === it.cat) 
 
 function render(){
   const res = current();
-  $("#resTitle").textContent = !$("#q").value.trim() && !$("#cat").value && !$("#where").value ? "Ultimi oggetti registrati" : `${res.length} ${res.length===1?"oggetto trovato":"oggetti trovati"}`;
+  $("#resTitle").textContent = !$("#q").value.trim() && !$("#cat").value && !$("#where").value ? "▼ Ultimi oggetti trovati" : `${res.length} ${res.length===1?"oggetto trovato":"oggetti trovati"}`;
   $("#list").innerHTML = res.length ? res.map(it => {
     const p = R.places[it.p], s = srcOf(it.src);
     const pill = matchesAlert(it) ? `<span class="pill match">Compatibile col tuo avviso</span>` : it.days <= 2 ? `<span class="pill new">Nuovo</span>` : `<span class="pill held">In custodia</span>`;
@@ -739,6 +753,7 @@ function bind(){
     $("#q").placeholder = r.value === "perso" ? "Scrivi qui, es. portafoglio marrone a Como" : "Scrivi qui, es. chiavi trovate sul bus a Lugano";
   }));
   drawTiles();
+  const upd = () => $("#srcCount").textContent = `${enabledSrc.size} di ${R.sources.length}`; upd(); $("#sources").addEventListener("change", upd);
   smartField({input:$("#q"), chips:$("#qUnderstood"), cat:$("#cat"), where:$("#where"), when:$("#when"), onChange:render});
   ["#cat","#where","#when"].forEach(s => $(s).addEventListener("input", render));
   aUpdate = smartField({input:$("#aWhat"), chips:$("#aUnderstood"), cat:$("#aCat"), where:$("#aWhere")});
