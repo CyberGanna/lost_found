@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Ritrovo Ticino</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+html,body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+/* Layout: barra sticky + ricerca unica in alto, poi risultati a sinistra e mappa schematica del confine a destra; sezioni "ho trovato", "avvisi", "per enti" sotto. */
+:root{
+  /* Stile B "Segnaletica": per cambiare i colori basta modificare questi token. */
+  --bg:#f4f3ee; --surface:#ffffff; --ink:#111111; --muted:#55524a; --line:#d8d4c8;
+  --lake:#111111; --lake-soft:#fff2a8; --signal:#ffd100; --signal-ink:#111111;
+  --ch:#e2001a; --it:#1f8a4c; --ok:#1f8a4c; --warn:#a86a00; --trail:#e2001a;
+  --display:"Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  --r:4px;
+  color-scheme:light;
+}
+/* Tema unico chiaro, su richiesta: niente sfondo scuro nemmeno con il sistema in modalità scura. */
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+a{color:var(--lake)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+.mono{font-family:var(--mono);font-size:.82em}
+.eyebrow{font-size:.75rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+
+/* barra */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:var(--signal);display:grid;place-items:center}
+.brand b{font-family:var(--display);font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
+.brand small{display:block;font-size:.72rem;color:var(--muted);margin-top:-3px}
+nav.main{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav.main a{padding:6px 10px;border-radius:6px;text-decoration:none;color:var(--ink);font-weight:700;font-size:.92rem}
+nav.main a:hover{background:var(--lake-soft)}
+.top-tools{display:flex;gap:8px;align-items:center}
+select.region{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:5px 8px;font-size:.9rem;max-width:210px}
+.langs{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.langs button{border:0;background:transparent;padding:5px 8px;font-size:.8rem;font-weight:700;cursor:pointer;color:var(--muted)}
+.langs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+.mockbar{background:var(--signal);color:var(--signal-ink);font-size:.85rem}
+.mockbar .wrap{padding-block:6px}
+
+/* hero ricerca */
+.hero{padding-block:40px 36px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr);gap:40px;align-items:center}
+.hero h1{font-size:clamp(2.1rem,5vw,3.5rem);font-weight:800;letter-spacing:-.025em;max-width:16ch}
+.hero p.lead{color:var(--muted);max-width:56ch;margin:14px 0 22px;font-size:1.1rem}
+.examples{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px}
+.ex{border:1px dashed var(--lake);background:transparent;color:var(--lake);border-radius:999px;padding:4px 12px;font-size:.88rem;cursor:pointer}
+.ex:hover{background:var(--lake-soft)}
+.trust{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;margin:18px 0 0;font-size:.9rem;font-weight:700}
+.trust li::before{content:"✓";color:var(--ok);margin-right:6px}
+.found-link{display:inline-block;margin-top:14px;font-weight:700;text-decoration:none}
+.found-link:hover{text-decoration:underline}
+.hero-visual{position:relative;display:flex;flex-direction:column;gap:12px;padding:28px 24px;border-radius:24px;background:linear-gradient(160deg,#cfe6e6,#e9f2ef)}
+.notif{background:var(--surface);border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(21,33,29,.14);transform:rotate(-1.5deg)}
+.notif p{margin:6px 0 0;font-size:.92rem}
+.notif-top{display:flex;align-items:center;gap:8px;font-size:.85rem}
+.notif-top .note{margin-left:auto}
+.brand-mark.sm{width:22px;height:22px;border-radius:6px}
+.pcard{display:grid;grid-template-columns:90px minmax(0,1fr);gap:14px;background:var(--surface);border-radius:14px;padding:14px;box-shadow:0 6px 20px rgba(21,33,29,.08)}
+.pcard-ph{border-radius:10px;background:#e7d6c3;color:#7a5530;display:grid;place-items:center;min-height:90px}
+.pcard-b{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.fake-btn{margin-top:8px;background:var(--ink);color:var(--bg);border-radius:8px;padding:7px 12px;font-weight:700;font-size:.85rem}
+.stat-row{display:flex;justify-content:space-around;font-size:.85rem;color:var(--muted)}
+.stat-row b{font-family:var(--display);font-size:1.3rem;color:var(--ink);margin-right:4px}
+.how{border-block:1px solid var(--line);background:var(--surface)}
+.how-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding-block:20px}
+.how-grid div{display:flex;flex-direction:column;gap:2px}
+.results{padding-top:28px}
+.res-head + .sources{margin:0 0 12px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.search{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 8px 30px rgba(31,111,120,.10)}
+.bigq{display:flex;gap:8px}
+.bigq input{flex:1;min-width:0;border:0;background:transparent;font-size:1.15rem;padding:10px 8px}
+.understood{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:0 8px;min-height:28px;font-size:.88rem}
+.understood .lbl{color:var(--muted)}
+.understood:empty{display:none}
+.tag{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-weight:700;background:var(--lake-soft);color:var(--lake)}
+.tag small{font-weight:400;color:var(--muted)}
+.tag.manual{background:var(--signal);color:var(--signal-ink)}
+.refine{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:flex-end;border-top:1px dashed var(--line);padding-top:8px}
+.refine-t{font-size:.78rem;color:var(--muted);padding:6px 8px;align-self:center}
+.refine label{display:flex;flex-direction:column;gap:2px;padding:2px 8px;min-width:0;flex:1 1 150px}
+.refine label span{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.refine select{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:5px 6px;min-width:0;width:100%}
+.btn{border:0;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.signal{background:var(--signal);color:var(--signal-ink)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn:hover{filter:brightness(1.08)}
+.sources{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.8rem}
+.chip .flag{width:14px;height:10px;border-radius:2px;display:inline-block}
+.flag.CH{background:var(--ch)} .flag.IT{background:var(--it)}
+.chip input{margin:0;accent-color:var(--lake)}
+
+/* risultati + mappa */
+.results{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;padding-block:8px 40px}
+.res-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.res-head h2{font-size:1.3rem}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;cursor:pointer;text-align:left;width:100%}
+.item:hover,.item.sel{border-color:var(--lake);box-shadow:0 0 0 1px var(--lake)}
+.ico{width:52px;height:52px;border-radius:8px;background:var(--lake-soft);display:grid;place-items:center;color:var(--lake)}
+.item h3{font-size:1.02rem;font-family:var(--body);font-weight:700}
+.meta{color:var(--muted);font-size:.85rem;display:flex;gap:4px 12px;flex-wrap:wrap}
+.pill{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.new{background:var(--signal);color:var(--signal-ink)}
+.pill.held{background:var(--lake-soft);color:var(--lake)}
+.pill.match{background:var(--ok);color:var(--bg)}
+.empty{padding:28px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);text-align:center}
+
+.mapbox{position:sticky;top:calc(env(safe-area-inset-top,0px) + 74px);align-self:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.mapbox svg{width:100%;height:auto;display:block;max-height:68vh}
+.map-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:6px}
+.m-lake{fill:none;stroke:#aed3d5;stroke-linecap:round;stroke-linejoin:round}
+.m-border{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-dasharray:5 4;opacity:.55}
+.m-town{fill:var(--muted)}
+.m-label{font-family:var(--body);font-size:11px;fill:var(--muted)}
+.m-country{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.12em;fill:var(--muted);opacity:.55}
+.m-pin{cursor:pointer}
+.m-pin circle{stroke:var(--surface);stroke-width:2}
+.m-pin.CH circle{fill:var(--ch)} .m-pin.IT circle{fill:var(--it)}
+.m-pin.sel circle{stroke:var(--signal);stroke-width:4}
+
+/* dettaglio */
+dialog{border:0;border-radius:14px;padding:0;max-width:640px;width:calc(100% - 32px);background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:rgba(10,20,18,.55)}
+.dlg{padding:22px;display:flex;flex-direction:column;gap:14px}
+.dlg-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.dlg h2{font-size:1.5rem}
+.x{border:0;background:var(--bg);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:1.2rem;flex:none}
+dl.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;margin:0}
+dl.facts dt{color:var(--muted);font-size:.85rem}
+dl.facts dd{margin:0}
+.legal{background:var(--bg);border-left:4px solid var(--signal);border-radius:6px;padding:10px 14px;font-size:.9rem}
+.steps{display:flex;flex-direction:column;gap:10px}
+.q{display:flex;flex-direction:column;gap:4px}
+.q input,.q select,.q textarea,.form input,.form select,.form textarea{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 10px;width:100%}
+.note{font-size:.85rem;color:var(--muted)}
+.okbox{background:var(--lake-soft);border-radius:8px;padding:12px 14px}
+
+/* sezioni */
+section.band{padding-block:44px;border-top:1px solid var(--line)}
+section.band h2{font-size:clamp(1.6rem,3.4vw,2.2rem);font-weight:800;letter-spacing:-.01em}
+section.band > .wrap > p.lead{color:var(--muted);max-width:62ch}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin-top:20px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.form{display:grid;gap:12px}
+.form .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.9rem}
+.form label .note{font-weight:400}
+ol.flow{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:f}
+ol.flow li{counter-increment:f;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px}
+ol.flow li::before{content:counter(f);width:34px;height:34px;border-radius:50%;background:var(--signal);color:var(--signal-ink);display:grid;place-items:center;font-weight:800;font-family:var(--display)}
+ol.flow b{display:block}
+.office{border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:2px}
+.alerts{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.alert-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--bg)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:20px}
+.grid3 .panel h3{font-size:1.1rem;margin-bottom:6px}
+.compare{overflow-x:auto;margin-top:20px}
+.compare table{border-collapse:collapse;width:100%;min-width:620px;background:var(--surface);border-radius:var(--r);overflow:hidden}
+.compare th,.compare td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:.92rem}
+.compare th{font-family:var(--display)}
+.compare td.us{background:var(--lake-soft);font-weight:700}
+.yes{color:var(--ok);font-weight:700}.no{color:var(--muted)}
+.roadmap{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.roadmap .step{border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--surface);min-width:0;flex:1 1 180px}
+.roadmap .step.now{border-color:var(--lake);box-shadow:inset 0 0 0 1px var(--lake)}
+footer{padding-block:28px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+
+@media (max-width:900px){
+  .bigq{flex-direction:column}
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:28px}
+  .how-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .bigq input{font-size:1.05rem}
+  .results{grid-template-columns:minmax(0,1fr)}
+  .mapbox{position:static;order:-1}
+  .mapbox svg{max-height:340px}
+  .two,.grid3{grid-template-columns:minmax(0,1fr)}
+  nav.main{order:3;width:100%;margin-left:0}
+}
+@media (max-width:480px){
+  .form .row{grid-template-columns:1fr}
+  .item{grid-template-columns:44px minmax(0,1fr)}
+  .item .pill{grid-column:2;justify-self:start}
+  .ico{width:44px;height:44px}
+  .top-tools{width:100%}
+  select.region{flex:1;max-width:none;min-width:0}
+  .langs{flex:none}
+  .langs button{padding:5px 6px}
+}
+@media (prefers-reduced-motion:no-preference){.item,.btn{transition:box-shadow .15s,border-color .15s,filter .15s}}
+
+/* ---------- Stile B: Segnaletica ---------- */
+h1,h2{font-stretch:72%;font-weight:900;text-transform:uppercase;letter-spacing:0;line-height:.95}
+.brand b{font-stretch:80%;font-weight:900;text-transform:uppercase;letter-spacing:.01em}
+.brand-mark{border-radius:0;background:var(--ink)}
+.brand-mark svg{stroke:var(--signal)}
+.mockbar{background:var(--ink);color:var(--signal)}
+nav.main a:hover{background:var(--signal)}
+a{color:var(--ink)}
+.hero{background:var(--signal);color:var(--ink);padding-block:44px 40px;border-bottom:4px solid var(--ink)}
+.hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center}
+.hero h1{font-size:clamp(2.8rem,7vw,5.2rem);max-width:none}
+.hero h1 span{background:var(--ink);color:var(--signal);padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hero-visual{background:none;padding:0;border-radius:0}
+.hero-visual svg{width:100%;height:auto;display:block}
+.mode{display:inline-flex;align-self:flex-start;gap:0;background:var(--surface);border:3px solid var(--ink);margin:26px 0 12px}
+.mode label{cursor:pointer}
+.mode input{position:absolute;opacity:0}
+.mode span{display:block;padding:9px 20px;font-family:var(--display);font-weight:800;font-stretch:80%;text-transform:uppercase;letter-spacing:.03em}
+.mode input:checked + span{background:var(--ink);color:var(--signal)}
+.mode input:focus-visible + span{outline:3px solid var(--trail);outline-offset:-3px}
+.search,.simple{box-shadow:none}
+.simple{display:flex;flex-direction:column;gap:8px}
+.bigq{background:var(--surface);border:3px solid var(--ink);padding:6px;gap:6px}
+.bigq input{font-size:1.1rem}
+.btn{border-radius:0}
+.bigq .btn{background:var(--ink);color:var(--signal);text-transform:uppercase;letter-spacing:.06em;font-family:var(--display);font-weight:800;font-stretch:85%;padding:10px 22px}
+.btn.signal{background:var(--signal);color:var(--signal-ink);border:2px solid var(--ink)}
+.btn.ghost{border:2px solid var(--ink)}
+.understood{padding:0}
+.tag{background:var(--surface);color:var(--ink);border:2px solid var(--ink);border-radius:0}
+.tag.manual{background:var(--ink);color:var(--signal)}
+.tag small{color:inherit;opacity:.75}
+.refine-d summary{cursor:pointer;font-weight:700;font-size:.9rem;width:max-content}
+.refine-d .refine{border-top:0;padding-top:8px}
+.refine select{background:var(--surface);border:2px solid var(--ink);border-radius:0}
+.trust{margin-top:16px}
+.trust li::before{color:var(--trail)}
+.disc{margin-top:20px;padding-top:12px;border-top:2px solid var(--ink);font-size:.82rem;max-width:58ch}
+.disc p{margin:0 0 6px}
+.how{background:var(--ink);color:#fff;border:0}
+.how .note{color:#d6d3c9}
+.how b{font-family:var(--display);font-stretch:80%;text-transform:uppercase;font-size:1.1rem;color:var(--signal)}
+.item,.panel,.mapbox,.office,.alert-row,.empty{border-radius:var(--r)}
+.item:hover,.item.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.ico{background:var(--signal);color:var(--ink);border-radius:0}
+.pill.new{background:var(--signal);color:var(--ink);border:1px solid var(--ink)}
+.pill.held{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.chip input{accent-color:var(--ink)}
+.legal{border-left-color:var(--trail)}
+ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
+.compare td.us{background:var(--signal)}
+.roadmap .step.now{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink);background:var(--signal)}
+.m-lake{stroke:#c9dfe6}
+.m-pin.sel circle{stroke:var(--ink)}
+@media (max-width:900px){ .hero-grid{grid-template-columns:minmax(0,1fr)} .hero-visual{max-width:420px} }
+@media (max-width:480px){ .bigq{flex-direction:column} .mode span{padding:8px 14px} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#cerca" aria-label="Ritrovo, home">
+      <span class="brand-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2a2200" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M7.8 10.6l2 2 3.6-4"/></svg></span>
+      <span><b>Ritrovo</b><small id="brandRegion">Ticino e zona di confine</small></span>
+    </a>
+    <nav class="main" aria-label="Sezioni">
+      <a href="#cerca">Cerca</a>
+      <a href="#trovato">Ho trovato qualcosa</a>
+      <a href="#avvisi">I miei avvisi</a>
+      <a href="#enti">Per comuni e aziende</a>
+    </nav>
+    <div class="top-tools">
+      <select class="region" id="region" aria-label="Regione"></select>
+      <div class="langs" role="group" aria-label="Lingua">
+        <button aria-pressed="true">IT</button><button aria-pressed="false">DE</button><button aria-pressed="false">FR</button><button aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="mockbar"><div class="wrap"><b>Prototipo.</b> Oggetti, uffici e numeri di pratica sono dati di esempio, non collegati alle fonti reali.</div></div>
+
+<main>
+<section class="hero" id="cerca">
+  <div class="wrap hero-grid">
+    <div class="hero-main">
+      <h1>Perso? <span>Trovato?</span></h1>
+      <form class="simple" id="searchForm" role="search">
+        <div class="mode" role="radiogroup" aria-label="Cosa vuoi fare">
+          <label><input type="radio" name="mode" value="perso" checked><span>Ho perso</span></label>
+          <label><input type="radio" name="mode" value="trovato"><span>Ho trovato</span></label>
+        </div>
+        <div class="bigq">
+          <label for="q" class="sr">Descrivi l'oggetto</label>
+          <input id="q" type="search" placeholder="Scrivi qui, es. portafoglio marrone a Como" autocomplete="off" enterkeyhint="go">
+          <button class="btn" type="submit">Continua</button>
+        </div>
+        <div class="understood" id="qUnderstood" aria-live="polite"></div>
+        <details class="refine-d">
+          <summary>Affina la ricerca</summary>
+          <div class="refine">
+            <label><span>Categoria</span><select id="cat"></select></label>
+            <label><span>Dove</span><select id="where"></select></label>
+            <label><span>Quando</span><select id="when">
+              <option value="3">Ultimi 3 giorni</option><option value="7">Ultima settimana</option><option value="30" selected>Ultimo mese</option><option value="365">Ultimo anno</option>
+            </select></label>
+          </div>
+        </details>
+      </form>
+      <ul class="trust"><li>Gratis</li><li>Senza registrazione</li><li>Svizzera e Italia</li></ul>
+      <div class="disc">
+        <p><b>Ritrovo non sostituisce l'ufficio oggetti trovati.</b> Chi trova un oggetto deve consegnarlo all'autorità: in Svizzera alla polizia o al comune (art. 720 CC), in Italia al sindaco del comune (art. 927 c.c.).</p>
+        <p>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</p>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <svg viewBox="0 0 520 440" font-family="Archivo, sans-serif">
+        <g id="tiles"></g>
+        <g transform="translate(300 300)">
+          <rect x="-6" y="0" width="12" height="140" fill="#111"/>
+          <path d="M-150 -6 H170 L205 26 L170 58 H-150Z" fill="#111"/>
+          <text x="-134" y="22" fill="#ffd100" font-weight="900" font-size="18" style="font-stretch:72%">UFFICIO OGGETTI TROVATI</text>
+          <text x="-134" y="46" fill="#fff" font-weight="700" font-size="15">Lugano 5 min · Como 25 min</text>
+          <g transform="translate(150 12)"><rect width="10" height="30" fill="#fff"/><rect y="10" width="10" height="10" fill="#e2001a"/></g>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="how" aria-label="Come funziona">
+  <div class="wrap how-grid">
+    <div><b>1. Descrivi</b><span class="note">Scrivi l'oggetto e dove l'hai perso, come lo diresti a un amico.</span></div>
+    <div><b>2. Cerchiamo ovunque</b><span class="note">Uffici comunali, FFS, AutoPostale, Trenord e comuni italiani, insieme.</span></div>
+    <div><b>3. Ti avvisiamo</b><span class="note">Se non c'è ancora, ricevi un messaggio appena un ufficio lo registra.</span></div>
+  </div>
+</section>
+
+<section class="wrap results" aria-label="Risultati">
+  <div>
+    <div class="res-head">
+      <h2 id="resTitle">Oggetti trovati</h2>
+      <button class="btn ghost" id="toAlert" type="button">Crea un avviso con questa ricerca</button>
+    </div>
+    <div class="sources" id="sources" aria-label="Fonti consultate"><span class="note">Cerchiamo in:</span></div>
+    <div class="list" id="list"></div>
+  </div>
+  <aside class="mapbox" aria-label="Mappa">
+    <svg id="map" viewBox="0 0 400 600" role="img" aria-label="Mappa schematica di Ticino, Como, Varese e Verbano con gli oggetti trovati"></svg>
+    <div class="map-legend">
+      <span><span class="flag CH chip-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ch)"></span> Ufficio svizzero</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--it)"></span> Ufficio italiano</span>
+      <span>- - - confine (schematico)</span>
+    </div>
+  </aside>
+</section>
+
+<section class="band" id="trovato">
+  <div class="wrap">
+    <p class="eyebrow">Per chi trova</p>
+    <h2>Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
+    <p class="lead">La legge chiede di consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
+    <div class="two">
+      <form class="panel form" id="foundForm">
+        <label>Cosa hai trovato, e dove<textarea id="fWhat" rows="2" required placeholder="es. zaino blu con dei libri, sul bus a Bellinzona"></textarea></label>
+        <div class="understood" id="fUnderstood" aria-live="polite" style="padding:0"></div>
+        <div class="row">
+          <label>Categoria <span class="note">affina</span><select id="fCat"></select></label>
+          <label>Dove <span class="note">affina</span><select id="fWhere"></select></label>
+        </div>
+        <label>Foto <span class="note">Facoltativa. Nascondi documenti e dati personali prima di caricarla.</span><input type="file" id="fPhoto" accept="image/*"></label>
+        <label>Un dettaglio che solo il proprietario conosce <span class="note">Non viene pubblicato. Serve all'ufficio per verificare chi lo reclama.</span><input id="fSecret" placeholder="es. portachiavi a forma di pesce"></label>
+        <button class="btn" type="submit">Trova l'ufficio competente</button>
+      </form>
+      <div class="panel" id="foundOut">
+        <ol class="flow">
+          <li><div><b>Descrivi l'oggetto</b><span class="note">Foto e luogo bastano. I dati sensibili restano nascosti.</span></div></li>
+          <li><div><b>Ti indichiamo l'ufficio</b><span class="note">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.</span></div></li>
+          <li><div><b>Consegni e ricevi la ricevuta</b><span class="note">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti.</span></div></li>
+          <li><div><b>Il proprietario riceve un avviso</b><span class="note">Se ha creato un avviso compatibile, lo informiamo subito.</span></div></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="avvisi">
+  <div class="wrap">
+    <p class="eyebrow">Per chi ha perso</p>
+    <h2>Non c'è ancora? Lascia un avviso.</h2>
+    <p class="lead">Molti oggetti vengono registrati giorni dopo. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
+    <div class="two">
+      <form class="panel form" id="alertForm">
+        <label>Cosa hai perso, e dove <span class="note">Scrivilo con parole tue: categoria e zona le riconosciamo noi.</span><textarea id="aWhat" rows="2" required placeholder="es. occhiali da sole neri, persi sabato a Locarno"></textarea></label>
+        <div class="understood" id="aUnderstood" aria-live="polite" style="padding:0"></div>
+        <div class="row">
+          <label>Categoria <span class="note">affina</span><select id="aCat"></select></label>
+          <label>Zona <span class="note">affina</span><select id="aWhere"></select></label>
+        </div>
+        <label>Email per l'avviso<input id="aMail" type="email" placeholder="nome@esempio.ch"></label>
+        <button class="btn" type="submit">Crea avviso</button>
+      </form>
+      <div class="panel">
+        <h3 style="font-size:1.1rem">I tuoi avvisi</h3>
+        <div class="alerts" id="alerts"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="enti">
+  <div class="wrap">
+    <p class="eyebrow">Per comuni, polizie e aziende di trasporto</p>
+    <h2>Un solo annuncio, visto su entrambi i lati del confine.</h2>
+    <p class="lead">Gli uffici che usano già easyfind o un sistema proprio continuano a farlo: Ritrovo legge i loro dati. Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.</p>
+    <div class="grid3">
+      <div class="panel"><h3>Aggregatore</h3><p class="note">Raccogliamo gli oggetti da portali comunali, trasporti e albo pretorio, senza chiedere agli uffici di cambiare strumento.</p></div>
+      <div class="panel"><h3>Registro per piccoli comuni</h3><p class="note">Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (1 anno in Italia, 5 in Svizzera).</p></div>
+      <div class="panel"><h3>Verifica del proprietario</h3><p class="note">Domande sui dettagli nascosti prima della restituzione, per ridurre truffe e falsi proprietari. Conforme a nLPD e GDPR.</p></div>
+    </div>
+    <div class="compare">
+      <table>
+        <thead><tr><th></th><th>Ritrovo</th><th>easyfind.ch</th><th>FindMyLost</th><th>Sito del comune</th></tr></thead>
+        <tbody>
+          <tr><td>Ricerca unica CH e IT</td><td class="us yes">Sì</td><td class="no">Solo CH</td><td class="no">Solo clienti</td><td class="no">No</td></tr>
+          <tr><td>Avviso automatico quando compare</td><td class="us yes">Sì</td><td class="no">Parziale</td><td class="no">Parziale</td><td class="no">No</td></tr>
+          <tr><td>Guida per chi trova</td><td class="us yes">Sì</td><td class="no">No</td><td class="no">No</td><td class="no">Orari sportello</td></tr>
+          <tr><td>Mappa e lingue IT/DE/FR/EN</td><td class="us yes">Sì</td><td class="no">DE/FR/IT</td><td class="yes">7 lingue</td><td class="no">IT</td></tr>
+          <tr><td>Costo per i piccoli comuni</td><td class="us yes">Gratuito</td><td class="no">Abbonamento</td><td class="no">Non pubblico</td><td class="no">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 style="margin-top:32px;font-size:1.2rem">Dove arriviamo</h3>
+    <div class="roadmap" id="roadmap"></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">Ritrovo è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al sindaco del comune (art. 927 segg. c.c.).</div></footer>
+
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- CONFIGURAZIONE REGIONI ----------
+   Per aggiungere una regione: un nuovo oggetto in REGIONS con luoghi, fonti e (se serve) un riquadro mappa.
+   Le regole di legge stanno in LAW per paese, così ogni regione eredita quelle del suo stato. */
+const LAW = {
+  CH: { name:"Svizzera", ref:"art. 720–722 CC", keep:"5 anni", text:"Chi ha perso l'oggetto può reclamarlo per 5 anni. Poi la proprietà passa a chi l'ha trovato, che ha diritto a una ricompensa adeguata (di solito circa il 10%)." },
+  IT: { name:"Italia", ref:"art. 927–930 c.c.", keep:"1 anno", text:"L'oggetto resta in custodia un anno dalla pubblicazione all'albo pretorio. Al ritrovatore spetta un premio pari a un decimo del valore." }
+};
+
+const REGIONS = {
+  ticino: {
+    label:"Ticino e zona di confine", active:true,
+    bbox:{ lon0:8.40, lat1:46.60, kx:417, ky:600 },
+    places:{
+      airolo:{n:"Airolo",c:"CH",lon:8.61,lat:46.53}, biasca:{n:"Biasca",c:"CH",lon:8.97,lat:46.36},
+      bellinzona:{n:"Bellinzona",c:"CH",lon:9.02,lat:46.19}, locarno:{n:"Locarno",c:"CH",lon:8.80,lat:46.17},
+      ascona:{n:"Ascona",c:"CH",lon:8.77,lat:46.155}, lugano:{n:"Lugano",c:"CH",lon:8.95,lat:46.005},
+      mendrisio:{n:"Mendrisio",c:"CH",lon:8.985,lat:45.87}, chiasso:{n:"Chiasso",c:"CH",lon:9.03,lat:45.835},
+      como:{n:"Como",c:"IT",lon:9.085,lat:45.805}, varese:{n:"Varese",c:"IT",lon:8.825,lat:45.82},
+      luino:{n:"Luino",c:"IT",lon:8.74,lat:46.00}, ponte_tresa:{n:"Lavena Ponte Tresa",c:"IT",lon:8.86,lat:45.965},
+      menaggio:{n:"Menaggio",c:"IT",lon:9.24,lat:46.02}, verbania:{n:"Verbania",c:"IT",lon:8.55,lat:45.925}
+    },
+    sources:[
+      {id:"lug", n:"Polizia Città di Lugano", c:"CH", via:"easyfind"},
+      {id:"bel", n:"Polizia comunale Bellinzona", c:"CH", via:"easyfind"},
+      {id:"loc", n:"Polizia comunale Locarno", c:"CH", via:"portale comunale"},
+      {id:"ffs", n:"FFS oggetti trovati", c:"CH", via:"FFS"},
+      {id:"apt", n:"AutoPostale Ticino", c:"CH", via:"AutoPostale"},
+      {id:"tpl", n:"TPL Lugano", c:"CH", via:"modulo TPL"},
+      {id:"com", n:"Comune di Como, oggetti rinvenuti", c:"IT", via:"albo pretorio"},
+      {id:"var", n:"Comune di Varese, oggetti rinvenuti", c:"IT", via:"portale comunale"},
+      {id:"tno", n:"Trenord", c:"IT", via:"Trenord"},
+      {id:"vco", n:"Comune di Verbania", c:"IT", via:"albo pretorio"}
+    ],
+    /* ufficio a cui consegnare, per luogo */
+    offices:{
+      CH:{ n:"Polizia comunale del luogo", d:"In Ticino gli oggetti si consegnano alla polizia comunale. A Lugano: Polizia Città di Lugano, sportello oggetti trovati." },
+      IT:{ n:"Ufficio oggetti rinvenuti del comune", d:"In Italia l'oggetto va consegnato al sindaco del comune in cui è stato trovato, di solito tramite la polizia locale." },
+      transport:{ CH:"FFS o AutoPostale, al più vicino sportello in stazione", IT:"Trenord, presso il personale di bordo o in stazione" }
+    }
+  },
+  insubria: { label:"Lombardia (in preparazione)", active:false },
+  svizzera: { label:"Tutta la Svizzera (in preparazione)", active:false },
+  italia:   { label:"Tutta l'Italia (in preparazione)", active:false }
+};
+
+const CATS = {
+  portafoglio:"Portafogli e documenti", telefono:"Telefoni ed elettronica", chiavi:"Chiavi",
+  borsa:"Borse e zaini", abbigliamento:"Abbigliamento", gioielli:"Gioielli e orologi",
+  occhiali:"Occhiali", bici:"Biciclette e monopattini", altro:"Altro"
+};
+const ICONS = {
+  portafoglio:'<path d="M3 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-3 1 3"/><circle cx="16" cy="13" r="1.4"/>',
+  telefono:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+  chiavi:'<circle cx="8" cy="8" r="4.5"/><path d="M11.2 11.2 20 20M16 16l2-2M18.5 18.5l2-2"/>',
+  borsa:'<path d="M5 8h14l-1 13H6zM9 8V6a3 3 0 0 1 6 0v2"/>',
+  abbigliamento:'<path d="M8 3l4 2 4-2 5 4-3 3-2-1v12H8V9l-2 1-3-3z"/>',
+  gioielli:'<circle cx="12" cy="13" r="6"/><path d="M9 4h6l-1.5 3h-3z"/>',
+  occhiali:'<circle cx="6.5" cy="14" r="3.5"/><circle cx="17.5" cy="14" r="3.5"/><path d="M10 14h4M3 14l1-6M21 14l-1-6"/>',
+  bici:'<circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-8h5l3 8M10 8l2 8"/>',
+  altro:'<rect x="4" y="6" width="16" height="13" rx="2"/><path d="M4 10h16"/>'
+};
+
+/* ---------- LETTURA DEL TESTO LIBERO ----------
+   Nel prototipo è un riconoscimento a parole chiave; nel servizio reale lo farebbe un modello linguistico,
+   che capisce anche frasi più libere e altre lingue. Restituisce categoria, luogo, periodo e colore. */
+const CAT_WORDS = {
+  portafoglio:["portafoglio","portafogli","portamonete","borsellino","wallet","documenti","documento","carta d'identita","passaporto","patente","tessera","abbonamento","bancomat"],
+  telefono:["telefono","telefonino","cellulare","smartphone","iphone","samsung","tablet","ipad","auricolari","airpods","cuffie","laptop","computer","portatile","pc"],
+  chiavi:["chiave","chiavi","mazzo","portachiavi","telecomando"],
+  borsa:["borsa","borsetta","zaino","zainetto","valigia","trolley","tracolla","marsupio"],
+  abbigliamento:["giacca","giubbotto","giubbino","cappotto","sciarpa","cappello","berretto","guanti","felpa","maglione","scarpe","impermeabile"],
+  gioielli:["anello","collana","braccialetto","bracciale","orecchini","orologio","gioiello","fede"],
+  occhiali:["occhiali"],
+  bici:["bici","bicicletta","monopattino","ebike"],
+  altro:["passeggino","ombrello","peluche","pupazzo","giocattolo"]
+};
+const PLACE_WORDS = { lugano:["lugano","paradiso","cassarate"], bellinzona:["bellinzona"], locarno:["locarno","muralto","minusio"], ascona:["ascona"],
+  mendrisio:["mendrisio"], chiasso:["chiasso"], como:["como"], varese:["varese"], luino:["luino"], ponte_tresa:["ponte tresa","tresa"],
+  verbania:["verbania","pallanza","intra"], biasca:["biasca"], airolo:["airolo"], menaggio:["menaggio"] };
+const COLORS = ["marrone","nero","bianco","rosso","blu","azzurro","verde","giallo","grigio","beige","rosa","viola","arancione","argento","oro","tartarugato"];
+const TIME_WORDS = [[3,["oggi","stamattina","stamani","stasera","ieri","ieri sera","stanotte","l'altro ieri"]],[7,["lunedi","martedi","mercoledi","giovedi","venerdi","sabato","domenica","weekend","fine settimana","settimana"]],[30,["mese","settimane","giorni fa"]],[365,["anno","mesi"]]];
+const STOP = new Set("ho hai perso persa persi perse smarrito smarrita dimenticato dimenticata trovato trovata zona vicino presso dalle nella nello sul sulla sui tra fra colore color una uno del della dei delle per con mio mia miei mie che non forse credo".split(" "));
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const has = (t, w) => new RegExp(`(^|[^a-z])${w.replace(/'/g,"'")}($|[^a-z])`).test(t);
+function parse(text){
+  const t = norm(text), out = {cat:"", place:"", days:0, color:""};
+  for(const [k,ws] of Object.entries(CAT_WORDS)) if(ws.some(w => has(t,w))){ out.cat = k; break; }
+  for(const [k,ws] of Object.entries(PLACE_WORDS)) if(ws.some(w => has(t,w))){ out.place = k; break; }
+  for(const [n,ws] of TIME_WORDS) if(ws.some(w => has(t,w))){ out.days = n; break; }
+  out.color = COLORS.find(c => c.length > 3 ? has(t, c.slice(0,-1) + "[aeio]") : has(t,c)) || "";
+  return out;
+}
+
+/* ---------- OGGETTI DI ESEMPIO ---------- */
+const TODAY = new Date("2026-10-18T12:00:00");
+const d = n => new Date(TODAY - n*864e5);
+const ITEMS = [
+  {id:"TI-LUG-26-04817", cat:"portafoglio", t:"Portafoglio in pelle marrone", desc:"Portafoglio a libro, pelle marrone scuro, con tessere. Documenti custoditi a parte.", p:"lugano", spot:"Piazza della Riforma", src:"lug", days:1},
+  {id:"FFS-26-118204", cat:"telefono", t:"iPhone con cover verde", desc:"Smartphone Apple con cover in silicone verde salvia. Schermo integro.", p:"bellinzona", spot:"Treno RE80 Bellinzona–Milano, carrozza 3", src:"ffs", days:2},
+  {id:"CO-RIN-2026-0391", cat:"chiavi", t:"Mazzo di chiavi con telecomando Fiat", desc:"Tre chiavi di casa e una chiave Fiat con telecomando, portachiavi rosso.", p:"como", spot:"Lungolago Mafalda di Savoia", src:"com", days:3},
+  {id:"TI-LOC-26-00912", cat:"occhiali", t:"Occhiali da sole neri", desc:"Montatura nera squadrata, astuccio rigido grigio.", p:"locarno", spot:"Piazza Grande", src:"loc", days:4},
+  {id:"APT-26-7741", cat:"borsa", t:"Zaino blu da escursione", desc:"Zaino 25 litri blu con bastoncini agganciati.", p:"airolo", spot:"Bus 111 Airolo–Nufenen", src:"apt", days:5},
+  {id:"TNO-26-55120", cat:"abbigliamento", t:"Giacca impermeabile gialla", desc:"Giacca leggera gialla taglia M, cappuccio ripiegabile.", p:"como", spot:"Treno S11 Chiasso–Milano", src:"tno", days:2},
+  {id:"TI-LUG-26-04822", cat:"gioielli", t:"Orologio da polso argento", desc:"Orologio analogico, cinturino in maglia metallica.", p:"lugano", spot:"Parco Ciani", src:"lug", days:6},
+  {id:"TPL-26-3310", cat:"telefono", t:"Auricolari wireless bianchi in custodia", desc:"Custodia di ricarica bianca con adesivo a forma di stella.", p:"lugano", spot:"Linea 2, fermata Centro", src:"tpl", days:1},
+  {id:"VA-RIN-2026-0217", cat:"bici", t:"Monopattino elettrico grigio", desc:"Monopattino pieghevole grigio, senza caricatore.", p:"varese", spot:"Stazione Varese Nord", src:"var", days:9},
+  {id:"TI-BEL-26-01455", cat:"portafoglio", t:"Porta tessere nero con abbonamento", desc:"Porta tessere in tessuto nero, contiene un abbonamento Arcobaleno.", p:"bellinzona", spot:"Viale Stazione", src:"bel", days:3},
+  {id:"FFS-26-118377", cat:"borsa", t:"Borsa a tracolla in tela beige", desc:"Tracolla beige con taccuino e ombrello pieghevole.", p:"mendrisio", spot:"Stazione Mendrisio, binario 2", src:"ffs", days:7},
+  {id:"VB-RIN-2026-0088", cat:"altro", t:"Passeggino pieghevole", desc:"Passeggino leggero blu notte, parasole incluso.", p:"verbania", spot:"Imbarcadero Pallanza", src:"vco", days:12},
+  {id:"TNO-26-55301", cat:"telefono", t:"Tablet in custodia nera", desc:"Tablet 10 pollici, custodia a libro nera.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
+  {id:"TI-LUG-26-04790", cat:"chiavi", t:"Chiave singola con portachiavi a pesce", desc:"Chiave di sicurezza con portachiavi in metallo.", p:"lugano", spot:"Lido di Lugano", src:"lug", days:15},
+  {id:"APT-26-7790", cat:"abbigliamento", t:"Sciarpa di lana a righe", desc:"Sciarpa lunga a righe rosse e grigie.", p:"ascona", spot:"Bus 316 Locarno–Ascona", src:"apt", days:8},
+  {id:"CO-RIN-2026-0415", cat:"portafoglio", t:"Portafoglio marrone con portamonete", desc:"Portafoglio da uomo in pelle marrone chiaro, con scomparto portamonete. Tessere custodite a parte.", p:"como", spot:"Stazione Como San Giovanni", src:"com", days:2},
+  {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio rosso con cerniera", desc:"Portafoglio piccolo rosso, chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
+  {id:"FFS-26-117950", cat:"bici", t:"Bicicletta da città nera", desc:"Bici olandese nera con cestino anteriore, lucchetto tagliato.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
+  {id:"VA-RIN-2026-0221", cat:"occhiali", t:"Occhiali da vista con montatura tartarugata", desc:"Montatura tonda tartarugata, astuccio blu.", p:"luino", spot:"Mercato del mercoledì", src:"var", days:6}
+].map(it => ({...it, date:d(it.days)}));
+
+/* ---------- STATO ---------- */
+const R = REGIONS.ticino;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let selected = null, aUpdate = () => {};
+let enabledSrc = new Set(R.sources.map(s => s.id));
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem("ritrovo-avvisi") || "[]"); }catch(e){ return []; } },
+  set(v){ try{ localStorage.setItem("ritrovo-avvisi", JSON.stringify(v)); }catch(e){} }
+};
+let alerts = store.get();
+if(!alerts.length) alerts = [{what:"occhiali da sole neri", cat:"occhiali", where:"locarno", example:true}];
+
+const srcOf = id => R.sources.find(s => s.id === id);
+const fmtDate = dt => dt.toLocaleDateString("it-CH", {day:"numeric", month:"short"});
+const ago = n => n === 0 ? "oggi" : n === 1 ? "ieri" : `${n} giorni fa`;
+const proj = p => ({ x:(p.lon - R.bbox.lon0) * R.bbox.kx, y:(R.bbox.lat1 - p.lat) * R.bbox.ky });
+
+/* ---------- SELECT ---------- */
+function fillSelects(){
+  const regionSel = $("#region");
+  regionSel.innerHTML = Object.entries(REGIONS).map(([k,r]) => `<option value="${k}" ${r.active?"":"disabled"}>${esc(r.label)}</option>`).join("");
+  const catOpts = `<option value="">Tutte</option>` + Object.entries(CATS).map(([k,v]) => `<option value="${k}">${esc(v)}</option>`).join("");
+  const placeOpts = Object.entries(R.places).sort((a,b) => a[1].c.localeCompare(b[1].c) || a[1].n.localeCompare(b[1].n));
+  const ch = placeOpts.filter(p => p[1].c==="CH").map(([k,p]) => `<option value="${k}">${esc(p.n)}</option>`).join("");
+  const it = placeOpts.filter(p => p[1].c==="IT").map(([k,p]) => `<option value="${k}">${esc(p.n)}</option>`).join("");
+  const placeHtml = `<option value="">Tutta la zona</option><optgroup label="Svizzera · Ticino">${ch}</optgroup><optgroup label="Italia · Como, Varese, VCO">${it}</optgroup>`;
+  $("#cat").innerHTML = catOpts; $("#aCat").innerHTML = catOpts;
+  $("#fCat").innerHTML = catOpts.replace('<option value="">Tutte</option>', "");
+  $("#where").innerHTML = placeHtml; $("#aWhere").innerHTML = placeHtml;
+  $("#fWhere").innerHTML = placeHtml.replace('<option value="">Tutta la zona</option>', "");
+  $("#sources").insertAdjacentHTML("beforeend", R.sources.map(s =>
+    `<label class="chip"><input type="checkbox" checked data-src="${s.id}"><span class="flag ${s.c}"></span>${esc(s.n)}</label>`).join(""));
+  $("#roadmap").innerHTML = [
+    ["Ora","Ticino + Como, Varese, Verbano",true],
+    ["Poi","Lombardia e Piemonte, con i trasporti regionali"],
+    ["Dopo","Tutta la Svizzera, in DE e FR"],
+    ["Infine","Tutta l'Italia, con il registro per piccoli comuni"]
+  ].map(([w,t,now]) => `<div class="step ${now?"now":""}"><div class="eyebrow">${w}</div>${esc(t)}</div>`).join("");
+}
+
+/* ---------- RICERCA ---------- */
+/* parole utili per il confronto: senza luoghi, tempi e parole di contorno, con la desinenza tolta (rosso/rossa) */
+const NOISE = new Set([...Object.values(PLACE_WORDS).flat(), ...TIME_WORDS.flatMap(x => x[1])].flatMap(w => norm(w).split(/[^a-z]+/)));
+const stem = w => w.length > 4 ? w.replace(/[aeio]$/,"") : w;
+function words(s){ return norm(s).split(/[^a-z0-9]+/).filter(w => w.length > 2 && !STOP.has(w) && !NOISE.has(w)).map(stem); }
+function score(it, q){
+  if(!q.length) return 1;
+  const hay = norm(`${it.t} ${it.desc} ${CATS[it.cat]} ${CAT_WORDS[it.cat].join(" ")} ${it.spot}`).split(/[^a-z0-9]+/).filter(w => w.length > 2).map(stem);
+  return q.filter(w => hay.some(h => h.startsWith(w) || w.startsWith(h))).length / q.length;
+}
+
+/* collega un campo di testo libero ai suoi menu: compila da solo finché la persona non sceglie a mano */
+function smartField({input, chips, cat, where, when, onChange}){
+  const manual = {cat:false, where:false, when:false};
+  const sel = {cat, where, when};
+  Object.entries(sel).forEach(([k,el]) => el && el.addEventListener("change", e => { if(e.isTrusted){ manual[k] = true; update(); } }));
+  function update(){
+    const p = parse(input.value);
+    if(cat && !manual.cat && (p.cat || cat.querySelector('option[value=""]'))) cat.value = p.cat || (cat.querySelector('option[value=""]') ? "" : cat.value);
+    if(where && !manual.where && (p.place || where.querySelector('option[value=""]'))) where.value = p.place || (where.querySelector('option[value=""]') ? "" : where.value);
+    if(when && !manual.when) when.value = String(p.days || 30);
+    const tag = (k, label, val, sub) => `<span class="tag ${manual[k]?"manual":""}">${esc(label)}: ${esc(val)}${sub?` <small>${esc(sub)}</small>`:""}</span>`;
+    const parts = [];
+    if(cat && cat.value) parts.push(tag("cat","Oggetto",CATS[cat.value], manual.cat?"scelto da te":""));
+    if(where && where.value){ const pl = R.places[where.value]; parts.push(tag("where","Zona",`${pl.n} (${pl.c})`, manual.where?"scelta da te":"")); }
+    if(when && (p.days || manual.when)) parts.push(tag("when","Periodo",when.selectedOptions[0].text.toLowerCase(), manual.when?"scelto da te":""));
+    if(p.color) parts.push(`<span class="tag">Colore: ${esc(p.color)}</span>`);
+    chips.innerHTML = input.value.trim() ? (parts.length ? `<span class="lbl">Ho capito</span>${parts.join("")}` : `<span class="lbl">Scrivi anche cosa e dove, per esempio «zaino blu a Lugano».</span>`) : "";
+    if(!input.value.trim()) Object.keys(manual).forEach(k => manual[k] = false);
+    onChange && onChange();
+  }
+  input.addEventListener("input", update);
+  update();
+  return update;
+}
+function current(){
+  const q = words($("#q").value), cat = $("#cat").value, where = $("#where").value, when = +$("#when").value;
+  return ITEMS.filter(it => enabledSrc.has(it.src) && (!cat || it.cat === cat) && (!where || it.p === where) && it.days <= when)
+    .map(it => ({it, s:score(it,q)})).filter(x => x.s >= .5)
+    .sort((a,b) => b.s - a.s || a.it.days - b.it.days).map(x => x.it);
+}
+function matchesAlert(it){ return alerts.some(a => (!a.cat || a.cat === it.cat) && (!a.where || a.where === it.p || R.places[a.where].c === R.places[it.p].c) && score(it, words(a.what)) >= .5); }
+
+function render(){
+  const res = current();
+  $("#resTitle").textContent = !$("#q").value.trim() && !$("#cat").value && !$("#where").value ? "Ultimi oggetti registrati" : `${res.length} ${res.length===1?"oggetto trovato":"oggetti trovati"}`;
+  $("#list").innerHTML = res.length ? res.map(it => {
+    const p = R.places[it.p], s = srcOf(it.src);
+    const pill = matchesAlert(it) ? `<span class="pill match">Compatibile col tuo avviso</span>` : it.days <= 2 ? `<span class="pill new">Nuovo</span>` : `<span class="pill held">In custodia</span>`;
+    return `<button class="item ${selected===it.id?"sel":""}" data-id="${it.id}" type="button">
+      <span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[it.cat]}</svg></span>
+      <span style="min-width:0"><h3>${esc(it.t)}</h3>
+        <span class="meta"><span><span class="flag ${p.c}" style="display:inline-block;width:10px;height:7px;border-radius:1px"></span> ${esc(p.n)}, ${esc(it.spot)}</span><span>${ago(it.days)}</span><span>${esc(s.n)}</span></span></span>
+      ${pill}</button>`;
+  }).join("") : `<div class="empty">Nessun oggetto corrisponde, per ora. Gli uffici registrano spesso con qualche giorno di ritardo.<br><br><button class="btn signal" type="button" onclick="document.getElementById('toAlert').click()">Avvisami quando compare</button></div>`;
+  drawMap(res);
+}
+
+/* ---------- MAPPA SCHEMATICA ---------- */
+function line(pts){ return pts.map((p,i) => { const q = proj({lon:p[0],lat:p[1]}); return `${i?"L":"M"}${q.x.toFixed(1)} ${q.y.toFixed(1)}`; }).join(" "); }
+function drawMap(res){
+  const lakes = [
+    [[8.82,46.18],[8.76,46.13],[8.72,46.05],[8.74,46.00],[8.66,45.93],[8.58,45.90],[8.56,45.84],[8.58,45.76]],
+    [[8.86,45.965],[8.90,45.98],[8.95,46.005],[9.00,46.02],[9.08,46.03],[9.13,46.04]],
+    [[8.95,46.005],[8.96,45.96],[8.97,45.92],[8.98,45.90]],
+    [[9.30,46.13],[9.26,46.06],[9.24,46.02],[9.19,45.96],[9.12,45.87],[9.085,45.81]]
+  ];
+  const border = [[8.40,46.30],[8.47,46.20],[8.60,46.13],[8.71,46.10],[8.80,46.08],[8.83,46.02],[8.86,45.97],[8.90,45.93],[8.92,45.85],[8.98,45.83],[9.04,45.82],[9.06,45.88],[9.02,45.94],[9.03,46.01],[9.10,46.06],[9.12,46.12],[9.20,46.18],[9.27,46.25]];
+  const towns = Object.values(R.places).map(p => { const q = proj(p); return `<circle class="m-town" cx="${q.x}" cy="${q.y}" r="2"/><text class="m-label" x="${q.x+5}" y="${q.y-5}">${esc(p.n.replace("Lavena ",""))}</text>`; }).join("");
+  const byPlace = {};
+  res.forEach(it => (byPlace[it.p] = byPlace[it.p] || []).push(it));
+  const pins = Object.entries(byPlace).map(([k,list]) => {
+    const p = R.places[k], q = proj(p), n = list.length, sel = list.some(i => i.id === selected);
+    return `<g class="m-pin ${p.c} ${sel?"sel":""}" data-place="${k}" tabindex="0" role="button" aria-label="${n} oggetti a ${esc(p.n)}">
+      <circle cx="${q.x}" cy="${q.y}" r="${8 + Math.min(n,5)*2}"/>
+      <text x="${q.x}" y="${q.y+4}" text-anchor="middle" font-family="var(--body)" font-size="11" font-weight="700" fill="#fff">${n}</text></g>`;
+  }).join("");
+  $("#map").innerHTML = `
+    ${lakes.map(l => `<path class="m-lake" d="${line(l)}" stroke-width="11"/>`).join("")}
+    <path class="m-border" d="${line(border)}"/>
+    <text class="m-country" x="40" y="120">SVIZZERA</text>
+    <text class="m-country" x="230" y="560">ITALIA</text>
+    ${towns}${pins}`;
+}
+
+/* ---------- DETTAGLIO E RECLAMO ---------- */
+function openItem(id){
+  const it = ITEMS.find(i => i.id === id); if(!it) return;
+  selected = id; render();
+  const p = R.places[it.p], s = srcOf(it.src), law = LAW[p.c];
+  $("#dlgBody").innerHTML = `
+    <div class="dlg-head"><div><p class="eyebrow">${esc(CATS[it.cat])} · <span class="mono">${it.id}</span></p><h2>${esc(it.t)}</h2></div>
+      <button class="x" type="button" aria-label="Chiudi" data-close>×</button></div>
+    <p>${esc(it.desc)}</p>
+    <dl class="facts">
+      <dt>Trovato</dt><dd>${esc(it.spot)}, ${esc(p.n)} (${law.name})</dd>
+      <dt>Data</dt><dd>${fmtDate(it.date)} 2026, ${ago(it.days)}</dd>
+      <dt>In custodia presso</dt><dd>${esc(s.n)} <span class="note">· fonte: ${esc(s.via)}</span></dd>
+      <dt>Reclamabile per</dt><dd>${law.keep}</dd>
+    </dl>
+    <div class="legal"><b>${law.name}, ${law.ref}.</b> ${law.text}</div>
+    <form class="steps" id="claim">
+      <b>È tuo? Rispondi a due domande</b>
+      <p class="note" style="margin:0">Le risposte vanno all'ufficio, che le confronta con i dettagli non pubblicati prima di fissare il ritiro. Porta un documento d'identità.</p>
+      <label class="q">Descrivi un dettaglio che non è nell'annuncio<input id="c1" required placeholder="es. cosa c'era dentro, un segno particolare"></label>
+      <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12"></label>
+      <button class="btn" type="submit">Invia la richiesta all'ufficio</button>
+    </form>`;
+  $("#dlg").showModal();
+  $("#claim").addEventListener("submit", e => {
+    e.preventDefault();
+    e.target.outerHTML = `<div class="okbox"><b>Richiesta pronta per ${esc(s.n)}.</b><br>In questo prototipo non viene inviata. Nel servizio reale l'ufficio ti contatta per il ritiro e ti indica gli orari dello sportello.</div>`;
+  });
+}
+
+/* ---------- EVENTI ---------- */
+function bind(){
+  $("#searchForm").addEventListener("submit", e => {
+    e.preventDefault();
+    if(document.querySelector(".mode input:checked").value === "trovato"){
+      const f = $("#fWhat"); f.value = $("#q").value; f.dispatchEvent(new Event("input"));
+      $("#trovato").scrollIntoView({behavior:"smooth"}); return;
+    }
+    render(); $("#list").scrollIntoView({behavior:"smooth",block:"start"});
+  });
+  document.querySelectorAll(".mode input").forEach(r => r.addEventListener("change", () => {
+    $("#q").placeholder = r.value === "perso" ? "Scrivi qui, es. portafoglio marrone a Como" : "Scrivi qui, es. chiavi trovate sul bus a Lugano";
+  }));
+  drawTiles();
+  smartField({input:$("#q"), chips:$("#qUnderstood"), cat:$("#cat"), where:$("#where"), when:$("#when"), onChange:render});
+  ["#cat","#where","#when"].forEach(s => $(s).addEventListener("input", render));
+  aUpdate = smartField({input:$("#aWhat"), chips:$("#aUnderstood"), cat:$("#aCat"), where:$("#aWhere")});
+  smartField({input:$("#fWhat"), chips:$("#fUnderstood"), cat:$("#fCat"), where:$("#fWhere")});
+  $("#sources").addEventListener("change", e => { const id = e.target.dataset.src; if(!id) return; e.target.checked ? enabledSrc.add(id) : enabledSrc.delete(id); render(); });
+  $("#list").addEventListener("click", e => { const b = e.target.closest(".item"); if(b) openItem(b.dataset.id); });
+  $("#map").addEventListener("click", e => { const g = e.target.closest(".m-pin"); if(g){ $("#where").value = g.dataset.place; render(); $("#list").scrollIntoView({behavior:"smooth",block:"start"}); } });
+  $("#map").addEventListener("keydown", e => { if(e.key === "Enter" && e.target.closest(".m-pin")) e.target.closest(".m-pin").dispatchEvent(new MouseEvent("click",{bubbles:true})); });
+  $("#dlg").addEventListener("click", e => { if(e.target.hasAttribute("data-close") || e.target === $("#dlg")) $("#dlg").close(); });
+  $("#dlg").addEventListener("close", () => { selected = null; render(); });
+  document.querySelectorAll(".langs button").forEach(b => b.addEventListener("click", () => { if(b.textContent !== "IT") toast(`Versione ${b.textContent} in preparazione. Il prototipo è solo in italiano.`); }));
+
+  $("#toAlert").addEventListener("click", () => {
+    $("#aWhat").value = $("#q").value; aUpdate();
+    $("#avvisi").scrollIntoView({behavior:"smooth"}); setTimeout(() => $("#aWhat").focus(), 400);
+  });
+  $("#alertForm").addEventListener("submit", e => {
+    e.preventDefault();
+    alerts = alerts.filter(a => !a.example);
+    alerts.unshift({what:$("#aWhat").value, cat:$("#aCat").value, where:$("#aWhere").value});
+    store.set(alerts); e.target.reset(); aUpdate(); renderAlerts(); render();
+    toast("Avviso creato. Gli oggetti compatibili sono segnati in verde nei risultati.");
+  });
+  $("#alerts").addEventListener("click", e => {
+    const i = e.target.dataset.del; if(i === undefined) return;
+    alerts.splice(+i,1); store.set(alerts.filter(a => !a.example)); renderAlerts(); render();
+  });
+
+  $("#foundForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const p = R.places[$("#fWhere").value], law = LAW[p.c], off = R.offices[p.c];
+    const transport = /treno|bus|autopostale|ffs|trenord|tram|battello/i.test($("#fWhat").value);
+    $("#foundOut").innerHTML = `
+      <p class="eyebrow">Ufficio competente per ${esc(p.n)} · ${law.name}</p>
+      <div class="office"><b>${esc(off.n)}</b><span class="note">${esc(off.d)}</span></div>
+      ${transport ? `<div class="office" style="margin-top:8px"><b>Se l'hai trovato a bordo</b><span class="note">${esc(R.offices.transport[p.c])}</span></div>` : ""}
+      <div class="legal" style="margin-top:12px"><b>${law.ref}.</b> ${law.text}</div>
+      <p class="note">Annuncio in bozza: <b>${esc($("#fWhat").value)}</b>, ${esc(CATS[$("#fCat").value])}, ${esc(p.n)}. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
+      <button class="btn ghost" type="button" onclick="location.hash='cerca';location.reload()">Ricomincia</button>`;
+  });
+}
+function renderAlerts(){
+  $("#alerts").innerHTML = alerts.length ? alerts.map((a,i) => {
+    const n = ITEMS.filter(it => (!a.cat || a.cat === it.cat) && (!a.where || a.where === it.p || R.places[a.where].c === R.places[it.p].c) && score(it, words(a.what)) >= .5).length;
+    return `<div class="alert-row"><div><b>${esc(a.what)}</b>${a.example?' <span class="pill held">esempio</span>':""}<div class="note">${esc(CATS[a.cat]||"Tutte le categorie")} · ${esc(a.where?R.places[a.where].n:"tutta la zona")} · ${n ? `<span class="yes">${n} compatibil${n===1?"e":"i"}</span>` : "nessuno per ora"}</div></div>
+      <button class="btn ghost" type="button" data-del="${i}" aria-label="Elimina avviso">Elimina</button></div>`;
+  }).join("") : `<p class="note">Nessun avviso. Creane uno a sinistra.</p>`;
+}
+/* illustrazione hero: scaffale di pittogrammi come le caselle di un ufficio oggetti trovati */
+function drawTiles(){
+  const names = ["portafoglio","telefono","chiavi","borsa","occhiali","bici"];
+  $("#tiles").innerHTML = names.map((n,i) => {
+    const x = 30 + (i%3)*160, y = 30 + Math.floor(i/3)*130, hot = n === "chiavi";
+    return `<g transform="translate(${x} ${y})"><rect width="140" height="110" fill="${hot?"#111":"#fff"}" stroke="#111" stroke-width="3"/>
+      <g transform="translate(46 14) scale(2)" fill="none" stroke="${hot?"#ffd100":"#111"}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</g>
+      <text x="10" y="100" font-size="13" font-weight="800" fill="${hot?"#ffd100":"#111"}" style="font-stretch:72%">${hot?"TROVATO!":n.toUpperCase()}</text></g>`;
+  }).join("");
+}
+let tt; function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 3200); }
+
+fillSelects(); bind(); renderAlerts(); render();
+</script>
+</body>
+</html>
