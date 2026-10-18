@@ -847,7 +847,7 @@ const REGIONS = {
 /* Chiavi, documenti e oggetti di valore passano sempre dall'ufficio; il resto può essere restituito direttamente da chi trova. */
 const OFFICE_ONLY = new Set(["portafoglio","chiavi","telefono","gioielli"]);
 const CATS = {
-  portafoglio:"Portafogli e documenti", telefono:"Telefoni ed elettronica", chiavi:"Chiavi",
+  portafoglio:"Portafogli e documenti", telefono:"Elettronica", chiavi:"Chiavi",
   borsa:"Borse e zaini", abbigliamento:"Abbigliamento", gioielli:"Gioielli e orologi",
   occhiali:"Occhiali", bici:"Biciclette e monopattini", animale:"Animali domestici", altro:"Altro"
 };
@@ -870,7 +870,7 @@ const ICONS = {
    che capisce anche frasi più libere e altre lingue. Restituisce categoria, luogo, periodo e colore. */
 const CAT_WORDS = {
   portafoglio:["portafoglio","portafogli","portamonete","borsellino","wallet","documenti","documento","carta d'identita","passaporto","patente","tessera","abbonamento","bancomat"],
-  telefono:["telefono","telefonino","cellulare","smartphone","iphone","samsung","tablet","ipad","auricolari","airpods","cuffie","laptop","computer","portatile","pc"],
+  telefono:["telefono","telefonino","cellulare","smartphone","iphone","samsung","tablet","ipad","auricolari","airpods","cuffie","laptop","computer","portatile","pc","auricolare","elettronica","elettronico","elettronici"],
   chiavi:["chiave","chiavi","mazzo","portachiavi","telecomando"],
   borsa:["borsa","borsetta","zaino","zainetto","valigia","trolley","tracolla","marsupio"],
   abbigliamento:["giacca","giubbotto","giubbino","cappotto","sciarpa","cappello","berretto","guanti","felpa","maglione","scarpe","impermeabile"],
@@ -1213,7 +1213,7 @@ function bind(){
   qa.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); $("#searchForm").requestSubmit(); } });
   smartField({input:$("#q"), chips:$("#qUnderstood"), cat:$("#cat"), onChange:render});
   /* COSA: elenco di oggetti tipici da scegliere o filtrare scrivendo; se non corrisponde resta testo libero */
-  const SUG = [["Bici o monopattino","bici"],["Borsa o zaino","borsa"],["Chiavi","chiavi"],["Cuffie","telefono"],["Documenti","portafoglio","documenti"],["Giacca o abbigliamento","abbigliamento"],["Giocattolo o peluche","altro"],["Occhiali","occhiali"],["Ombrello","altro"],["Orologio o gioielli","gioielli"],["PET (Animale domestico)","animale"],["Portafoglio","portafoglio"],["Telefono, tablet o PC","telefono"],["Altro","altro"]];
+  const SUG = [["Bici o monopattino","bici"],["Borsa o zaino","borsa"],["Chiavi","chiavi"],["Documenti","portafoglio","documenti"],["Elettronica (PC, telefono, tablet, auricolari, …)","telefono",null,"Elettronica"],["Giacca o abbigliamento","abbigliamento"],["Giocattolo o peluche","altro"],["Occhiali","occhiali"],["Ombrello","altro"],["Orologio o gioielli","gioielli"],["PET (Animale domestico)","animale"],["Portafoglio","portafoglio"],["Altro","altro"]];
   /* campo con elenco di suggerimenti: si sceglie dall'elenco o si scrive per filtrarlo; se nulla corrisponde resta testo libero */
   const combo = (inp, ul, items, pick) => {
     let i0 = -1, picking = false;
@@ -1221,10 +1221,10 @@ function bind(){
     const draw = () => {
       const t = norm(inp.value.trim()), list = items().filter(x => !t || norm(x.l).startsWith(t) || norm(x.l).split(/[^a-z]+/).some(w => w.startsWith(t)));
       let g = null; i0 = -1;
-      ul.innerHTML = list.map((x,i) => (x.g && x.g !== g ? `<li class="grp" role="presentation">${esc(g = x.g)}</li>` : "") + `<li role="option" id="${ul.id}${i}" data-v="${esc(x.v)}">${x.icon ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.icon}</svg>` : ""}${esc(x.l)}</li>`).join("");
+      ul.innerHTML = list.map((x,i) => (x.g && x.g !== g ? `<li class="grp" role="presentation">${esc(g = x.g)}</li>` : "") + `<li role="option" id="${ul.id}${i}" data-v="${esc(x.v)}"${x.t ? ` data-t="${esc(x.t)}"` : ""}>${x.icon ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.icon}</svg>` : ""}${esc(x.l)}</li>`).join("");
       open(list.length > 0 && !(list.length === 1 && norm(list[0].l) === t));
     };
-    const choose = li => { picking = true; inp.value = li.textContent; inp.dispatchEvent(new Event("input", {bubbles:true})); picking = false; open(false); pick(li.dataset.v); };
+    const choose = li => { picking = true; inp.value = li.dataset.t || li.textContent; inp.dispatchEvent(new Event("input", {bubbles:true})); picking = false; open(false); pick(li.dataset.v); };
     inp.addEventListener("focus", draw); inp.addEventListener("click", draw);
     inp.addEventListener("input", () => { if(!picking) draw(); });
     inp.addEventListener("blur", () => setTimeout(() => open(false), 150));
@@ -1236,7 +1236,7 @@ function bind(){
       else if(e.key === "Escape") open(false);
     }, true);
   };
-  combo($("#q"), $("#qSug"), () => SUG.map(([l,c,i]) => ({l, v:c, icon:ICONS[i||c]})), c => { $("#cat").value = c; render(); $("#qWhere").focus(); });
+  combo($("#q"), $("#qSug"), () => SUG.map(([l,c,i,t]) => ({l, t, v:c, icon:ICONS[i||c]})), c => { $("#cat").value = c; render(); $("#qWhere").focus(); });
   /* DOVE e QUANDO: campi separati che guidano i filtri di zona e periodo */
   $("#qWhere").addEventListener("input", () => { const v = $("#qWhere").value.trim(); $("#where").value = v ? (parse(v).place || "") : ""; render(); });
   $("#qWhen").addEventListener("change", () => { $("#when").value = $("#qWhen").value; render(); });
@@ -1245,7 +1245,7 @@ function bind(){
   const setFCat = c => { $("#fCat").value = c; $("#fCat").dispatchEvent(new Event("change")); };
   fw.addEventListener("input", () => { const v = fw.value.trim(); setFCat(v ? (parse(v).cat || "altro") : ""); fGrow(); });
   fw.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); $("#fPlace").focus(); } });
-  combo(fw, $("#fSug"), () => SUG.map(([l,c,i]) => ({l, v:c, icon:ICONS[i||c]})), c => { setFCat(c); $("#fPlace").focus(); });
+  combo(fw, $("#fSug"), () => SUG.map(([l,c,i,t]) => ({l, t, v:c, icon:ICONS[i||c]})), c => { setFCat(c); $("#fPlace").focus(); });
   let fWherePicked = false; $("#fWhere").addEventListener("change", e => { if(e.isTrusted) fWherePicked = true; });
   $("#fPlace").addEventListener("input", () => { const v = $("#fPlace").value.trim(), pl = v && parse(v).place; if(!v) fWherePicked = false; if(pl || !fWherePicked) $("#fWhere").value = pl || ""; });
   /* quello che il testo fa capire va direttamente nei filtri sotto: li apriamo e li evidenziamo per un attimo */
@@ -1381,7 +1381,7 @@ function renderAlerts(){
 /* illustrazione hero: scaffale di pittogrammi come le caselle di un ufficio oggetti trovati */
 /* stessi colori dei tooltip: verde = oggetto comune, rosso = va all'ufficio */
 const TILE_BG = {occhiali:"#c9ecc4", borsa:"#c9ecc4", bici:"#c9ecc4", chiavi:"#f6c6c1", portafoglio:"#f6c6c1", telefono:"#f6c6c1"};
-const TILE_LABEL = {telefono:"TELEFONO, TABLET, PC"};
+const TILE_LABEL = {telefono:"ELETTRONICA"};
 function drawTiles(){
   const names = ["portafoglio","telefono","chiavi","borsa","occhiali","bici"];
   $("#tiles").innerHTML = names.map((n,i) => {
