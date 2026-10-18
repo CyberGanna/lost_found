@@ -445,6 +445,8 @@ html.locked #gate{display:grid;place-items:center;min-height:100vh;background:va
 .qsug li.grp{cursor:default;background:none!important;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:10px 12px 4px}
 .qf .ql.dd-hint::after{content:" ▾";color:var(--muted)}
 .disc .mid{white-space:nowrap;display:inline-block;line-height:1.35;background:var(--ink);color:var(--signal);font-family:var(--display);font-weight:800;font-stretch:80%;text-transform:uppercase;letter-spacing:.02em;padding:1px 6px 0;margin-right:2px}
+.hero-visual{position:relative}
+.tile-tip{position:absolute;z-index:20;width:240px;padding:10px 12px;background:var(--lake-soft);color:var(--ink);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-size:.85rem;line-height:1.4;pointer-events:none;transform:translate(-50%,calc(-100% - 8px))}
 </style>
 </head>
 <body>
@@ -537,6 +539,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
       </div>
     </div>
     <div class="hero-visual">
+      <div class="tile-tip" id="tileTip" role="tooltip" data-i18n="tileTip.1" hidden>Oggetto comune: chi lo trova può restituirlo direttamente al proprietario, dopo essersi accertato che sia davvero suo.</div>
       <svg viewBox="0 0 520 440" font-family="Archivo, sans-serif">
         <g id="tiles"></g>
         <g transform="translate(300 300)"><g class="tile" id="sign" role="button" tabindex="0" aria-label="Vedi sulla mappa gli uffici oggetti trovati" data-i18n-aria-label="attr.12">
@@ -681,6 +684,7 @@ const STRINGS = { it: {
  "cerca.6b": "In <span class=\"mid\">Svizzera<\/span> si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href=\"https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720\" target=\"_blank\" rel=\"noopener\">art. 720 CC<\/a>).",
  "cerca.6c": "In <span class=\"mid\">Italia<\/span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href=\"https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html\" target=\"_blank\" rel=\"noopener\">art. 927 c.c.<\/a>).",
  "cerca.6d": "Se il proprietario si fa avanti su RITROVO, per gli oggetti comuni puoi <span class=\"mid\">restituirlo direttamente<\/span>, dopo esserti accertato che sia davvero suo.",
+ "tileTip.1": "Oggetto comune: chi lo trova può restituirlo direttamente al proprietario, dopo essersi accertato che sia davvero suo.",
  "cerca.6e": "Non scrivere dati personali né numeri di documenti. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama, chiedendo i dettagli dell'oggetto e un documento d'identità.",
  "cerca.7": "<a class=\"scroll-cue\" href=\"#risultati\"><span aria-hidden=\"true\">▼<\/span> Scorri per vedere gli ultimi oggetti trovati<\/a>\n  ",
  "pagina.7": "<b>1. Descrivi<\/b><span class=\"note\">Scrivi l'oggetto e dove l'hai perso, come lo diresti a un amico.<\/span>",
@@ -1359,6 +1363,20 @@ function tileGo(el){
 }
 document.addEventListener("click", e => { const t = e.target.closest(".hero-visual .tile"); if(t) tileGo(t); });
 document.addEventListener("keydown", e => { const t = e.target.closest && e.target.closest(".hero-visual .tile"); if(t && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); tileGo(t); } });
+/* oggetti comuni nel disegno: tooltip sulla restituzione diretta */
+const COMMON_TILES = ["occhiali","borsa","bici"];
+function tileTip(t, show){
+  const tip = $("#tileTip");
+  if(!show || !t || !COMMON_TILES.includes(t.dataset.tile)){ tip.hidden = true; t && t.removeAttribute("aria-describedby"); return; }
+  const box = $(".hero-visual").getBoundingClientRect(), r = t.querySelector("rect").getBoundingClientRect();
+  tip.hidden = false;
+  const half = tip.offsetWidth / 2, x = Math.min(Math.max(r.left + r.width/2 - box.left, half), box.width - half);
+  tip.style.left = x + "px"; tip.style.top = (r.top - box.top) + "px";
+  t.setAttribute("aria-describedby", "tileTip");
+}
+document.addEventListener("mouseover", e => { const t = e.target.closest && e.target.closest(".hero-visual .tile"); tileTip(t, !!t); });
+document.addEventListener("focusin", e => { const t = e.target.closest && e.target.closest(".hero-visual .tile"); tileTip(t, !!t); });
+document.addEventListener("focusout", () => tileTip(null, false));
 /* menu a tendina nello stile del sito: il select nativo resta (nascosto) come fonte del valore */
 const DDS = [];
 function enhanceSelect(sel){
