@@ -301,8 +301,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 
 
 /* titolo molto grande e testi della hero più leggibili */
-.hero h1{font-size:clamp(3.6rem,10vw,8.5rem);line-height:.9}
-.hero h1 span{display:inline-block;margin-top:.06em}
+.hero h1{font-size:clamp(2.4rem,8.5vw,8.5rem);line-height:.95;white-space:nowrap;grid-column:1/-1;margin-bottom:-8px}
 .bigq input{font-size:1.25rem}
 .mode span{font-size:1.1rem}
 .refine-d summary{font-size:1rem}
@@ -344,8 +343,8 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 <div class="fold">
 <section class="hero" id="cerca">
   <div class="wrap hero-grid">
+    <h1 class="hero-title">Perso? <span>Trovato?</span></h1>
     <div class="hero-main">
-      <h1>Perso? <span>Trovato?</span></h1>
       <form class="simple" id="searchForm" role="search">
         <div class="mode" role="radiogroup" aria-label="Cosa vuoi fare">
           <label><input type="radio" name="mode" value="perso" checked><span>Ho perso</span></label>
@@ -721,7 +720,7 @@ function render(){
       <span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[it.cat]}</svg></span>
       <span style="min-width:0"><h3>${esc(it.t)}</h3>
         <span class="meta"><span><span class="flag ${p.c}" style="display:inline-block;width:10px;height:7px;border-radius:1px"></span> ${esc(p.n)}, ${esc(it.spot)}</span><span>${ago(it.days)}</span><span>${esc(s.n)}</span></span></span>
-      <span class="state">${pill}<span class="since">in custodia dal ${fmtDate(it.custody)}</span></span></button>`;
+      <span class="state">${pill}<span class="since">dal ${fmtDate(it.custody)}</span></span></button>`;
   }).join("") : `<div class="empty">Nessun oggetto corrisponde, per ora. Gli uffici registrano spesso con qualche giorno di ritardo.<br><br><button class="btn signal" type="button" onclick="document.getElementById('toAlert').click()">Avvisami quando compare</button></div>`;
   drawMap(res);
 }
@@ -736,6 +735,7 @@ function initSwissMap(){
   const box = $("#lmap"), svg = $("#map");
   box.hidden = false; svg.style.display = "none";
   lmap = L.map(box, {scrollWheelZoom:false, attributionControl:true}).fitBounds([[45.62,8.45],[46.56,9.32]]);
+  lmap.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
   let ok = false;
   const tiles = L.tileLayer(SWISSTOPO, {maxZoom:18, attribution:'© <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener">swisstopo</a>'}).addTo(lmap);
   tiles.on("tileload", () => { if(!ok){ ok = true; $("#mapNote").textContent = "Carta nazionale © swisstopo"; } });
