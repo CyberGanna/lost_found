@@ -397,6 +397,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 @media (max-width:480px){ .qalert .qa-row{flex-direction:column} }
 #enti{background:#111;color:#fff;border-top:0}
 #enti .eyebrow{color:var(--signal)}
+.cta-enti{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:18px 0 6px;font-weight:700}
 #enti h2,#enti h3{color:#fff}
 #enti > .wrap > p.lead{color:#cfcfcf}
 #enti .panel{background:#1c1c1c;border:1px solid #444}
@@ -587,6 +588,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <p class="eyebrow">Per comuni, polizie e aziende di trasporto</p>
     <h2>Un solo annuncio, visto su entrambi i lati del confine.</h2>
     <p class="lead">Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.</p>
+    <p class="cta-enti"><span>Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVO?</span> <button class="btn signal" type="button" id="contactUs">Contattateci</button></p>
     <div class="grid3">
       <div class="panel"><h3>Aggregatore</h3><p class="note">Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono, in Svizzera e in Italia.</p></div>
       <div class="panel"><h3>Registro per piccoli comuni</h3><p class="note">Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (1 anno in Italia, 5 in Svizzera).</p></div>
@@ -1051,6 +1053,7 @@ function bind(){
     const v = e.target.value.trim();
     e.target.setCustomValidity(!v || okContact(v, c === "any") ? "" : c === "any" ? "Scrivi un'email o un numero di telefono valido." : "Scrivi un'email valida.");
   });
+  $("#contactUs").addEventListener("click", () => toast("Nel prototipo il contatto non è ancora attivo."));
   $("#qAlert").addEventListener("submit", e => {
     e.preventDefault();
     alerts = alerts.filter(a => !a.example);
