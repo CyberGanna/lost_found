@@ -539,7 +539,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
       </div>
     </div>
     <div class="hero-visual">
-      <div class="tile-tip" id="tileTip" role="tooltip" data-i18n="tileTip.1" hidden>Oggetto comune: chi lo trova può restituirlo direttamente al proprietario, dopo essersi accertato che sia davvero suo.</div>
+      <div class="tile-tip" id="tileTip" role="tooltip" hidden><span data-tip-kind="common" data-i18n="tileTip.1">Oggetto comune: chi lo trova può restituirlo direttamente al proprietario, dopo essersi accertato che sia davvero suo.</span><span data-tip-kind="office" data-i18n="tileTip.2">Oggetto personale o di valore: va sempre consegnato a un ufficio pubblico, come la polizia o il Comune.</span></div>
       <svg viewBox="0 0 520 440" font-family="Archivo, sans-serif">
         <g id="tiles"></g>
         <g transform="translate(300 300)"><g class="tile" id="sign" role="button" tabindex="0" aria-label="Vedi sulla mappa gli uffici oggetti trovati" data-i18n-aria-label="attr.12">
@@ -685,6 +685,7 @@ const STRINGS = { it: {
  "cerca.6c": "In <span class=\"mid\">Italia<\/span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href=\"https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html\" target=\"_blank\" rel=\"noopener\">art. 927 c.c.<\/a>).",
  "cerca.6d": "Se il proprietario si fa avanti su RITROVO, per gli oggetti comuni puoi <span class=\"mid\">restituirlo direttamente<\/span>, dopo esserti accertato che sia davvero suo.",
  "tileTip.1": "Oggetto comune: chi lo trova può restituirlo direttamente al proprietario, dopo essersi accertato che sia davvero suo.",
+ "tileTip.2": "Oggetto personale o di valore: va sempre consegnato a un ufficio pubblico, come la polizia o il Comune.",
  "cerca.6e": "Non scrivere dati personali né numeri di documenti. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama, chiedendo i dettagli dell'oggetto e un documento d'identità.",
  "cerca.7": "<a class=\"scroll-cue\" href=\"#risultati\"><span aria-hidden=\"true\">▼<\/span> Scorri per vedere gli ultimi oggetti trovati<\/a>\n  ",
  "pagina.7": "<b>1. Descrivi<\/b><span class=\"note\">Scrivi l'oggetto e dove l'hai perso, come lo diresti a un amico.<\/span>",
@@ -1363,12 +1364,14 @@ function tileGo(el){
 }
 document.addEventListener("click", e => { const t = e.target.closest(".hero-visual .tile"); if(t) tileGo(t); });
 document.addEventListener("keydown", e => { const t = e.target.closest && e.target.closest(".hero-visual .tile"); if(t && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); tileGo(t); } });
-/* oggetti comuni nel disegno: tooltip sulla restituzione diretta */
-const COMMON_TILES = ["occhiali","borsa","bici"];
+/* tooltip sul disegno: oggetti comuni (restituzione diretta) o di valore (sempre all'ufficio) */
+const TILE_TIP = {occhiali:"common", borsa:"common", bici:"common", chiavi:"office", portafoglio:"office", telefono:"office"};
 function tileTip(t, show){
   const tip = $("#tileTip");
-  if(!show || !t || !COMMON_TILES.includes(t.dataset.tile)){ tip.hidden = true; t && t.removeAttribute("aria-describedby"); return; }
+  const kind = t && TILE_TIP[t.dataset.tile];
+  if(!show || !kind){ tip.hidden = true; t && t.removeAttribute("aria-describedby"); return; }
   const box = $(".hero-visual").getBoundingClientRect(), r = t.querySelector("rect").getBoundingClientRect();
+  tip.querySelectorAll("[data-tip-kind]").forEach(x => x.hidden = x.dataset.tipKind !== kind);
   tip.hidden = false;
   const half = tip.offsetWidth / 2, x = Math.min(Math.max(r.left + r.width/2 - box.left, half), box.width - half);
   tip.style.left = x + "px"; tip.style.top = (r.top - box.top) + "px";
