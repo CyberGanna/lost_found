@@ -832,6 +832,7 @@ const ICONS = {
   gioielli:'<circle cx="12" cy="13" r="6"/><path d="M9 4h6l-1.5 3h-3z"/>',
   occhiali:'<circle cx="6.5" cy="14" r="3.5"/><circle cx="17.5" cy="14" r="3.5"/><path d="M10 14h4M3 14l1-6M21 14l-1-6"/>',
   bici:'<circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-8h5l3 8M10 8l2 8"/>',
+  documenti:'<rect x="2.5" y="5" width="19" height="14" rx="2"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5 16.5c.6-1.8 2-2.7 3.5-2.7s2.9.9 3.5 2.7M14.5 10h4.5M14.5 13.5h3"/>',
   altro:'<rect x="4" y="6" width="16" height="13" rx="2"/><path d="M4 10h16"/>'
 };
 
@@ -1181,7 +1182,7 @@ function bind(){
   qa.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); $("#searchForm").requestSubmit(); } });
   smartField({input:$("#q"), chips:$("#qUnderstood"), cat:$("#cat"), onChange:render});
   /* COSA: elenco di oggetti tipici da scegliere o filtrare scrivendo; se non corrisponde resta testo libero */
-  const SUG = [["Portafoglio","portafoglio"],["Chiavi","chiavi"],["Telefono","telefono"],["Documenti","portafoglio"],["Occhiali","occhiali"],["Borsa o zaino","borsa"],["Giacca o abbigliamento","abbigliamento"],["Orologio o gioielli","gioielli"],["Cuffie, tablet o computer","telefono"],["Bici o monopattino","bici"],["Ombrello","altro"],["Giocattolo o peluche","altro"],["Altro","altro"]];
+  const SUG = [["Bici o monopattino","bici"],["Borsa o zaino","borsa"],["Chiavi","chiavi"],["Cuffie, tablet o computer","telefono"],["Documenti","portafoglio","documenti"],["Giacca o abbigliamento","abbigliamento"],["Giocattolo o peluche","altro"],["Occhiali","occhiali"],["Ombrello","altro"],["Orologio o gioielli","gioielli"],["Portafoglio","portafoglio"],["Telefono","telefono"],["Altro","altro"]];
   /* campo con elenco di suggerimenti: si sceglie dall'elenco o si scrive per filtrarlo; se nulla corrisponde resta testo libero */
   const combo = (inp, ul, items, pick) => {
     let i0 = -1, picking = false;
@@ -1204,7 +1205,7 @@ function bind(){
       else if(e.key === "Escape") open(false);
     }, true);
   };
-  combo($("#q"), $("#qSug"), () => SUG.map(([l,c]) => ({l, v:c, icon:ICONS[c]})), c => { $("#cat").value = c; render(); $("#qWhere").focus(); });
+  combo($("#q"), $("#qSug"), () => SUG.map(([l,c,i]) => ({l, v:c, icon:ICONS[i||c]})), c => { $("#cat").value = c; render(); $("#qWhere").focus(); });
   /* DOVE e QUANDO: campi separati che guidano i filtri di zona e periodo */
   $("#qWhere").addEventListener("input", () => { const v = $("#qWhere").value.trim(); $("#where").value = v ? (parse(v).place || "") : ""; render(); });
   $("#qWhen").addEventListener("change", () => { $("#when").value = $("#qWhen").value; render(); });
