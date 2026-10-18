@@ -416,6 +416,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .mode-row .ex{margin:0 0 4px;position:relative;top:7px;line-height:1.1;border:0;background:none;color:var(--ink);font:inherit;font-size:.95rem;font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:2px 0;cursor:pointer;white-space:nowrap}
 .mode-row .ex:hover{text-decoration-thickness:2px}
 .bigq textarea{align-self:center!important;padding:6px 8px!important}
+.map-legend .showall{margin-left:auto;border:0;background:none;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -533,6 +534,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       <span><span class="flag CH chip-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ch)"></span> Ufficio svizzero</span>
       <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--it)"></span> Ufficio italiano</span>
       <span id="mapNote">- - - confine (schematico)</span>
+      <button class="showall" type="button" id="showAll" hidden>Mostra tutto</button>
     </div>
   </aside>
 </section>
@@ -850,7 +852,8 @@ function initSwissMap(){
   if(!window.L) return;
   const box = $("#lmap"), svg = $("#map");
   box.hidden = false; svg.style.display = "none";
-  lmap = L.map(box, {scrollWheelZoom:false, attributionControl:true}).fitBounds([[45.62,8.45],[46.56,9.32]]);
+  lmap = L.map(box, {scrollWheelZoom:false, attributionControl:true}).fitBounds(HOME);
+  lmap.on("zoomstart dragstart", e => { if(!lmap._homing){ mapMoved = true; syncShowAll(); } });
   lmap.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
   let ok = false;
   const tiles = L.tileLayer(SWISSTOPO, {maxZoom:18, attribution:'© <a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener">swisstopo</a>'}).addTo(lmap);
@@ -872,8 +875,12 @@ function drawPins(res){
   });
 }
 
+const HOME = [[45.62,8.45],[46.56,9.32]];
+let mapMoved = false;
+function filtered(){ return !!($("#q").value.trim() || $("#cat").value || $("#where").value) || $("#when").value !== "30"; }
+function syncShowAll(){ $("#showAll").hidden = !(filtered() || mapMoved); }
 function drawMap(res){
-  lastRes = res;
+  lastRes = res; syncShowAll();
   if(lmap) drawPins(res);
   const lakes = [
     [[8.82,46.18],[8.76,46.13],[8.72,46.05],[8.74,46.00],[8.66,45.93],[8.58,45.90],[8.56,45.84],[8.58,45.76]],
@@ -1067,6 +1074,12 @@ function bind(){
     $(w).addEventListener("invalid", () => { lab.hidden = false; setTimeout(() => $(w).focus()); });
     const upd = () => setTimeout(() => { const txt = $(t).value.trim(); if(!txt) picked = false; lab.hidden = !txt || (!picked && !!$(w).value) || (txt.length < 4); });
     $(t).addEventListener("input", upd); $(t).closest("form").addEventListener("reset", () => { picked = false; setTimeout(() => lab.hidden = true); });
+  });
+  $("#showAll").addEventListener("click", () => {
+    const qa = $("#q"); qa.value = ""; qa.dispatchEvent(new Event("input", {bubbles:true}));
+    $("#cat").value = ""; $("#where").value = ""; $("#when").value = "30";
+    if(lmap){ lmap._homing = true; lmap.fitBounds(HOME); setTimeout(() => { lmap._homing = false; }, 400); }
+    mapMoved = false; render();
   });
   $("#contactUs").addEventListener("click", () => toast("Nel prototipo il contatto non è ancora attivo."));
   $("#qAlert").addEventListener("submit", e => {
