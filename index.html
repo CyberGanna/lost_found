@@ -505,7 +505,7 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
         </div>
         <div class="q3">
           <label class="qf qf-what"><span class="ql dd-hint" data-i18n="q3.cosa">Cosa</span><textarea id="q" rows="1" role="combobox" aria-autocomplete="list" aria-controls="qSug" aria-expanded="false" placeholder="es. occhiali da sole" data-i18n-placeholder="attr.7" autocomplete="off" enterkeyhint="go"></textarea><ul class="qsug" id="qSug" role="listbox" hidden></ul></label>
-          <label class="qf"><span class="ql dd-hint" data-i18n="q3.dove">Dove</span><input id="qWhere" role="combobox" aria-autocomplete="list" aria-controls="wSug" aria-expanded="false" autocomplete="off" enterkeyhint="go" placeholder="es. Lugano" data-i18n-placeholder="q3.dove.ph"><ul class="qsug" id="wSug" role="listbox" hidden></ul></label>
+          <label class="qf"><span class="ql" data-i18n="q3.dove">Dove</span><input id="qWhere" autocomplete="off" enterkeyhint="go" placeholder="es. Lugano" data-i18n-placeholder="q3.dove.ph"></label>
           <label class="qf"><span class="ql" data-i18n="q3.quando">Quando</span><select id="qWhen">
             <option value="0" data-i18n="q3.w0">Oggi</option><option value="1" data-i18n="q3.w1">Ieri</option><option value="7" data-i18n="q3.w7">Ultimi 7 giorni</option><option value="30" selected data-i18n="q3.w30">Ultimo mese</option><option value="365" data-i18n="q3.w365">Ultimo anno</option>
           </select></label>
@@ -1205,7 +1205,6 @@ function bind(){
     }, true);
   };
   combo($("#q"), $("#qSug"), () => SUG.map(([l,c]) => ({l, v:c, icon:ICONS[c]})), c => { $("#cat").value = c; render(); $("#qWhere").focus(); });
-  combo($("#qWhere"), $("#wSug"), () => Object.entries(R.places).sort((a,b) => a[1].c.localeCompare(b[1].c) || a[1].n.localeCompare(b[1].n)).map(([k,p]) => ({l:p.n, v:k, g:p.c === "CH" ? "Ticino" : "Italia"})), k => { $("#where").value = k; render(); $("#qWhen").focus(); });
   /* DOVE e QUANDO: campi separati che guidano i filtri di zona e periodo */
   $("#qWhere").addEventListener("input", () => { const v = $("#qWhere").value.trim(); $("#where").value = v ? (parse(v).place || "") : ""; render(); });
   $("#qWhen").addEventListener("change", () => { $("#when").value = $("#qWhen").value; render(); });
