@@ -419,26 +419,56 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .map-legend .showall{margin-left:auto;border:0;background:none;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .reward .more{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;cursor:pointer}
 .disc .more{border:0;background:none;padding:0;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+#gate{display:none}
+html.locked body > *:not(#gate):not(script){display:none!important}
+html.locked #gate{display:grid;place-items:center;min-height:100vh;background:var(--signal);padding:24px}
+#gate form{width:min(440px,100%)}
+#gate .gate-logo{font-family:var(--display);font-weight:900;letter-spacing:.04em;margin:0 0 8px}
+#gate h1{font-family:var(--display);font-weight:900;font-stretch:72%;text-transform:uppercase;font-size:clamp(2.2rem,8vw,3.6rem);line-height:1;margin:0 0 10px}
+#gate .gate-row{display:flex;gap:6px;background:var(--surface);border:3px solid var(--ink);padding:6px;margin-top:14px}
+#gate input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:1.1rem;padding:8px;outline:none}
+#gate .btn.go{color:var(--signal);padding:8px 14px}
+#gate .gate-err{color:#b80014;font-weight:700;margin-top:10px}
 </style>
 </head>
 <body>
 
+<!-- accesso al sito di prova: solo una barriera visiva (il codice è pubblico), non una protezione vera -->
+<script>try{ if(localStorage.getItem("ritrovo-ok") !== "789f0da840ca59e0d9314a276aacf482c4bfe91685f0404abf28b79da757a051") document.documentElement.classList.add("locked"); }catch(e){ document.documentElement.classList.add("locked"); }</script>
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gateT">
+  <form id="gateForm">
+    <p class="gate-logo">RITROVO</p>
+    <h1 id="gateT">Sito di prova</h1>
+    <p>Inserisci la password per entrare.</p>
+    <div class="gate-row"><input id="gatePw" type="password" autocomplete="current-password" aria-label="Password" placeholder="Password" required><button class="btn go" type="submit" aria-label="Entra"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button></div>
+    <p class="gate-err" id="gateErr" hidden>Password errata.</p>
+  </form>
+</div>
+<script>
+document.getElementById("gateForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(document.getElementById("gatePw").value));
+  const hex = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  if(hex === "789f0da840ca59e0d9314a276aacf482c4bfe91685f0404abf28b79da757a051"){ try{ localStorage.setItem("ritrovo-ok", hex); }catch(_){} document.documentElement.classList.remove("locked"); window.dispatchEvent(new Event("resize")); }
+  else { document.getElementById("gateErr").hidden = false; document.getElementById("gatePw").select(); }
+});
+</script>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#cerca" aria-label="Ritrovo, home">
+    <a class="brand" href="#cerca" aria-label="Ritrovo, home" data-i18n-aria-label="attr.1">
       <span class="brand-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2a2200" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M7.8 10.6l2 2 3.6-4"/></svg></span>
-      <span><b>Ritrovo</b><small id="brandRegion">Ticino e zona di confine</small></span>
+      <span><b data-i18n="pagina.1">Ritrovo</b><small id="brandRegion"><span data-i18n="brandRegion.1">Ticino e zona di confine</span></small></span>
     </a>
-    <nav class="main" aria-label="Sezioni">
+    <nav class="main" aria-label="Sezioni" data-i18n-aria-label="attr.2" data-i18n="pagina.2">
       <a href="#cerca">Cerca</a>
       <a href="#trovato">Ho trovato qualcosa</a>
       <a href="#avvisi">I miei avvisi</a>
       <a href="#enti">Per comuni e aziende</a>
     </nav>
     <div class="top-tools">
-      <select class="region" id="region" aria-label="Regione" hidden></select>
-      <div class="langs" role="group" aria-label="Lingua">
-        <button aria-pressed="true">IT</button><button aria-pressed="false">DE</button><button aria-pressed="false">FR</button><button aria-pressed="false">EN</button>
+      <select class="region" id="region" aria-label="Regione" data-i18n-aria-label="attr.3" hidden></select>
+      <div class="langs" role="group" aria-label="Lingua" data-i18n-aria-label="attr.4">
+        <button aria-pressed="true" data-i18n="pagina.3">IT</button><button aria-pressed="false" data-i18n="pagina.4">DE</button><button aria-pressed="false" data-i18n="pagina.5">FR</button><button aria-pressed="false" data-i18n="pagina.6">EN</button>
       </div>
     </div>
   </div>
@@ -448,45 +478,45 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 <div class="fold">
 <section class="hero" id="cerca">
   <div class="wrap hero-grid">
-    <h1 class="hero-title">Perso? <span>Trovato?</span></h1>
+    <h1 class="hero-title" data-i18n="cerca.1">Perso? <span>Trovato?</span></h1>
     <div class="hero-main">
       <form class="simple" id="searchForm" role="search">
         <div class="mode-row">
-        <div class="mode" role="radiogroup" aria-label="Cosa vuoi fare">
-          <label><input type="radio" name="mode" value="perso" checked><span>Ho perso</span></label>
-          <label><input type="radio" name="mode" value="trovato"><span>Ho trovato</span></label>
+        <div class="mode" role="radiogroup" aria-label="Cosa vuoi fare" data-i18n-aria-label="attr.5">
+          <label><input type="radio" name="mode" value="perso" checked><span data-i18n="searchForm.1">Ho perso</span></label>
+          <label><input type="radio" name="mode" value="trovato"><span data-i18n="searchForm.2">Ho trovato</span></label>
         </div>
-        <button class="ex" type="button" id="qEx" title="Compila con un esempio">Esempio</button>
+        <button class="ex" type="button" id="qEx" title="Compila con un esempio" data-i18n-title="attr.6" data-i18n="qEx.1">Esempio</button>
         </div>
         <div class="bigq">
-          <label for="q" class="sr">Descrivi l'oggetto</label>
-          <textarea id="q" rows="1" placeholder="Cosa, dove, quando: scrivilo come lo diresti a un amico" autocomplete="off" enterkeyhint="go"></textarea>
-          <button class="clr" type="button" id="qClr" aria-label="Cancella il testo" title="Cancella" hidden>×</button>
-          <button class="btn go" type="submit" id="qGo" aria-label="Cerca" title="Cerca"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button>
+          <label for="q" class="sr" data-i18n="searchForm.3">Descrivi l'oggetto</label>
+          <textarea id="q" rows="1" placeholder="Cosa, dove, quando: scrivilo come lo diresti a un amico" data-i18n-placeholder="attr.7" autocomplete="off" enterkeyhint="go"></textarea>
+          <button class="clr" type="button" id="qClr" aria-label="Cancella il testo" data-i18n-aria-label="attr.8" title="Cancella" data-i18n-title="attr.9" hidden data-i18n="qClr.1">×</button>
+          <button class="btn go" type="submit" id="qGo" aria-label="Cerca" data-i18n-aria-label="attr.10" title="Cerca" data-i18n-title="attr.11"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button>
         </div>
-        <p class="note qhint" id="qHint">Resta sul generico: tipo di oggetto, zona, quando. Non scrivere colore, marca o contenuto: ti serviranno per dimostrare che è tuo.</p>
+        <p class="note qhint" id="qHint" data-i18n="qHint.1">Resta sul generico: tipo di oggetto, zona, quando. Non scrivere colore, marca o contenuto: ti serviranno per dimostrare che è tuo.</p>
         <div class="understood" id="qUnderstood" aria-live="polite"></div>
         <details class="refine-d" hidden>
-          <summary>Affina la ricerca</summary>
+          <summary data-i18n="searchForm.4">Affina la ricerca</summary>
           <div class="refine">
-            <label><span>Categoria</span><select id="cat"></select></label>
-            <label><span>In zona di</span><select id="where"></select></label>
-            <label><span>Quando</span><select id="when">
+            <label><span data-i18n="searchForm.5">Categoria</span><select id="cat"></select></label>
+            <label><span data-i18n="searchForm.6">In zona di</span><select id="where"></select></label>
+            <label><span data-i18n="searchForm.7">Quando</span><select id="when">
               <option value="3">Ultimi 3 giorni</option><option value="7">Ultima settimana</option><option value="30" selected>Ultimo mese</option><option value="365">Ultimo anno</option>
             </select></label>
           </div>
         </details>
       </form>
-      <ul class="trust"><li>Gratis</li><li>Senza registrazione</li><li>Svizzera e Italia</li></ul>
+      <ul class="trust"><li data-i18n="cerca.2">Gratis</li><li data-i18n="cerca.3">Senza registrazione</li><li data-i18n="cerca.4">Svizzera e Italia</li></ul>
       <div class="disc">
-        <p><span class="imp">Nota importante</span><br><b>RITROVO non sostituisce l'ufficio oggetti trovati.</b></p>
-        <p>Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità: in <span class="mid">Svizzera</span> la polizia, in <span class="mid">Italia</span> il Comune. <button class="more" type="button" id="discLaw">Leggi di più…</button></p>
+        <p data-i18n="cerca.5"><span class="imp">Nota importante</span><br><b>RITROVO non sostituisce l'ufficio oggetti trovati.</b></p>
+        <p><span data-i18n="cerca.6">Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità: in <span class="mid">Svizzera</span> la polizia, in <span class="mid">Italia</span> il Comune.</span> <button class="more" type="button" id="discLaw" data-i18n="discLaw.1">Leggi di più…</button></p>
       </div>
     </div>
     <div class="hero-visual">
       <svg viewBox="0 0 520 440" font-family="Archivo, sans-serif">
         <g id="tiles"></g>
-        <g transform="translate(300 300)"><g class="tile" id="sign" role="button" tabindex="0" aria-label="Vedi sulla mappa gli uffici oggetti trovati">
+        <g transform="translate(300 300)"><g class="tile" id="sign" role="button" tabindex="0" aria-label="Vedi sulla mappa gli uffici oggetti trovati" data-i18n-aria-label="attr.12">
           <rect x="-6" y="0" width="12" height="140" fill="#111"/>
           <path d="M-150 -6 H170 L205 26 L170 58 H-150Z" fill="#111"/>
           <text x="-134" y="22" fill="#ffd100" font-weight="900" font-size="18" style="font-stretch:72%">UFFICIO OGGETTI TROVATI</text>
@@ -496,68 +526,68 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       </svg>
     </div>
   </div>
-  <div class="wrap cue-row"><a class="scroll-cue" href="#risultati"><span aria-hidden="true">▼</span> Scorri per vedere gli ultimi oggetti trovati</a>
+  <div class="wrap cue-row" data-i18n="cerca.7"><a class="scroll-cue" href="#risultati"><span aria-hidden="true">▼</span> Scorri per vedere gli ultimi oggetti trovati</a>
   </div>
 </section>
 
-<section class="how" aria-label="Come funziona">
+<section class="how" aria-label="Come funziona" data-i18n-aria-label="attr.13">
   <div class="wrap how-grid">
-    <div><b>1. Descrivi</b><span class="note">Scrivi l'oggetto e dove l'hai perso, come lo diresti a un amico.</span></div>
-    <div><b>2. Cerchiamo per te</b><span class="note">Confrontiamo la tua descrizione con gli oggetti trovati nella zona, in Svizzera e in Italia.</span></div>
-    <div><b>3. Ti avvisiamo</b><span class="note">Se non c'è ancora, ricevi un messaggio appena un ufficio lo registra.</span></div>
+    <div data-i18n="pagina.7"><b>1. Descrivi</b><span class="note">Scrivi l'oggetto e dove l'hai perso, come lo diresti a un amico.</span></div>
+    <div data-i18n="pagina.8"><b>2. Cerchiamo per te</b><span class="note">Confrontiamo la tua descrizione con gli oggetti trovati nella zona, in Svizzera e in Italia.</span></div>
+    <div data-i18n="pagina.9"><b>3. Ti avvisiamo</b><span class="note">Se non c'è ancora, ricevi un messaggio appena un ufficio lo registra.</span></div>
   </div>
 </section>
 </div>
 
-<section class="wrap results" id="risultati" aria-label="Ultimi oggetti trovati">
+<section class="wrap results" id="risultati" aria-label="Ultimi oggetti trovati" data-i18n-aria-label="attr.14">
   <div>
     <div class="res-head">
-      <h2 id="resTitle">▼ Ultimi oggetti trovati</h2>
+      <h2 id="resTitle" data-i18n="resTitle.1">▼ Ultimi oggetti trovati</h2>
     </div>
     <!-- Fonti nascoste finché gli uffici non sono collegati davvero: si riattivano togliendo hidden -->
-    <details class="src-d" hidden><summary>Fonti consultate: <span id="srcCount"></span></summary><div class="sources" id="sources" aria-label="Fonti consultate"></div></details>
+    <details class="src-d" hidden><summary><span data-i18n="risultati.1">Fonti consultate:</span> <span id="srcCount"></span></summary><div class="sources" id="sources" aria-label="Fonti consultate" data-i18n-aria-label="attr.15"></div></details>
     <div class="list" id="list"></div>
     <form class="qalert" id="qAlert" hidden>
-      <p class="qa-t" id="qaT">Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.</p>
-      <div class="qa-row"><input id="qaMail" type="email" data-contact="email" required autocomplete="email" placeholder="La tua email" aria-label="La tua email"><button class="btn" type="submit">Avvisami</button></div>
-      <p class="qa-n">Non serve registrarsi.</p>
+      <p class="qa-t" id="qaT" data-i18n="qaT.1">Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.</p>
+      <div class="qa-row"><input id="qaMail" type="email" data-contact="email" required autocomplete="email" placeholder="La tua email" data-i18n-placeholder="attr.16" aria-label="La tua email" data-i18n-aria-label="attr.17"><button class="btn" type="submit" data-i18n="qAlert.1">Avvisami</button></div>
+      <p class="qa-n" data-i18n="qAlert.2">Non serve registrarsi.</p>
     </form>
   </div>
-  <aside class="mapbox" aria-label="Mappa">
-    <div id="lmap" hidden role="region" aria-label="Carta nazionale swisstopo con gli oggetti trovati"></div>
-    <svg id="map" viewBox="0 0 400 600" role="img" aria-label="Mappa schematica di Ticino, Como, Varese e Verbano con gli oggetti trovati"></svg>
+  <aside class="mapbox" aria-label="Mappa" data-i18n-aria-label="attr.18">
+    <div id="lmap" hidden role="region" aria-label="Carta nazionale swisstopo con gli oggetti trovati" data-i18n-aria-label="attr.19"></div>
+    <svg id="map" viewBox="0 0 400 600" role="img" aria-label="Mappa schematica di Ticino, Como, Varese e Verbano con gli oggetti trovati" data-i18n-aria-label="attr.20"></svg>
     <div class="map-legend">
-      <span><span class="flag CH chip-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ch)"></span> Ufficio svizzero</span>
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--it)"></span> Ufficio italiano</span>
-      <span id="mapNote">- - - confine (schematico)</span>
-      <button class="showall" type="button" id="showAll" hidden>Mostra tutto</button>
+      <span data-i18n="risultati.2"><span class="flag CH chip-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ch)"></span> Ufficio svizzero</span>
+      <span data-i18n="risultati.3"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--it)"></span> Ufficio italiano</span>
+      <span id="mapNote" data-i18n="mapNote.1">- - - confine (schematico)</span>
+      <button class="showall" type="button" id="showAll" hidden data-i18n="showAll.1">Mostra tutto</button>
     </div>
   </aside>
 </section>
 
 <section class="band" id="trovato">
   <div class="wrap">
-    <p class="eyebrow">Per chi trova</p>
-    <h2>Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
-    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità.</span><span>In <span class="mid">Svizzera</span> va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</span><span>In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
+    <p class="eyebrow" data-i18n="trovato.1">Per chi trova</p>
+    <h2 data-i18n="trovato.2">Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
+    <p class="lead"><span data-i18n="trovato.3">La</span> <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge"><span data-i18n="trovato.4">legge</span><span class="tip-box" role="tooltip" id="tipLegge"><span data-i18n="tipLegge.1">Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità.</span><span data-i18n="tipLegge.2">In <span class="mid">Svizzera</span> va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</span><span data-i18n="tipLegge.3">In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span data-i18n="tipLegge.4">Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law data-i18n="tipLegge.5">Leggi di più…</button></span></span></span> <span data-i18n="trovato.5">chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</span></p>
     <div class="two">
       <form class="panel form" id="foundForm">
-        <label>Che oggetto è, e dove l'hai trovato <span class="note">Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.</span><textarea id="fWhat" rows="2" required placeholder="es. zaino, sul bus a Bellinzona"></textarea></label>
+        <label><span data-i18n="foundForm.1">Che oggetto è, e dove l'hai trovato</span> <span class="note" data-i18n="foundForm.2">Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.</span><textarea id="fWhat" rows="2" required placeholder="es. zaino, sul bus a Bellinzona" data-i18n-placeholder="attr.21"></textarea></label>
         <div class="understood" id="fUnderstood" aria-live="polite" style="padding:0"></div>
         <div class="row">
-          <label hidden>Categoria<select id="fCat"></select></label>
-          <label class="askwhere" hidden>Dove l'hai trovato? <span class="note">Non lo abbiamo capito dal testo.</span><select id="fWhere" required></select></label>
+          <label hidden><span data-i18n="foundForm.3">Categoria</span><select id="fCat"></select></label>
+          <label class="askwhere" hidden><span data-i18n="foundForm.4">Dove l'hai trovato?</span> <span class="note" data-i18n="foundForm.5">Non lo abbiamo capito dal testo.</span><select id="fWhere" required></select></label>
         </div>
         <div id="fRule" aria-live="polite"></div>
-        <label>Dettagli che solo il proprietario conosce <span class="note">Non vengono pubblicati. Servono a verificare chi lo reclama.</span><input id="fSecret" placeholder="es. colore, marca, cosa c'è dentro, un segno particolare"></label>
-        <button class="btn" type="submit">Trova l'ufficio competente</button>
+        <label><span data-i18n="foundForm.6">Dettagli che solo il proprietario conosce</span> <span class="note" data-i18n="foundForm.7">Non vengono pubblicati. Servono a verificare chi lo reclama.</span><input id="fSecret" placeholder="es. colore, marca, cosa c'è dentro, un segno particolare" data-i18n-placeholder="attr.22"></label>
+        <button class="btn" type="submit" data-i18n="foundForm.8">Trova l'ufficio competente</button>
       </form>
       <div class="panel" id="foundOut">
         <ol class="flow">
-          <li><div><b>Descrivi l'oggetto</b><span class="note">Tipo di oggetto e luogo bastano. I dati sensibili restano nascosti.</span></div></li>
-          <li><div><b>Ti indichiamo l'ufficio</b><span class="note">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.</span></div></li>
-          <li><div><b>Consegni e ricevi la ricevuta</b><span class="note">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti. Obbligatorio per chiavi, documenti e oggetti di valore; gli oggetti comuni puoi anche restituirli tu.</span></div></li>
-          <li><div><b>Il proprietario riceve un avviso</b><span class="note">Se ha creato un avviso compatibile, lo informiamo subito.</span></div></li>
+          <li><div data-i18n="foundOut.1"><b>Descrivi l'oggetto</b><span class="note">Tipo di oggetto e luogo bastano. I dati sensibili restano nascosti.</span></div></li>
+          <li><div data-i18n="foundOut.2"><b>Ti indichiamo l'ufficio</b><span class="note">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.</span></div></li>
+          <li><div data-i18n="foundOut.3"><b>Consegni e ricevi la ricevuta</b><span class="note">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti. Obbligatorio per chiavi, documenti e oggetti di valore; gli oggetti comuni puoi anche restituirli tu.</span></div></li>
+          <li><div data-i18n="foundOut.4"><b>Il proprietario riceve un avviso</b><span class="note">Se ha creato un avviso compatibile, lo informiamo subito.</span></div></li>
         </ol>
       </div>
     </div>
@@ -566,9 +596,9 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 
 <section class="band" id="avvisi">
   <div class="wrap">
-    <p class="eyebrow">Per chi ha perso</p>
-    <h2>I tuoi avvisi</h2>
-    <p class="lead">Per creare un avviso cerca l'oggetto qui sopra e lascia la tua email sotto i risultati. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
+    <p class="eyebrow" data-i18n="avvisi.1">Per chi ha perso</p>
+    <h2 data-i18n="avvisi.2">I tuoi avvisi</h2>
+    <p class="lead" data-i18n="avvisi.3">Per creare un avviso cerca l'oggetto qui sopra e lascia la tua email sotto i risultati. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
     <div class="panel" style="max-width:760px">
       <div class="alerts" id="alerts"></div>
     </div>
@@ -577,28 +607,136 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 
 <section class="band" id="enti">
   <div class="wrap">
-    <p class="eyebrow">Per comuni, polizie e aziende di trasporto</p>
-    <h2>Un solo annuncio, visto su entrambi i lati del confine.</h2>
-    <p class="lead">Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.</p>
-    <p class="cta-enti"><span>Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVO?</span> <button class="btn signal" type="button" id="contactUs">Contattateci</button></p>
+    <p class="eyebrow" data-i18n="enti.1">Per comuni, polizie e aziende di trasporto</p>
+    <h2 data-i18n="enti.2">Un solo annuncio, visto su entrambi i lati del confine.</h2>
+    <p class="lead" data-i18n="enti.3">Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.</p>
+    <p class="cta-enti"><span data-i18n="enti.4">Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVO?</span> <button class="btn signal" type="button" id="contactUs" data-i18n="contactUs.1">Contattateci</button></p>
     <div class="grid3">
-      <div class="panel"><h3>Aggregatore</h3><p class="note">Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono, in Svizzera e in Italia.</p></div>
-      <div class="panel"><h3>Registro per piccoli comuni</h3><p class="note">Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (1 anno in Italia, 5 in Svizzera).</p></div>
-      <div class="panel"><h3>Verifica del proprietario</h3><p class="note">Domande sui dettagli nascosti prima della restituzione, per ridurre truffe e falsi proprietari. Conforme a nLPD e GDPR.</p></div>
+      <div class="panel"><h3 data-i18n="enti.5">Aggregatore</h3><p class="note" data-i18n="enti.6">Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono, in Svizzera e in Italia.</p></div>
+      <div class="panel"><h3 data-i18n="enti.7">Registro per piccoli comuni</h3><p class="note" data-i18n="enti.8">Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (1 anno in Italia, 5 in Svizzera).</p></div>
+      <div class="panel"><h3 data-i18n="enti.9">Verifica del proprietario</h3><p class="note" data-i18n="enti.10">Domande sui dettagli nascosti prima della restituzione, per ridurre truffe e falsi proprietari. Conforme a nLPD e GDPR.</p></div>
     </div>
-    <h3 style="margin-top:32px;font-size:1.2rem">Dove arriviamo</h3>
+    <h3 style="margin-top:32px;font-size:1.2rem" data-i18n="enti.11">Dove arriviamo</h3>
     <div class="roadmap" id="roadmap"></div>
   </div>
 </section>
 </main>
 
-<footer><div class="wrap">RITROVO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).</div></footer>
+<footer><div class="wrap" data-i18n="pagina.10">RITROVO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).</div></footer>
 
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
+/* ---------- TESTI DELL'INTERFACCIA ----------
+   Tutti i testi fissi della pagina, per lingua. Per tradurre: aggiungere STRINGS.de / .fr / .en con le stesse chiavi;
+   le chiavi mancanti restano in italiano. data-i18n sostituisce il contenuto, data-i18n-<attributo> l'attributo. */
+const STRINGS = { it: {
+ "pagina.1": "Ritrovo",
+ "brandRegion.1": "Ticino e zona di confine",
+ "pagina.2": "\n      <a href=\"#cerca\">Cerca<\/a>\n      <a href=\"#trovato\">Ho trovato qualcosa<\/a>\n      <a href=\"#avvisi\">I miei avvisi<\/a>\n      <a href=\"#enti\">Per comuni e aziende<\/a>\n    ",
+ "pagina.3": "IT",
+ "pagina.4": "DE",
+ "pagina.5": "FR",
+ "pagina.6": "EN",
+ "cerca.1": "Perso? <span>Trovato?<\/span>",
+ "searchForm.1": "Ho perso",
+ "searchForm.2": "Ho trovato",
+ "qEx.1": "Esempio",
+ "searchForm.3": "Descrivi l'oggetto",
+ "qClr.1": "×",
+ "qHint.1": "Resta sul generico: tipo di oggetto, zona, quando. Non scrivere colore, marca o contenuto: ti serviranno per dimostrare che è tuo.",
+ "searchForm.4": "Affina la ricerca",
+ "searchForm.5": "Categoria",
+ "searchForm.6": "In zona di",
+ "searchForm.7": "Quando",
+ "cerca.2": "Gratis",
+ "cerca.3": "Senza registrazione",
+ "cerca.4": "Svizzera e Italia",
+ "cerca.5": "<span class=\"imp\">Nota importante<\/span><br><b>RITROVO non sostituisce l'ufficio oggetti trovati.<\/b>",
+ "cerca.6": "Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità: in <span class=\"mid\">Svizzera<\/span> la polizia, in <span class=\"mid\">Italia<\/span> il Comune.",
+ "discLaw.1": "Leggi di più…",
+ "cerca.7": "<a class=\"scroll-cue\" href=\"#risultati\"><span aria-hidden=\"true\">▼<\/span> Scorri per vedere gli ultimi oggetti trovati<\/a>\n  ",
+ "pagina.7": "<b>1. Descrivi<\/b><span class=\"note\">Scrivi l'oggetto e dove l'hai perso, come lo diresti a un amico.<\/span>",
+ "pagina.8": "<b>2. Cerchiamo per te<\/b><span class=\"note\">Confrontiamo la tua descrizione con gli oggetti trovati nella zona, in Svizzera e in Italia.<\/span>",
+ "pagina.9": "<b>3. Ti avvisiamo<\/b><span class=\"note\">Se non c'è ancora, ricevi un messaggio appena un ufficio lo registra.<\/span>",
+ "resTitle.1": "▼ Ultimi oggetti trovati",
+ "risultati.1": "Fonti consultate:",
+ "qaT.1": "Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.",
+ "qAlert.1": "Avvisami",
+ "qAlert.2": "Non serve registrarsi.",
+ "risultati.2": "<span class=\"flag CH chip-dot\" style=\"display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ch)\"><\/span> Ufficio svizzero",
+ "risultati.3": "<span style=\"display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--it)\"><\/span> Ufficio italiano",
+ "mapNote.1": "- - - confine (schematico)",
+ "showAll.1": "Mostra tutto",
+ "trovato.1": "Per chi trova",
+ "trovato.2": "Hai trovato qualcosa? Ti diciamo a chi consegnarlo.",
+ "trovato.3": "La",
+ "trovato.4": "legge",
+ "tipLegge.1": "Chi trova un oggetto e <b>non sa a chi appartiene<\/b> deve avvisare l'autorità.",
+ "tipLegge.2": "In <span class=\"mid\">Svizzera<\/span> va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href=\"https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720\" target=\"_blank\" rel=\"noopener\">art. 720 CC<\/a>).",
+ "tipLegge.3": "In <span class=\"mid\">Italia<\/span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href=\"https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html\" target=\"_blank\" rel=\"noopener\">art. 927 c.c.<\/a>).",
+ "tipLegge.4": "Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.",
+ "tipLegge.5": "Leggi di più…",
+ "trovato.5": "chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.",
+ "foundForm.1": "Che oggetto è, e dove l'hai trovato",
+ "foundForm.2": "Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.",
+ "foundForm.3": "Categoria",
+ "foundForm.4": "Dove l'hai trovato?",
+ "foundForm.5": "Non lo abbiamo capito dal testo.",
+ "foundForm.6": "Dettagli che solo il proprietario conosce",
+ "foundForm.7": "Non vengono pubblicati. Servono a verificare chi lo reclama.",
+ "foundForm.8": "Trova l'ufficio competente",
+ "foundOut.1": "<b>Descrivi l'oggetto<\/b><span class=\"note\">Tipo di oggetto e luogo bastano. I dati sensibili restano nascosti.<\/span>",
+ "foundOut.2": "<b>Ti indichiamo l'ufficio<\/b><span class=\"note\">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.<\/span>",
+ "foundOut.3": "<b>Consegni e ricevi la ricevuta<\/b><span class=\"note\">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti. Obbligatorio per chiavi, documenti e oggetti di valore; gli oggetti comuni puoi anche restituirli tu.<\/span>",
+ "foundOut.4": "<b>Il proprietario riceve un avviso<\/b><span class=\"note\">Se ha creato un avviso compatibile, lo informiamo subito.<\/span>",
+ "avvisi.1": "Per chi ha perso",
+ "avvisi.2": "I tuoi avvisi",
+ "avvisi.3": "Per creare un avviso cerca l'oggetto qui sopra e lascia la tua email sotto i risultati. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.",
+ "enti.1": "Per comuni, polizie e aziende di trasporto",
+ "enti.2": "Un solo annuncio, visto su entrambi i lati del confine.",
+ "enti.3": "Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.",
+ "enti.4": "Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVO?",
+ "contactUs.1": "Contattateci",
+ "enti.5": "Aggregatore",
+ "enti.6": "Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono, in Svizzera e in Italia.",
+ "enti.7": "Registro per piccoli comuni",
+ "enti.8": "Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (1 anno in Italia, 5 in Svizzera).",
+ "enti.9": "Verifica del proprietario",
+ "enti.10": "Domande sui dettagli nascosti prima della restituzione, per ridurre truffe e falsi proprietari. Conforme a nLPD e GDPR.",
+ "enti.11": "Dove arriviamo",
+ "pagina.10": "RITROVO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).",
+ "attr.1": "Ritrovo, home",
+ "attr.2": "Sezioni",
+ "attr.3": "Regione",
+ "attr.4": "Lingua",
+ "attr.5": "Cosa vuoi fare",
+ "attr.6": "Compila con un esempio",
+ "attr.7": "Cosa, dove, quando: scrivilo come lo diresti a un amico",
+ "attr.8": "Cancella il testo",
+ "attr.9": "Cancella",
+ "attr.10": "Cerca",
+ "attr.11": "Cerca",
+ "attr.12": "Vedi sulla mappa gli uffici oggetti trovati",
+ "attr.13": "Come funziona",
+ "attr.14": "Ultimi oggetti trovati",
+ "attr.15": "Fonti consultate",
+ "attr.16": "La tua email",
+ "attr.17": "La tua email",
+ "attr.18": "Mappa",
+ "attr.19": "Carta nazionale swisstopo con gli oggetti trovati",
+ "attr.20": "Mappa schematica di Ticino, Como, Varese e Verbano con gli oggetti trovati",
+ "attr.21": "es. zaino, sul bus a Bellinzona",
+ "attr.22": "es. colore, marca, cosa c'è dentro, un segno particolare"
+} };
+function applyStrings(lang){
+  const S = Object.assign({}, STRINGS.it, STRINGS[lang] || {});
+  document.querySelectorAll("[data-i18n]").forEach(el => { const v = S[el.dataset.i18n]; if(v !== undefined && el.innerHTML !== v) el.innerHTML = v; });
+  ["placeholder","aria-label","title"].forEach(a => document.querySelectorAll(`[data-i18n-${a}]`).forEach(el => { const v = S[el.getAttribute(`data-i18n-${a}`)]; if(v !== undefined) el.setAttribute(a, v); }));
+  document.documentElement.lang = lang;
+}
 /* ---------- CONFIGURAZIONE REGIONI ----------
    Per aggiungere una regione: un nuovo oggetto in REGIONS con luoghi, fonti e (se serve) un riquadro mappa.
    Le regole di legge stanno in LAW per paese, così ogni regione eredita quelle del suo stato. */
@@ -1218,7 +1356,7 @@ document.querySelectorAll(".tip").forEach(t => {
   t.addEventListener("keydown", e => { if(e.key === "Escape"){ t.classList.remove("open"); t.blur(); } });
 });
 document.addEventListener("click", () => document.querySelectorAll(".tip.open").forEach(t => t.classList.remove("open")));
-fillSelects(); ["#cat","#where","#when"].forEach(id => enhanceSelect($(id))); bind(); renderAlerts(); render();
+applyStrings("it"); fillSelects(); ["#cat","#where","#when"].forEach(id => enhanceSelect($(id))); bind(); renderAlerts(); render();
 try{ initSwissMap(); }catch(e){ lmap = null; $("#lmap").hidden = true; $("#map").style.display = ""; }
 </script>
 </body>
