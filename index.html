@@ -315,6 +315,8 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{position:relative}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
+.dir{color:var(--ink);font-weight:700;text-decoration:none}.dir span{font-weight:700;font-size:.85rem;margin-left:6px;padding:1px 6px;background:var(--signal);border:1px solid var(--ink);border-radius:2px;white-space:nowrap}
+.dir:hover span{background:var(--ink);color:var(--signal)}
 .tip-box .more{display:block;margin-top:8px;padding:0;border:0;background:none;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;color:var(--ink)}
 .lawdoc h3{font-family:var(--display);text-transform:uppercase;font-size:1.05rem;margin:18px 0 6px}
 .lawdoc p,.lawdoc li{line-height:1.5;margin:0 0 8px}.lawdoc ul{padding-left:20px;margin:0 0 8px}
@@ -747,7 +749,7 @@ function render(){
     const p = R.places[it.p], s = srcOf(it.src);
     const pill = it.reported
       ? `<span class="pill rep" data-tip="Chi l'ha trovato l'ha segnalato qui, ma non l'ha ancora consegnato all'ufficio indicato. Quando lo consegna diventa In custodia.">Segnalato</span><span class="since">il ${fmtDate(it.date)}</span>`
-      : `<span class="pill held" data-tip="Consegnato a ${esc(s.n)} il ${fmtDate(it.custody)}, confermato dall'ufficio. L'ufficio lo custodisce e lo restituisce al proprietario dopo aver verificato chi è.">In custodia</span><span class="since">dal ${fmtDate(it.custody)}</span>`;
+      : `<span class="pill held" data-tip="Consegnato a ${esc(s.n)} il ${fmtDate(it.custody)}, confermato dall'ufficio. L'ufficio lo custodisce e lo restituisce al proprietario dopo aver verificato chi è. Clicca per vedere come arrivarci.">In custodia</span><span class="since">dal ${fmtDate(it.custody)}</span>`;
     const tags = (it.days <= 2 ? `<span class="tag new">Nuovo</span>` : "") + (matchesAlert(it) ? `<span class="tag match">Compatibile col tuo avviso</span>` : "");
     return `<button class="item ${selected===it.id?"sel":""}" data-id="${it.id}" type="button">
       <span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[it.cat]}</svg></span>
@@ -817,6 +819,11 @@ function drawMap(res){
 }
 
 /* ---------- DETTAGLIO E RECLAMO ---------- */
+/* link alle indicazioni stradali per l'ufficio; per i trasporti punta allo sportello della stazione del luogo */
+function dirLink(s, p){
+  const q = {ffs:`Stazione FFS ${p.n}`, tno:`Stazione ${p.n}`, apt:`AutoPostale ${p.n}`}[s.id] || `${s.n}, ${p.n}`;
+  return `<a class="dir" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}" target="_blank" rel="noopener">${esc(s.n)} <span>Come arrivarci ↗</span></a>`;
+}
 function openItem(id){
   const it = ITEMS.find(i => i.id === id); if(!it) return;
   selected = id; render();
@@ -830,8 +837,8 @@ function openItem(id){
       <dt>Trovato</dt><dd>${esc(it.spot)}, ${esc(p.n)} (${law.name})</dd>
       <dt>Trovato il</dt><dd>${fmtDate(it.date)} 2026, ${ago(it.days)}</dd>
       ${it.reported
-        ? `<dt>Stato</dt><dd><b>Segnalato</b>: chi l'ha trovato non l'ha ancora consegnato all'ufficio.</dd><dt>${direct ? "Restituzione" : "Da consegnare a"}</dt><dd>${direct ? `Direttamente da chi l'ha trovato, oppure tramite ${esc(s.n)}` : `${esc(s.n)}. Chiavi, documenti e oggetti di valore si ritirano solo all'ufficio.`}</dd>`
-        : `<dt>Consegnato in custodia</dt><dd>${fmtDate(it.custody)} 2026</dd><dt>In custodia presso</dt><dd>${esc(s.n)}</dd>`}
+        ? `<dt>Stato</dt><dd><b>Segnalato</b>: chi l'ha trovato non l'ha ancora consegnato all'ufficio.</dd><dt>${direct ? "Restituzione" : "Da consegnare a"}</dt><dd>${direct ? `Direttamente da chi l'ha trovato, oppure tramite ${dirLink(s, p)}` : `${dirLink(s, p)}. Chiavi, documenti e oggetti di valore si ritirano solo all'ufficio.`}</dd>`
+        : `<dt>Consegnato in custodia</dt><dd>${fmtDate(it.custody)} 2026</dd><dt>In custodia presso</dt><dd>${dirLink(s, p)}</dd>`}
       <dt>Reclamabile per</dt><dd>${law.keep}</dd>
     </dl>
     <div class="legal"><b>${law.name}, ${law.ref}.</b> ${law.text}</div>
