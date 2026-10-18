@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>RITROVO Ticino</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -216,7 +216,7 @@ h1,h2{font-stretch:72%;font-weight:900;text-transform:uppercase;letter-spacing:0
 nav.main a:hover{background:var(--signal)}
 a{color:var(--ink)}
 .hero{background:var(--signal);color:var(--ink);padding-block:44px 40px;border-bottom:4px solid var(--ink)}
-.hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center}
+.hero-grid{grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);align-items:center}
 .hero h1{font-size:clamp(2.8rem,7vw,5.2rem);max-width:none}
 .hero h1 span{background:var(--ink);color:var(--signal);padding:0 .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .hero-visual{background:none;padding:0;border-radius:0}
@@ -317,6 +317,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
 #qUnderstood{display:none}
+@media (max-width:600px){ #q::placeholder{font-size:.88em} }
 .dd.flash .dd-btn{animation:ddflash 1.6s ease-out}
 @keyframes ddflash{0%,40%{background:var(--signal);box-shadow:0 0 0 4px var(--ink)}100%{background:var(--surface);box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.dd.flash .dd-btn{animation:none;background:var(--signal)}}
@@ -380,6 +381,17 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .tip-box a{color:var(--ink);font-weight:700;text-decoration:underline}
 .tip-box span{display:block}.tip-box span + span{margin-top:8px}
 .tip:hover .tip-box,.tip:focus .tip-box,.tip.open .tip-box{visibility:visible;opacity:1}
+.imp{color:#b80014;text-transform:uppercase;font-weight:700;letter-spacing:.04em;font-size:.9em}
+.qalert{margin-top:16px;padding:18px;background:var(--lake-soft);border:3px solid var(--ink)}
+.qalert .qa-t{margin:0 0 10px;font-weight:700;font-size:1.1rem}
+.qalert .qa-row{display:flex;gap:8px}
+.qalert input{flex:1;min-width:0;padding:10px 12px;border:2px solid var(--ink);background:var(--surface);font:inherit}
+.qalert .qa-n{margin:8px 0 0;color:var(--muted);font-size:.88rem}
+.qalert.quiet{background:var(--surface);border:1px solid var(--line);padding:14px}
+.qalert.quiet .qa-t{font-size:1rem}
+.qalert.done{background:var(--lake-soft);border:3px solid var(--ink)}
+.qalert.done .qa-t{margin:0}
+@media (max-width:480px){ .qalert .qa-row{flex-direction:column} }
 </style>
 </head>
 <body>
@@ -424,7 +436,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
           <button class="ex" type="button" id="qEx" title="Compila con un esempio">Esempio</button>
           <button class="btn go" type="submit" id="qGo" aria-label="Cerca" title="Cerca"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button>
         </div>
-        <p class="note qhint" id="qHint">Resta sul generico: tipo di oggetto, colore, zona. Tieni per te i dettagli particolari (contenuto, segni, incisioni): ti serviranno per dimostrare che è tuo.</p>
+        <p class="note qhint" id="qHint">Resta sul generico: tipo di oggetto, zona, quando. Non scrivere colore, marca o contenuto: ti serviranno per dimostrare che è tuo.</p>
         <div class="understood" id="qUnderstood" aria-live="polite"></div>
         <details class="refine-d">
           <summary>Affina la ricerca</summary>
@@ -439,7 +451,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       </form>
       <ul class="trust"><li>Gratis</li><li>Senza registrazione</li><li>Svizzera e Italia</li></ul>
       <div class="disc">
-        <p><b>RITROVO non sostituisce l'ufficio oggetti trovati.</b></p>
+        <p><span class="imp">Nota importante</span><br><b>RITROVO non sostituisce l'ufficio oggetti trovati.</b></p>
         <p>Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità. In <span class="mid">Svizzera</span> va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
         <p>Se il proprietario si fa avanti su RITROVO, per gli oggetti comuni puoi restituirlo direttamente, dopo esserti accertato che sia davvero suo.</p>
         <p>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</p>
@@ -480,6 +492,11 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <!-- Fonti nascoste finché gli uffici non sono collegati davvero: si riattivano togliendo hidden -->
     <details class="src-d" hidden><summary>Fonti consultate: <span id="srcCount"></span></summary><div class="sources" id="sources" aria-label="Fonti consultate"></div></details>
     <div class="list" id="list"></div>
+    <form class="qalert" id="qAlert" hidden>
+      <p class="qa-t" id="qaT">Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.</p>
+      <div class="qa-row"><input id="qaMail" required autocomplete="email" placeholder="Email o numero di telefono" aria-label="Email o numero di telefono"><button class="btn" type="submit">Avvisami</button></div>
+      <p class="qa-n">Non serve registrarsi.</p>
+    </form>
   </div>
   <aside class="mapbox" aria-label="Mappa">
     <div id="lmap" hidden role="region" aria-label="Carta nazionale swisstopo con gli oggetti trovati"></div>
@@ -499,7 +516,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità. In <span class="mid">Svizzera</span> va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
     <div class="two">
       <form class="panel form" id="foundForm">
-        <label>Cosa hai trovato, e dove<textarea id="fWhat" rows="2" required placeholder="es. zaino blu con dei libri, sul bus a Bellinzona"></textarea></label>
+        <label>Cosa hai trovato, e dove <span class="note">Non scrivere colore, marca o contenuto: mettili nel dettaglio riservato qui sotto.</span><textarea id="fWhat" rows="2" required placeholder="es. zaino con dei libri, sul bus a Bellinzona"></textarea></label>
         <div class="understood" id="fUnderstood" aria-live="polite" style="padding:0"></div>
         <div class="row">
           <label>Categoria <span class="note">affina</span><select id="fCat"></select></label>
@@ -507,7 +524,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
         </div>
         <label>Foto <span class="note">Facoltativa. Nascondi documenti e dati personali prima di caricarla.</span><input type="file" id="fPhoto" accept="image/*"></label>
         <div id="fRule" aria-live="polite"></div>
-        <label>Un dettaglio che solo il proprietario conosce <span class="note">Non viene pubblicato. Serve a verificare chi lo reclama.</span><input id="fSecret" placeholder="es. portachiavi a forma di pesce"></label>
+        <label>Dettagli che solo il proprietario conosce <span class="note">Non vengono pubblicati. Servono a verificare chi lo reclama.</span><input id="fSecret" placeholder="es. colore, marca, cosa c'è dentro, un segno particolare"></label>
         <button class="btn" type="submit">Trova l'ufficio competente</button>
       </form>
       <div class="panel" id="foundOut">
@@ -529,7 +546,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <p class="lead">Molti oggetti vengono registrati giorni dopo. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
     <div class="two">
       <form class="panel form" id="alertForm">
-        <label>Cosa hai perso, e dove <span class="note">Scrivilo con parole tue, ma resta sul generico: i dettagli particolari ti serviranno per dimostrare che è tuo.</span><textarea id="aWhat" rows="2" required placeholder="es. occhiali da sole neri, persi sabato a Locarno"></textarea></label>
+        <label>Cosa hai perso, e dove <span class="note">Scrivilo con parole tue, ma resta sul generico: i dettagli particolari ti serviranno per dimostrare che è tuo.</span><textarea id="aWhat" rows="2" required placeholder="es. occhiali da sole, persi sabato a Locarno"></textarea></label>
         <div class="understood" id="aUnderstood" aria-live="polite" style="padding:0"></div>
         <div class="row">
           <label>Categoria <span class="note">affina</span><select id="aCat"></select></label>
@@ -680,26 +697,26 @@ function parse(text){
 const TODAY = new Date("2026-10-18T12:00:00");
 const d = n => new Date(TODAY - n*864e5);
 const ITEMS = [
-  {id:"TI-LUG-26-04817", cat:"portafoglio", t:"Portafoglio in pelle marrone", desc:"Portafoglio a libro, pelle marrone scuro, con tessere. Documenti custoditi a parte.", p:"lugano", spot:"Piazza della Riforma", src:"lug", days:1},
-  {id:"FFS-26-118204", cat:"telefono", t:"iPhone con cover verde", desc:"Smartphone Apple con cover in silicone verde salvia. Schermo integro.", p:"bellinzona", spot:"Treno RE80 Bellinzona–Milano, carrozza 3", src:"ffs", days:2},
-  {id:"CO-RIN-2026-0391", cat:"chiavi", t:"Mazzo di chiavi con telecomando Fiat", desc:"Tre chiavi di casa e una chiave Fiat con telecomando, portachiavi rosso.", p:"como", spot:"Lungolago Mafalda di Savoia", src:"com", days:3},
-  {id:"TI-LOC-26-00912", cat:"occhiali", t:"Occhiali da sole neri", desc:"Montatura nera squadrata, astuccio rigido grigio.", p:"locarno", spot:"Piazza Grande", src:"loc", days:4},
-  {id:"APT-26-7741", cat:"borsa", t:"Zaino blu da escursione", desc:"Zaino 25 litri blu con bastoncini agganciati.", p:"airolo", spot:"Bus 111 Airolo–Nufenen", src:"apt", days:5},
-  {id:"TNO-26-55120", cat:"abbigliamento", t:"Giacca impermeabile gialla", desc:"Giacca leggera gialla taglia M, cappuccio ripiegabile.", p:"como", spot:"Treno S11 Chiasso–Milano", src:"tno", days:2},
-  {id:"TI-LUG-26-04822", cat:"gioielli", t:"Orologio da polso argento", desc:"Orologio analogico, cinturino in maglia metallica.", p:"lugano", spot:"Parco Ciani", src:"lug", days:6},
-  {id:"TPL-26-3310", cat:"telefono", t:"Auricolari wireless bianchi con astuccio", desc:"Custodia di ricarica bianca con adesivo a forma di stella.", p:"lugano", spot:"Linea 2, fermata Centro", src:"tpl", days:1},
-  {id:"VA-RIN-2026-0217", cat:"bici", t:"Monopattino elettrico grigio", desc:"Monopattino pieghevole grigio, senza caricatore.", p:"varese", spot:"Stazione Varese Nord", src:"var", days:9},
-  {id:"TI-BEL-26-01455", cat:"portafoglio", t:"Porta tessere nero con abbonamento", desc:"Porta tessere in tessuto nero, contiene un abbonamento Arcobaleno.", p:"bellinzona", spot:"Viale Stazione", src:"bel", days:3},
-  {id:"FFS-26-118377", cat:"borsa", t:"Borsa a tracolla in tela beige", desc:"Tracolla beige con taccuino e ombrello pieghevole.", p:"mendrisio", spot:"Stazione Mendrisio, binario 2", src:"ffs", days:7},
-  {id:"VB-RIN-2026-0088", cat:"altro", t:"Passeggino pieghevole", desc:"Passeggino leggero blu notte, parasole incluso.", p:"verbania", spot:"Imbarcadero Pallanza", src:"vco", days:12},
-  {id:"TNO-26-55301", cat:"telefono", t:"Tablet con cover nera", desc:"Tablet 10 pollici, custodia a libro nera.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
-  {id:"TI-LUG-26-04790", cat:"chiavi", t:"Chiave singola con portachiavi a pesce", desc:"Chiave di sicurezza con portachiavi in metallo.", p:"lugano", spot:"Lido di Lugano", src:"lug", days:15},
-  {id:"APT-26-7790", cat:"abbigliamento", t:"Sciarpa di lana a righe", desc:"Sciarpa lunga a righe rosse e grigie.", p:"ascona", spot:"Bus 316 Locarno–Ascona", src:"apt", days:8},
-  {id:"CO-RIN-2026-0415", cat:"portafoglio", t:"Portafoglio marrone con portamonete", desc:"Portafoglio da uomo in pelle marrone chiaro, con scomparto portamonete. Tessere custodite a parte.", p:"como", spot:"Stazione Como San Giovanni", src:"com", days:2},
-  {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio rosso con cerniera", desc:"Portafoglio piccolo rosso, chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
-  {id:"FFS-26-117950", cat:"bici", t:"Bicicletta da città nera", desc:"Bici olandese nera con cestino anteriore, lucchetto tagliato.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
-  {id:"VA-RIN-2026-0221", cat:"occhiali", t:"Occhiali da vista con montatura tartarugata", desc:"Montatura tonda tartarugata, astuccio blu.", p:"luino", spot:"Mercato del mercoledì", src:"var", days:6},
-  {id:"TI-LUG-26-04862", cat:"occhiali", t:"Occhiali da sole graduati", desc:"Montatura in metallo dorato, lenti verdi graduate, senza astuccio.", p:"lugano", spot:"Via Nassa", src:"lug", days:1}
+  {id:"TI-LUG-26-04817", cat:"portafoglio", t:"Portafoglio in pelle", desc:"Portafoglio a libro in pelle. Documenti custoditi a parte.", p:"lugano", spot:"Piazza della Riforma", src:"lug", days:1},
+  {id:"FFS-26-118204", cat:"telefono", t:"iPhone con cover", desc:"Smartphone Apple con cover in silicone. Schermo integro.", p:"bellinzona", spot:"Treno RE80 Bellinzona–Milano, carrozza 3", src:"ffs", days:2},
+  {id:"CO-RIN-2026-0391", cat:"chiavi", t:"Mazzo di chiavi con telecomando auto", desc:"Alcune chiavi di casa e una chiave d'auto con telecomando.", p:"como", spot:"Lungolago Mafalda di Savoia", src:"com", days:3},
+  {id:"TI-LOC-26-00912", cat:"occhiali", t:"Occhiali da sole", desc:"Montatura squadrata, con astuccio rigido.", p:"locarno", spot:"Piazza Grande", src:"loc", days:4},
+  {id:"APT-26-7741", cat:"borsa", t:"Zaino da escursione", desc:"Zaino da escursione di media capienza.", p:"airolo", spot:"Bus 111 Airolo–Nufenen", src:"apt", days:5},
+  {id:"TNO-26-55120", cat:"abbigliamento", t:"Giacca impermeabile", desc:"Giacca leggera con cappuccio.", p:"como", spot:"Treno S11 Chiasso–Milano", src:"tno", days:2},
+  {id:"TI-LUG-26-04822", cat:"gioielli", t:"Orologio da polso", desc:"Orologio analogico con cinturino in metallo.", p:"lugano", spot:"Parco Ciani", src:"lug", days:6},
+  {id:"TPL-26-3310", cat:"telefono", t:"Auricolari wireless con astuccio", desc:"Auricolari nella custodia di ricarica.", p:"lugano", spot:"Linea 2, fermata Centro", src:"tpl", days:1},
+  {id:"VA-RIN-2026-0217", cat:"bici", t:"Monopattino elettrico", desc:"Monopattino pieghevole, senza caricatore.", p:"varese", spot:"Stazione Varese Nord", src:"var", days:9},
+  {id:"TI-BEL-26-01455", cat:"portafoglio", t:"Porta tessere con abbonamento", desc:"Porta tessere in tessuto con un abbonamento dei trasporti. Documenti custoditi a parte.", p:"bellinzona", spot:"Viale Stazione", src:"bel", days:3},
+  {id:"FFS-26-118377", cat:"borsa", t:"Borsa a tracolla in tela", desc:"Borsa a tracolla in tela.", p:"mendrisio", spot:"Stazione Mendrisio, binario 2", src:"ffs", days:7},
+  {id:"VB-RIN-2026-0088", cat:"altro", t:"Passeggino pieghevole", desc:"Passeggino leggero con parasole.", p:"verbania", spot:"Imbarcadero Pallanza", src:"vco", days:12},
+  {id:"TNO-26-55301", cat:"telefono", t:"Tablet con cover", desc:"Tablet 10 pollici con custodia a libro.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
+  {id:"TI-LUG-26-04790", cat:"chiavi", t:"Chiave singola con portachiavi", desc:"Chiave di sicurezza con portachiavi.", p:"lugano", spot:"Lido di Lugano", src:"lug", days:15},
+  {id:"APT-26-7790", cat:"abbigliamento", t:"Sciarpa di lana", desc:"Sciarpa lunga di lana.", p:"ascona", spot:"Bus 316 Locarno–Ascona", src:"apt", days:8},
+  {id:"CO-RIN-2026-0415", cat:"portafoglio", t:"Portafoglio con portamonete", desc:"Portafoglio da uomo in pelle con portamonete. Tessere custodite a parte.", p:"como", spot:"Stazione Como San Giovanni", src:"com", days:2},
+  {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio con cerniera", desc:"Portafoglio piccolo con chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
+  {id:"FFS-26-117950", cat:"bici", t:"Bicicletta da città", desc:"Bici da città con cestino anteriore.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
+  {id:"VA-RIN-2026-0221", cat:"occhiali", t:"Occhiali da vista", desc:"Montatura tonda, con astuccio.", p:"luino", spot:"Mercato del mercoledì", src:"var", days:6},
+  {id:"TI-LUG-26-04862", cat:"occhiali", t:"Occhiali da sole graduati", desc:"Occhiali da sole con lenti graduate, senza astuccio.", p:"lugano", spot:"Via Nassa", src:"lug", days:1}
 ].map((it,i) => { const lag = Math.min(it.days, i % 3), reported = [0, 5, 16].includes(i);
   return {...it, date:d(it.days), reported, custody: reported ? null : d(it.days - lag)}; });
 
@@ -714,7 +731,7 @@ const store = {
   set(v){ try{ localStorage.setItem("ritrovo-avvisi", JSON.stringify(v)); }catch(e){} }
 };
 let alerts = store.get();
-if(!alerts.length) alerts = [{what:"occhiali da sole neri", cat:"occhiali", where:"locarno", example:true}];
+if(!alerts.length) alerts = [{what:"occhiali da sole", cat:"occhiali", where:"locarno", example:true}];
 
 const srcOf = id => R.sources.find(s => s.id === id);
 const fmtDate = dt => dt.toLocaleDateString("it-CH", {day:"numeric", month:"short"});
@@ -770,7 +787,6 @@ function smartField({input, chips, cat, where, when, onChange}){
     if(cat && cat.value) parts.push(tag("cat","Oggetto",CATS[cat.value], manual.cat?"scelto da te":""));
     if(where && where.value){ const pl = R.places[where.value]; parts.push(tag("where","Zona",`${pl.n} (${pl.c})`, manual.where?"scelta da te":"")); }
     if(when && (p.days || manual.when)) parts.push(tag("when","Periodo",when.selectedOptions[0].text.toLowerCase(), manual.when?"scelto da te":""));
-    if(p.color) parts.push(`<span class="tag">Colore: ${esc(p.color)}</span>`);
     chips.innerHTML = input.value.trim() ? (parts.length ? `<span class="lbl">Ho capito</span>${parts.join("")}` : `<span class="lbl">Scrivi anche cosa e dove, per esempio «zaino blu a Lugano».</span>`) : "";
     if(!input.value.trim()) Object.keys(manual).forEach(k => manual[k] = false);
     onChange && onChange();
@@ -802,7 +818,10 @@ function render(){
       <span style="min-width:0"><h3>${esc(it.t)}${tags}</h3>
         <span class="meta"><span><span class="flag ${p.c}" style="display:inline-block;width:10px;height:7px;border-radius:1px"></span> ${esc(p.n)}, ${esc(it.spot)}</span><span>${ago(it.days)}</span><span>${esc(s.n)}</span></span></span>
       <span class="state">${pill}</span></button>`;
-  }).join("") : `<div class="empty">Nessun oggetto corrisponde, per ora. Gli uffici registrano spesso con qualche giorno di ritardo.<br><br><button class="btn signal" type="button" onclick="document.getElementById('toAlert').click()">Avvisami quando compare</button></div>`;
+  }).join("") : `<div class="empty">Nessun oggetto corrisponde, per ora. Gli uffici registrano spesso con qualche giorno di ritardo.</div>`;
+  const searching = !!($("#q").value.trim() || $("#cat").value || $("#where").value), qa = $("#qAlert");
+  qa.hidden = !searching; qa.classList.toggle("quiet", res.length > 0);
+  if(!qa.classList.contains("done")) $("#qaT").textContent = res.length ? "Non è tra questi? Lascia la tua email e ti avvisiamo appena compare." : "Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.";
   drawMap(res);
 }
 
@@ -890,8 +909,8 @@ function openItem(id){
     <div class="legal"><b>${law.name}, ${law.ref}.</b> ${law.text}</div>
     <form class="steps" id="claim">
       <b>${direct ? "È tuo? Descrivilo per iscritto" : "È tuo? Rispondi a due domande"}</b>
-      <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (contenuto, segni particolari, colore interno). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " RITROVO non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
-      <label class="q">Descrivi un dettaglio che non è nell'annuncio<input id="c1" required placeholder="es. cosa c'era dentro, un segno particolare"></label>
+      <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (colore, contenuto, segni particolari). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " RITROVO non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
+      <label class="q">Descrivi un dettaglio che non è nell'annuncio<input id="c1" required placeholder="es. il colore, cosa c'era dentro, un segno particolare"></label>
       <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12"></label>
       ${direct ? `<div class="row">
         <label class="q">Nome e cognome<input id="c3" required autocomplete="name"></label>
@@ -957,7 +976,7 @@ function bind(){
     $("#qHint").hidden = r.value !== "perso";
     const lbl = r.value === "perso" ? "Cerca" : "Avanti"; $("#qGo").setAttribute("aria-label", lbl); $("#qGo").title = lbl;
   }));
-  /* esempi generici (tipo, colore, zona, quando): i dettagli particolari restano a chi reclama */
+  /* esempi generici (tipo, zona, quando): i dettagli particolari restano a chi reclama */
   const EX = {
     perso:["Occhiali da sole graduati persi ieri sera in centro a Lugano"],
     trovato:["Occhiali da sole graduati persi ieri sera in centro a Lugano"]
@@ -1010,6 +1029,15 @@ function bind(){
   $("#toAlert").addEventListener("click", () => {
     $("#aWhat").value = $("#q").value; aUpdate();
     $("#avvisi").scrollIntoView({behavior:"smooth"}); setTimeout(() => $("#aWhat").focus(), 400);
+  });
+  $("#qAlert").addEventListener("submit", e => {
+    e.preventDefault();
+    alerts = alerts.filter(a => !a.example);
+    alerts.unshift({what:$("#q").value, cat:$("#cat").value, where:$("#where").value});
+    store.set(alerts); renderAlerts();
+    const f = e.target; f.classList.add("done");
+    f.innerHTML = `<p class="qa-t">Fatto. Ti abbiamo mandato un link per confermare.</p><p class="qa-n">In ogni avviso trovi il link per disattivarlo.</p>`;
+    render();
   });
   $("#alertForm").addEventListener("submit", e => {
     e.preventDefault();
