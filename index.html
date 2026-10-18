@@ -1217,7 +1217,7 @@ function bind(){
   qa.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); $("#searchForm").requestSubmit(); } });
   smartField({input:$("#q"), chips:$("#qUnderstood"), cat:$("#cat"), onChange:render});
   /* COSA: elenco di oggetti tipici da scegliere o filtrare scrivendo; se non corrisponde resta testo libero */
-  const SUG = [["Bici o monopattino","bici"],["Borsa o zaino","borsa"],["Chiavi","chiavi"],["Cuffie, tablet o computer","telefono"],["Documenti","portafoglio","documenti"],["Giacca o abbigliamento","abbigliamento"],["Giocattolo o peluche","altro"],["Occhiali","occhiali"],["Ombrello","altro"],["Orologio o gioielli","gioielli"],["PET (Animale domestico)","animale"],["Portafoglio","portafoglio"],["Telefono","telefono"],["Altro","altro"]];
+  const SUG = [["Bici o monopattino","bici"],["Borsa o zaino","borsa"],["Chiavi","chiavi"],["Cuffie","telefono"],["Documenti","portafoglio","documenti"],["Giacca o abbigliamento","abbigliamento"],["Giocattolo o peluche","altro"],["Occhiali","occhiali"],["Ombrello","altro"],["Orologio o gioielli","gioielli"],["PET (Animale domestico)","animale"],["Portafoglio","portafoglio"],["Telefono, tablet o PC","telefono"],["Altro","altro"]];
   /* campo con elenco di suggerimenti: si sceglie dall'elenco o si scrive per filtrarlo; se nulla corrisponde resta testo libero */
   const combo = (inp, ul, items, pick) => {
     let i0 = -1, picking = false;
@@ -1385,6 +1385,7 @@ function renderAlerts(){
 /* illustrazione hero: scaffale di pittogrammi come le caselle di un ufficio oggetti trovati */
 /* stessi colori dei tooltip: verde = oggetto comune, rosso = va all'ufficio */
 const TILE_BG = {occhiali:"#c9ecc4", borsa:"#c9ecc4", bici:"#c9ecc4", chiavi:"#f6c6c1", portafoglio:"#f6c6c1", telefono:"#f6c6c1"};
+const TILE_LABEL = {telefono:"TELEFONO, TABLET, PC"};
 function drawTiles(){
   const names = ["portafoglio","telefono","chiavi","borsa","occhiali","bici"];
   $("#tiles").innerHTML = names.map((n,i) => {
@@ -1392,7 +1393,7 @@ function drawTiles(){
     const label = hot ? "Hai trovato qualcosa? Segnalalo" : `Vedi gli ultimi oggetti trovati: ${CATS[n]}`;
     return `<g transform="translate(${x} ${y})"><g class="tile" role="button" tabindex="0" data-tile="${n}" aria-label="${label}"><rect width="140" height="110" fill="${hot?"#111":TILE_BG[n]||"#fff"}" stroke="#111" stroke-width="3"/>
       <g transform="translate(46 14) scale(2)" fill="none" stroke="${hot?"#ffd100":"#111"}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</g>
-      <text x="10" y="100" font-size="13" font-weight="800" fill="${hot?"#ffd100":"#111"}" style="font-stretch:72%">${hot?"TROVATO!":n.toUpperCase()}</text></g></g>`;
+      <text x="10" y="100" font-size="13" font-weight="800" fill="${hot?"#ffd100":"#111"}" style="font-stretch:72%">${hot?"TROVATO!":(TILE_LABEL[n]||n.toUpperCase())}</text></g></g>`;
   }).join("");
 }
 /* tessere e cartello dell'illustrazione: scorciatoie verso categoria, flusso "Ho trovato" e mappa */
