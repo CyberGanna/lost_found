@@ -366,8 +366,8 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .check{display:flex;gap:8px;align-items:flex-start;font-size:.92rem}.check input{margin-top:3px;width:auto}
 .handin{display:grid;gap:10px;margin:16px 0 12px;padding:14px;border:2px solid var(--ink);border-radius:2px;background:var(--surface)}
 .handin label{display:grid;gap:4px;font-weight:700;font-size:.9rem}
-.rule.office-only{background:var(--signal)}
-.rule.direct{background:var(--surface);border-style:dashed}
+.rule.office-only{background:var(--no-soft)}
+.rule.direct{background:var(--ok-soft)}
 .pill.rep{background:var(--surface);color:var(--ink);border:1px dashed var(--ink)}
 .pill[data-tip]{cursor:help}
 .pill[data-tip]::after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 8px);z-index:20;width:260px;padding:10px 12px;background:var(--lake-soft);color:var(--ink);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-size:.85rem;font-weight:400;line-height:1.4;white-space:normal;text-align:left;visibility:hidden;opacity:0;transition:opacity .12s;pointer-events:none}
@@ -451,6 +451,15 @@ html.locked #gate{display:grid;place-items:center;min-height:100vh;background:va
 .new-badge{animation:pulse 1.6s ease-in-out infinite alternate}
 @keyframes pulse{from{opacity:1}to{opacity:.3}}
 @media (prefers-reduced-motion:reduce){.new-badge{animation:none}}
+:root{--ok-soft:#c9ecc4;--no-soft:#f6c6c1}
+.f3-lab{margin:0 0 10px}.f3-lab .note{display:block;font-weight:400}
+.q3.f3{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);margin-bottom:12px}
+.q3.f3 .qf{margin:0;font-weight:400}
+.q3.f3 .qf-what{position:relative}
+.q3.f3 textarea,.q3.f3 input,.q3.f3 select{border:0;background:transparent;box-shadow:none;padding:2px 0;min-height:0;border-radius:0}
+.q3.f3 .qf:last-child{border-right:0;border-bottom:0}
+#foundForm .row:not(:has(label:not([hidden]))){display:none}
+@media (max-width:640px){ .q3.f3{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -607,8 +616,14 @@ document.getElementById("gateForm").addEventListener("submit", async e => {
     <p class="lead"><span data-i18n="trovato.3">La</span> <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge"><span data-i18n="trovato.4">legge</span><span class="tip-box" role="tooltip" id="tipLegge"><span data-i18n="tipLegge.1">Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità.</span><span data-i18n="tipLegge.2">In <span class="mid">Svizzera</span> si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</span><span data-i18n="tipLegge.3">In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span data-i18n="tipLegge.4">Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law data-i18n="tipLegge.5">Leggi di più…</button></span></span></span> <span data-i18n="trovato.5">chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</span></p>
     <div class="two">
       <form class="panel form" id="foundForm">
-        <label><span data-i18n="foundForm.1">Che oggetto è, e dove l'hai trovato</span> <span class="note" data-i18n="foundForm.2">Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.</span><textarea id="fWhat" rows="2" required placeholder="es. zaino, sul bus a Bellinzona" data-i18n-placeholder="attr.21"></textarea></label>
-        <div class="understood" id="fUnderstood" aria-live="polite" style="padding:0"></div>
+        <p class="f3-lab"><b data-i18n="foundForm.1">Che oggetto è, e dove l'hai trovato</b> <span class="note" data-i18n="foundForm.2">Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.</span></p>
+        <div class="q3 f3">
+          <label class="qf qf-what"><span class="ql" data-i18n="q3.cosa">Cosa</span><textarea id="fWhat" rows="1" required role="combobox" aria-autocomplete="list" aria-controls="fSug" aria-expanded="false" placeholder="es. occhiali da sole" data-i18n-placeholder="attr.7" autocomplete="off"></textarea><ul class="qsug" id="fSug" role="listbox" hidden></ul></label>
+          <label class="qf"><span class="ql" data-i18n="q3.dove">Dove</span><input id="fPlace" required autocomplete="off" placeholder="es. sul bus a Lugano" data-i18n-placeholder="f3.dove.ph"></label>
+          <label class="qf"><span class="ql" data-i18n="q3.quando">Quando</span><select id="fWhen">
+            <option value="0" selected data-i18n="q3.w0">Oggi</option><option value="1" data-i18n="q3.w1">Ieri</option><option value="7" data-i18n="q3.w7">Ultimi 7 giorni</option><option value="30" data-i18n="q3.w30">Ultimo mese</option><option value="365" data-i18n="q3.w365">Ultimo anno</option>
+          </select></label>
+        </div>
         <div class="row">
           <label hidden><span data-i18n="foundForm.3">Categoria</span><select id="fCat"></select></label>
           <label class="askwhere" hidden><span data-i18n="foundForm.4">Dove l'hai trovato?</span> <span class="note" data-i18n="foundForm.5">Non lo abbiamo capito dal testo.</span><select id="fWhere" required></select></label>
@@ -722,6 +737,7 @@ const STRINGS = { it: {
  "tipLegge.4": "Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.",
  "tipLegge.5": "Leggi di più…",
  "trovato.5": "chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.",
+ "f3.dove.ph": "es. sul bus a Lugano",
  "foundForm.1": "Che oggetto è, e dove l'hai trovato",
  "foundForm.2": "Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.",
  "foundForm.3": "Categoria",
@@ -940,7 +956,7 @@ function fillSelects(){
   const it = placeOpts.filter(p => p[1].c==="IT").map(([k,p]) => `<option value="${k}">${esc(p.n)}</option>`).join("");
   const placeHtml = `<option value="">Tutta la zona</option><optgroup label="Svizzera · Ticino">${ch}</optgroup><optgroup label="Italia · Como, Varese, VCO">${it}</optgroup>`;
   $("#cat").innerHTML = catOpts;
-  $("#fCat").innerHTML = catOpts.replace('<option value="">Tutte</option>', "");
+  $("#fCat").innerHTML = catOpts.replace('<option value="">Tutte</option>', '<option value=""></option>');
   $("#where").innerHTML = placeHtml;
   $("#qPlaces").innerHTML = Object.values(R.places).map(p => `<option value="${esc(p.n)}">`).join("");
   $("#fWhere").innerHTML = placeHtml.replace('<option value="">Tutta la zona</option>', '<option value="">Scegli il luogo</option>');
@@ -1173,7 +1189,8 @@ function bind(){
   $("#searchForm").addEventListener("submit", e => {
     e.preventDefault();
     if(document.querySelector(".mode input:checked").value === "trovato"){
-      const f = $("#fWhat"); f.value = [$("#q").value.trim(), $("#qWhere").value.trim()].filter(Boolean).join(", "); f.dispatchEvent(new Event("input"));
+      $("#fWhat").value = $("#q").value.trim(); $("#fPlace").value = $("#qWhere").value.trim(); $("#fWhen").value = $("#qWhen").value === "30" ? "0" : $("#qWhen").value;
+      ["#fWhat","#fPlace"].forEach(s => $(s).dispatchEvent(new Event("input")));
       $("#trovato").scrollIntoView({behavior:"smooth"}); return;
     }
     render(); $("#resTitle").scrollIntoView({behavior:"smooth",block:"start"});
@@ -1226,6 +1243,14 @@ function bind(){
   /* DOVE e QUANDO: campi separati che guidano i filtri di zona e periodo */
   $("#qWhere").addEventListener("input", () => { const v = $("#qWhere").value.trim(); $("#where").value = v ? (parse(v).place || "") : ""; render(); });
   $("#qWhen").addEventListener("change", () => { $("#when").value = $("#qWhen").value; render(); });
+  /* modulo "Ho trovato": stessi tre campi della ricerca; categoria e zona si ricavano da COSA e DOVE */
+  const fw = $("#fWhat"), fGrow = () => { fw.style.height = "auto"; fw.style.height = fw.scrollHeight + "px"; };
+  const setFCat = c => { $("#fCat").value = c; $("#fCat").dispatchEvent(new Event("change")); };
+  fw.addEventListener("input", () => { const v = fw.value.trim(); setFCat(v ? (parse(v).cat || "altro") : ""); fGrow(); });
+  fw.addEventListener("keydown", e => { if(e.key === "Enter" && !e.isComposing){ e.preventDefault(); $("#fPlace").focus(); } });
+  combo(fw, $("#fSug"), () => SUG.map(([l,c,i]) => ({l, v:c, icon:ICONS[i||c]})), c => { setFCat(c); $("#fPlace").focus(); });
+  let fWherePicked = false; $("#fWhere").addEventListener("change", e => { if(e.isTrusted) fWherePicked = true; });
+  $("#fPlace").addEventListener("input", () => { const v = $("#fPlace").value.trim(), pl = v && parse(v).place; if(!v) fWherePicked = false; if(pl || !fWherePicked) $("#fWhere").value = pl || ""; });
   /* quello che il testo fa capire va direttamente nei filtri sotto: li apriamo e li evidenziamo per un attimo */
   const prevF = {cat:$("#cat").value, where:$("#where").value, when:$("#when").value};
   $("#q").addEventListener("input", () => {
@@ -1239,7 +1264,6 @@ function bind(){
     });
   });
   ["#cat","#where","#when"].forEach(s => $(s).addEventListener("input", render));
-  smartField({input:$("#fWhat"), chips:$("#fUnderstood"), cat:$("#fCat"), where:$("#fWhere")});
   $("#sources").addEventListener("change", e => { const id = e.target.dataset.src; if(!id) return; e.target.checked ? enabledSrc.add(id) : enabledSrc.delete(id); render(); });
   $("#list").addEventListener("click", e => { const b = e.target.closest(".item"); if(b) openItem(b.dataset.id); });
   $("#map").addEventListener("click", e => { const g = e.target.closest(".m-pin"); if(g){ $("#where").value = g.dataset.place; render(); $("#resTitle").scrollIntoView({behavior:"smooth",block:"start"}); } });
@@ -1256,7 +1280,7 @@ function bind(){
     e.target.setCustomValidity(!v || okContact(v, c === "any") ? "" : c === "any" ? "Scrivi un'email o un numero di telefono valido." : "Scrivi un'email valida.");
   });
   /* categoria e zona si ricavano dal testo; la zona si chiede solo se il testo non la dice */
-  [["#fWhat","#fWhere"]].forEach(([t, w]) => {
+  [["#fPlace","#fWhere"]].forEach(([t, w]) => {
     const lab = $(w).closest("label"); let picked = false;
     $(w).addEventListener("change", () => { picked = true; });
     $(w).addEventListener("invalid", () => { lab.hidden = false; setTimeout(() => $(w).focus()); });
@@ -1285,18 +1309,18 @@ function bind(){
   });
 
   const showRule = () => { $("#fRule").innerHTML = ruleHTML($("#fCat").value); };
-  $("#fCat").addEventListener("change", showRule); $("#fWhat").addEventListener("input", () => setTimeout(showRule)); showRule();
+  $("#fCat").addEventListener("change", showRule); showRule();
   $("#foundForm").addEventListener("submit", e => {
     e.preventDefault();
     const p = R.places[$("#fWhere").value], law = LAW[p.c], off = R.offices[p.c];
-    const sug = suggestOffice($("#fWhat").value, $("#fWhere").value), transport = !!sug.src && ["ffs","apt","tpl","tno"].includes(sug.src);
+    const sug = suggestOffice($("#fWhat").value + " " + $("#fPlace").value, $("#fWhere").value), transport = !!sug.src && ["ffs","apt","tpl","tno"].includes(sug.src);
     $("#foundOut").innerHTML = `
       <p class="eyebrow">Ufficio competente per ${esc(p.n)} · ${law.name}</p>
       <div class="office"><b>${esc(sug.n)}</b><span class="note">${esc(sug.d)}</span></div>
       <p class="why"><b>Perché:</b> ${sug.why}</p>
       ${ruleHTML($("#fCat").value)}
       <div class="legal" style="margin-top:12px"><b>${law.ref}.</b> ${law.text}</div>
-      <p class="note">Annuncio in bozza: <b>${esc(CATS[$("#fCat").value])}, ${esc(p.n)}</b>. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
+      <p class="note">Annuncio in bozza: <b>${esc(CATS[$("#fCat").value])}, ${esc(p.n)}, ${esc($("#fWhen").selectedOptions[0].text.toLowerCase())}</b>. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
       <form class="handin" id="handin">
         <b>L'hai già consegnato?</b>
         <div class="row">
