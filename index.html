@@ -316,6 +316,11 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{position:relative}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
+.hero-visual .tile{cursor:pointer;transition:transform .15s ease;outline:none}
+.hero-visual .tile:hover,.hero-visual .tile:focus-visible{transform:translateY(-5px)}
+.hero-visual .tile:focus-visible > rect:first-child,.hero-visual .tile:focus-visible > path{stroke:var(--trail);stroke-width:5}
+@media (prefers-reduced-motion:reduce){.hero-visual .tile{transition:none}}
+.qhint{margin:8px 0 0;font-size:.92rem;color:var(--ink)}
 .mid{font-family:"Atkinson Hyperlegible Next",var(--body);font-weight:600}
 #resTitle,#trovato,#avvisi{scroll-margin-top:calc(var(--top,110px) + 12px)}
 .why{font-size:.92rem;line-height:1.45;margin:8px 0 0}.why a{color:var(--ink);font-weight:700}
@@ -386,6 +391,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
           <input id="q" type="search" placeholder="Scrivi qui, es. portafoglio marrone a Como" autocomplete="off" enterkeyhint="go">
           <button class="btn" type="submit">Continua</button>
         </div>
+        <p class="note qhint" id="qHint">Resta sul generico: tipo di oggetto, colore, zona. Tieni per te i dettagli particolari (contenuto, segni, incisioni): ti serviranno per dimostrare che è tuo.</p>
         <div class="understood" id="qUnderstood" aria-live="polite"></div>
         <details class="refine-d">
           <summary>Affina la ricerca</summary>
@@ -405,16 +411,16 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
         <p>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</p>
       </div>
     </div>
-    <div class="hero-visual" aria-hidden="true">
+    <div class="hero-visual">
       <svg viewBox="0 0 520 440" font-family="Archivo, sans-serif">
         <g id="tiles"></g>
-        <g transform="translate(300 300)">
+        <g transform="translate(300 300)"><g class="tile" id="sign" role="button" tabindex="0" aria-label="Vedi sulla mappa gli uffici oggetti trovati">
           <rect x="-6" y="0" width="12" height="140" fill="#111"/>
           <path d="M-150 -6 H170 L205 26 L170 58 H-150Z" fill="#111"/>
           <text x="-134" y="22" fill="#ffd100" font-weight="900" font-size="18" style="font-stretch:72%">UFFICIO OGGETTI TROVATI</text>
           <text x="-134" y="46" fill="#fff" font-weight="700" font-size="15">Lugano 5 min · Como 25 min</text>
           <g transform="translate(150 12)"><rect width="10" height="30" fill="#fff"/><rect y="10" width="10" height="10" fill="#e2001a"/></g>
-        </g>
+        </g></g>
       </svg>
     </div>
   </div>
@@ -489,7 +495,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <p class="lead">Molti oggetti vengono registrati giorni dopo. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
     <div class="two">
       <form class="panel form" id="alertForm">
-        <label>Cosa hai perso, e dove <span class="note">Scrivilo con parole tue: categoria e zona le riconosciamo noi.</span><textarea id="aWhat" rows="2" required placeholder="es. occhiali da sole neri, persi sabato a Locarno"></textarea></label>
+        <label>Cosa hai perso, e dove <span class="note">Scrivilo con parole tue, ma resta sul generico: i dettagli particolari ti serviranno per dimostrare che è tuo.</span><textarea id="aWhat" rows="2" required placeholder="es. occhiali da sole neri, persi sabato a Locarno"></textarea></label>
         <div class="understood" id="aUnderstood" aria-live="polite" style="padding:0"></div>
         <div class="row">
           <label>Categoria <span class="note">affina</span><select id="aCat"></select></label>
@@ -912,6 +918,7 @@ function bind(){
   });
   document.querySelectorAll(".mode input").forEach(r => r.addEventListener("change", () => {
     $("#q").placeholder = r.value === "perso" ? "Scrivi qui, es. portafoglio marrone a Como" : "Scrivi qui, es. chiavi trovate sul bus a Lugano";
+    $("#qHint").hidden = r.value !== "perso";
   }));
   drawTiles();
   const setTop = () => document.documentElement.style.setProperty("--top", (document.querySelector("header.top").offsetHeight + document.querySelector(".mockbar").offsetHeight) + "px");
@@ -1022,11 +1029,22 @@ function drawTiles(){
   const names = ["portafoglio","telefono","chiavi","borsa","occhiali","bici"];
   $("#tiles").innerHTML = names.map((n,i) => {
     const x = 30 + (i%3)*160, y = 30 + Math.floor(i/3)*130, hot = n === "chiavi";
-    return `<g transform="translate(${x} ${y})"><rect width="140" height="110" fill="${hot?"#111":"#fff"}" stroke="#111" stroke-width="3"/>
+    const label = hot ? "Hai trovato qualcosa? Segnalalo" : `Vedi gli ultimi oggetti trovati: ${CATS[n]}`;
+    return `<g transform="translate(${x} ${y})"><g class="tile" role="button" tabindex="0" data-tile="${n}" aria-label="${label}"><rect width="140" height="110" fill="${hot?"#111":"#fff"}" stroke="#111" stroke-width="3"/>
       <g transform="translate(46 14) scale(2)" fill="none" stroke="${hot?"#ffd100":"#111"}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</g>
-      <text x="10" y="100" font-size="13" font-weight="800" fill="${hot?"#ffd100":"#111"}" style="font-stretch:72%">${hot?"TROVATO!":n.toUpperCase()}</text></g>`;
+      <text x="10" y="100" font-size="13" font-weight="800" fill="${hot?"#ffd100":"#111"}" style="font-stretch:72%">${hot?"TROVATO!":n.toUpperCase()}</text></g></g>`;
   }).join("");
 }
+/* tessere e cartello dell'illustrazione: scorciatoie verso categoria, flusso "Ho trovato" e mappa */
+function tileGo(el){
+  const n = el.dataset.tile;
+  if(el.id === "sign"){ $(".mapbox").scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  if(n === "chiavi"){ const r = document.querySelector('.mode input[value="trovato"]'); r.checked = true; r.dispatchEvent(new Event("change")); $("#trovato").scrollIntoView({behavior:"smooth"}); return; }
+  $("#q").value = ""; $("#cat").value = n; $("#where").value = ""; render();
+  $("#resTitle").scrollIntoView({behavior:"smooth",block:"start"});
+}
+document.addEventListener("click", e => { const t = e.target.closest(".hero-visual .tile"); if(t) tileGo(t); });
+document.addEventListener("keydown", e => { const t = e.target.closest && e.target.closest(".hero-visual .tile"); if(t && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); tileGo(t); } });
 let tt; function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 3200); }
 
 document.querySelectorAll(".tip").forEach(t => {
