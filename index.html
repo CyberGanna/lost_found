@@ -314,7 +314,9 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .since{font-size:.75rem;color:var(--muted);white-space:nowrap}
 @media (max-width:480px){ .item .state{grid-column:2;align-items:flex-start} }
 .tip{position:relative;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;cursor:help}
-.tip-box{position:absolute;left:0;top:calc(100% + 10px);z-index:20;width:min(420px,80vw);padding:14px 16px;background:var(--surface);color:var(--ink);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);font-size:.95rem;line-height:1.45;font-weight:400;text-transform:none;letter-spacing:0;visibility:hidden;opacity:0;transition:opacity .12s}
+.tip-box{position:absolute;left:0;top:calc(100% + 10px);z-index:20;width:min(420px,80vw);padding:14px 16px;background:var(--lake-soft);color:var(--ink);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);font-size:.95rem;line-height:1.45;font-weight:400;text-transform:none;letter-spacing:0;visibility:hidden;opacity:0;transition:opacity .12s}
+.tip-box::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
+.tip-box a{color:var(--ink);font-weight:700;text-decoration:underline}
 .tip-box span{display:block}.tip-box span + span{margin-top:8px}
 .tip:hover .tip-box,.tip:focus .tip-box,.tip.open .tip-box{visibility:visible;opacity:1}
 </style>
@@ -428,7 +430,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
   <div class="wrap">
     <p class="eyebrow">Per chi trova</p>
     <h2>Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
-    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e non conosce il proprietario deve avvisare l'autorità: in Svizzera la polizia (art. 720 CC; i cantoni possono designare un altro ufficio, esclusi gli oggetti di poco valore), in Italia consegnarlo al sindaco del comune (art. 927 c.c.).</span><span>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
+    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e non conosce il proprietario deve avvisare l'autorità: in Svizzera la polizia (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>; i cantoni possono designare un altro ufficio, esclusi gli oggetti di poco valore), in Italia consegnarlo al sindaco del comune (<a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:regio.decreto:1942-03-16;262~art927" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
     <div class="two">
       <form class="panel form" id="foundForm">
         <label>Cosa hai trovato, e dove<textarea id="fWhat" rows="2" required placeholder="es. zaino blu con dei libri, sul bus a Bellinzona"></textarea></label>
@@ -896,7 +898,7 @@ function drawTiles(){
 let tt; function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 3200); }
 
 document.querySelectorAll(".tip").forEach(t => {
-  t.addEventListener("click", e => { e.stopPropagation(); t.classList.toggle("open"); });
+  t.addEventListener("click", e => { e.stopPropagation(); if(!e.target.closest("a")) t.classList.toggle("open"); });
   t.addEventListener("keydown", e => { if(e.key === "Escape"){ t.classList.remove("open"); t.blur(); } });
 });
 document.addEventListener("click", () => document.querySelectorAll(".tip.open").forEach(t => t.classList.remove("open")));
