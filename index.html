@@ -313,6 +313,10 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .since{font-size:.75rem;color:var(--muted);white-space:nowrap}
 .state{position:relative}
+.rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
+.rule:empty{display:none}
+.rule.office-only{background:var(--signal)}
+.rule.direct{background:var(--surface);border-style:dashed}
 .pill.rep{background:var(--surface);color:var(--ink);border:1px dashed var(--ink)}
 .pill[data-tip]{cursor:help;text-decoration:underline dotted;text-underline-offset:2px}
 .pill[data-tip]::after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 8px);z-index:20;width:260px;padding:10px 12px;background:var(--lake-soft);color:var(--ink);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-size:.85rem;font-weight:400;line-height:1.4;white-space:normal;text-align:left;visibility:hidden;opacity:0;transition:opacity .12s;pointer-events:none}
@@ -448,14 +452,15 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
           <label>Dove <span class="note">affina</span><select id="fWhere"></select></label>
         </div>
         <label>Foto <span class="note">Facoltativa. Nascondi documenti e dati personali prima di caricarla.</span><input type="file" id="fPhoto" accept="image/*"></label>
-        <label>Un dettaglio che solo il proprietario conosce <span class="note">Non viene pubblicato. Serve all'ufficio per verificare chi lo reclama.</span><input id="fSecret" placeholder="es. portachiavi a forma di pesce"></label>
+        <div id="fRule" aria-live="polite"></div>
+        <label>Un dettaglio che solo il proprietario conosce <span class="note">Non viene pubblicato. Serve a verificare chi lo reclama.</span><input id="fSecret" placeholder="es. portachiavi a forma di pesce"></label>
         <button class="btn" type="submit">Trova l'ufficio competente</button>
       </form>
       <div class="panel" id="foundOut">
         <ol class="flow">
           <li><div><b>Descrivi l'oggetto</b><span class="note">Foto e luogo bastano. I dati sensibili restano nascosti.</span></div></li>
           <li><div><b>Ti indichiamo l'ufficio</b><span class="note">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.</span></div></li>
-          <li><div><b>Consegni e ricevi la ricevuta</b><span class="note">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti.</span></div></li>
+          <li><div><b>Consegni e ricevi la ricevuta</b><span class="note">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti. Obbligatorio per chiavi, documenti e oggetti di valore; gli oggetti comuni puoi anche restituirli tu.</span></div></li>
           <li><div><b>Il proprietario riceve un avviso</b><span class="note">Se ha creato un avviso compatibile, lo informiamo subito.</span></div></li>
         </ol>
       </div>
@@ -567,6 +572,8 @@ const REGIONS = {
   italia:   { label:"Tutta l'Italia (in preparazione)", active:false }
 };
 
+/* Chiavi, documenti e oggetti di valore passano sempre dall'ufficio; il resto può essere restituito direttamente da chi trova. */
+const OFFICE_ONLY = new Set(["portafoglio","chiavi","telefono","gioielli"]);
 const CATS = {
   portafoglio:"Portafogli e documenti", telefono:"Telefoni ed elettronica", chiavi:"Chiavi",
   borsa:"Borse e zaini", abbigliamento:"Abbigliamento", gioielli:"Gioielli e orologi",
@@ -631,14 +638,14 @@ const ITEMS = [
   {id:"TI-BEL-26-01455", cat:"portafoglio", t:"Porta tessere nero con abbonamento", desc:"Porta tessere in tessuto nero, contiene un abbonamento Arcobaleno.", p:"bellinzona", spot:"Viale Stazione", src:"bel", days:3},
   {id:"FFS-26-118377", cat:"borsa", t:"Borsa a tracolla in tela beige", desc:"Tracolla beige con taccuino e ombrello pieghevole.", p:"mendrisio", spot:"Stazione Mendrisio, binario 2", src:"ffs", days:7},
   {id:"VB-RIN-2026-0088", cat:"altro", t:"Passeggino pieghevole", desc:"Passeggino leggero blu notte, parasole incluso.", p:"verbania", spot:"Imbarcadero Pallanza", src:"vco", days:12},
-  {id:"TNO-26-55301", cat:"telefono", t:"Tablet in custodia nera", desc:"Tablet 10 pollici, custodia a libro nera.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
+  {id:"TNO-26-55301", cat:"telefono", t:"Tablet con cover nera", desc:"Tablet 10 pollici, custodia a libro nera.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
   {id:"TI-LUG-26-04790", cat:"chiavi", t:"Chiave singola con portachiavi a pesce", desc:"Chiave di sicurezza con portachiavi in metallo.", p:"lugano", spot:"Lido di Lugano", src:"lug", days:15},
   {id:"APT-26-7790", cat:"abbigliamento", t:"Sciarpa di lana a righe", desc:"Sciarpa lunga a righe rosse e grigie.", p:"ascona", spot:"Bus 316 Locarno–Ascona", src:"apt", days:8},
   {id:"CO-RIN-2026-0415", cat:"portafoglio", t:"Portafoglio marrone con portamonete", desc:"Portafoglio da uomo in pelle marrone chiaro, con scomparto portamonete. Tessere custodite a parte.", p:"como", spot:"Stazione Como San Giovanni", src:"com", days:2},
   {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio rosso con cerniera", desc:"Portafoglio piccolo rosso, chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
   {id:"FFS-26-117950", cat:"bici", t:"Bicicletta da città nera", desc:"Bici olandese nera con cestino anteriore, lucchetto tagliato.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
   {id:"VA-RIN-2026-0221", cat:"occhiali", t:"Occhiali da vista con montatura tartarugata", desc:"Montatura tonda tartarugata, astuccio blu.", p:"luino", spot:"Mercato del mercoledì", src:"var", days:6}
-].map((it,i) => { const lag = Math.min(it.days, i % 3), reported = it.days <= 3 && i % 2 === 0;
+].map((it,i) => { const lag = Math.min(it.days, i % 3), reported = [0, 5, 16].includes(i);
   return {...it, date:d(it.days), reported, custody: reported ? null : d(it.days - lag)}; });
 
 /* ---------- STATO ---------- */
@@ -806,6 +813,7 @@ function openItem(id){
   const it = ITEMS.find(i => i.id === id); if(!it) return;
   selected = id; render();
   const p = R.places[it.p], s = srcOf(it.src), law = LAW[p.c];
+  const direct = it.reported && !OFFICE_ONLY.has(it.cat), to = direct ? "a chi l'ha trovato" : "all'ufficio";
   $("#dlgBody").innerHTML = `
     <div class="dlg-head"><div><p class="eyebrow">${esc(CATS[it.cat])} · <span class="mono">${it.id}</span></p><h2>${esc(it.t)}</h2></div>
       <button class="x" type="button" aria-label="Chiudi" data-close>×</button></div>
@@ -814,22 +822,24 @@ function openItem(id){
       <dt>Trovato</dt><dd>${esc(it.spot)}, ${esc(p.n)} (${law.name})</dd>
       <dt>Trovato il</dt><dd>${fmtDate(it.date)} 2026, ${ago(it.days)}</dd>
       ${it.reported
-        ? `<dt>Stato</dt><dd><b>Segnalato</b>: chi l'ha trovato non l'ha ancora consegnato all'ufficio.</dd><dt>Da consegnare a</dt><dd>${esc(s.n)}</dd>`
+        ? `<dt>Stato</dt><dd><b>Segnalato</b>: chi l'ha trovato non l'ha ancora consegnato all'ufficio.</dd><dt>${direct ? "Restituzione" : "Da consegnare a"}</dt><dd>${direct ? `Direttamente da chi l'ha trovato, oppure tramite ${esc(s.n)}` : `${esc(s.n)}. Chiavi, documenti e oggetti di valore si ritirano solo all'ufficio.`}</dd>`
         : `<dt>Consegnato in custodia</dt><dd>${fmtDate(it.custody)} 2026</dd><dt>In custodia presso</dt><dd>${esc(s.n)}</dd>`}
       <dt>Reclamabile per</dt><dd>${law.keep}</dd>
     </dl>
     <div class="legal"><b>${law.name}, ${law.ref}.</b> ${law.text}</div>
     <form class="steps" id="claim">
       <b>È tuo? Rispondi a due domande</b>
-      <p class="note" style="margin:0">Le risposte vanno all'ufficio, che le confronta con i dettagli non pubblicati prima di fissare il ritiro. Porta un documento d'identità.</p>
+      <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (contenuto, segni particolari, colore interno). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " Ritrovo non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
       <label class="q">Descrivi un dettaglio che non è nell'annuncio<input id="c1" required placeholder="es. cosa c'era dentro, un segno particolare"></label>
       <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12"></label>
-      <button class="btn" type="submit">Invia la richiesta all'ufficio</button>
+      <button class="btn" type="submit">Invia la richiesta ${to}</button>
     </form>`;
   $("#dlg").showModal();
   $("#claim").addEventListener("submit", e => {
     e.preventDefault();
-    e.target.outerHTML = `<div class="okbox"><b>Richiesta pronta per ${esc(s.n)}.</b><br>In questo prototipo non viene inviata. Nel servizio reale l'ufficio ti contatta per il ritiro e ti indica gli orari dello sportello.</div>`;
+    e.target.outerHTML = direct
+      ? `<div class="okbox"><b>Richiesta pronta per chi l'ha trovato.</b><br>In questo prototipo non viene inviata. Nel servizio reale, se le risposte corrispondono, vi mettiamo in contatto per la restituzione.</div>`
+      : `<div class="okbox"><b>Richiesta pronta per ${esc(s.n)}.</b><br>In questo prototipo non viene inviata. Nel servizio reale l'ufficio ti contatta per il ritiro e ti indica gli orari dello sportello.</div>`;
   });
 }
 
@@ -878,6 +888,8 @@ function bind(){
     alerts.splice(+i,1); store.set(alerts.filter(a => !a.example)); renderAlerts(); render();
   });
 
+  const showRule = () => { $("#fRule").innerHTML = ruleHTML($("#fCat").value); };
+  $("#fCat").addEventListener("change", showRule); $("#fWhat").addEventListener("input", () => setTimeout(showRule)); showRule();
   $("#foundForm").addEventListener("submit", e => {
     e.preventDefault();
     const p = R.places[$("#fWhere").value], law = LAW[p.c], off = R.offices[p.c];
@@ -886,10 +898,17 @@ function bind(){
       <p class="eyebrow">Ufficio competente per ${esc(p.n)} · ${law.name}</p>
       <div class="office"><b>${esc(off.n)}</b><span class="note">${esc(off.d)}</span></div>
       ${transport ? `<div class="office" style="margin-top:8px"><b>Se l'hai trovato a bordo</b><span class="note">${esc(R.offices.transport[p.c])}</span></div>` : ""}
+      ${ruleHTML($("#fCat").value)}
       <div class="legal" style="margin-top:12px"><b>${law.ref}.</b> ${law.text}</div>
       <p class="note">Annuncio in bozza: <b>${esc($("#fWhat").value)}</b>, ${esc(CATS[$("#fCat").value])}, ${esc(p.n)}. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
       <button class="btn ghost" type="button" onclick="location.hash='cerca';location.reload()">Ricomincia</button>`;
   });
+}
+function ruleHTML(cat){
+  if(!cat) return "";
+  return OFFICE_ONLY.has(cat)
+    ? `<div class="rule office-only"><b>Va consegnato all'ufficio.</b> Chiavi, documenti e oggetti di valore non si restituiscono direttamente: l'ufficio verifica l'identità di chi li reclama.</div>`
+    : `<div class="rule direct"><b>Puoi restituirlo tu.</b> Se il proprietario risponde correttamente al dettaglio nascosto vi mettiamo in contatto. Ritrovo non verifica l'identità e la restituzione resta sotto la tua responsabilità; se preferisci, consegnalo all'ufficio.</div>`;
 }
 function renderAlerts(){
   $("#alerts").innerHTML = alerts.length ? alerts.map((a,i) => {
