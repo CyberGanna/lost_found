@@ -315,6 +315,9 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .state{position:relative}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:.92rem}.check input{margin-top:3px;width:auto}
+.handin{display:grid;gap:10px;margin:16px 0 12px;padding:14px;border:2px solid var(--ink);border-radius:2px;background:var(--surface)}
+.handin label{display:grid;gap:4px;font-weight:700;font-size:.9rem}
 .rule.office-only{background:var(--signal)}
 .rule.direct{background:var(--surface);border-style:dashed}
 .pill.rep{background:var(--surface);color:var(--ink);border:1px dashed var(--ink)}
@@ -739,7 +742,7 @@ function render(){
     const p = R.places[it.p], s = srcOf(it.src);
     const pill = it.reported
       ? `<span class="pill rep" data-tip="Chi l'ha trovato l'ha segnalato qui, ma non l'ha ancora consegnato all'ufficio indicato. Quando lo consegna diventa In custodia.">Segnalato</span><span class="since">il ${fmtDate(it.date)}</span>`
-      : `<span class="pill held" data-tip="L'oggetto è stato consegnato all'ufficio indicato, che lo custodisce e lo restituisce al proprietario dopo aver verificato chi è.">In custodia</span><span class="since">dal ${fmtDate(it.custody)}</span>`;
+      : `<span class="pill held" data-tip="Consegnato a ${esc(s.n)} il ${fmtDate(it.custody)}, confermato dall'ufficio. L'ufficio lo custodisce e lo restituisce al proprietario dopo aver verificato chi è.">In custodia</span><span class="since">dal ${fmtDate(it.custody)}</span>`;
     const tags = (it.days <= 2 ? `<span class="tag new">Nuovo</span>` : "") + (matchesAlert(it) ? `<span class="tag match">Compatibile col tuo avviso</span>` : "");
     return `<button class="item ${selected===it.id?"sel":""}" data-id="${it.id}" type="button">
       <span class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[it.cat]}</svg></span>
@@ -828,17 +831,23 @@ function openItem(id){
     </dl>
     <div class="legal"><b>${law.name}, ${law.ref}.</b> ${law.text}</div>
     <form class="steps" id="claim">
-      <b>È tuo? Rispondi a due domande</b>
+      <b>${direct ? "È tuo? Descrivilo per iscritto" : "È tuo? Rispondi a due domande"}</b>
       <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (contenuto, segni particolari, colore interno). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " Ritrovo non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
       <label class="q">Descrivi un dettaglio che non è nell'annuncio<input id="c1" required placeholder="es. cosa c'era dentro, un segno particolare"></label>
       <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12"></label>
+      ${direct ? `<div class="row">
+        <label class="q">Nome e cognome<input id="c3" required autocomplete="name"></label>
+        <label class="q">Telefono o e-mail<input id="c4" required autocomplete="email"></label>
+      </div>
+      <label class="check"><input type="checkbox" required> Dichiaro che l'oggetto è mio e che i dettagli indicati sono veri.</label>
+      <p class="note" style="margin:0">A tutela di chi l'ha trovato, Ritrovo conserva questa dichiarazione scritta con data e ora. Alla consegna confermate entrambi con una ricevuta digitale.</p>` : ""}
       <button class="btn" type="submit">Invia la richiesta ${to}</button>
     </form>`;
   $("#dlg").showModal();
   $("#claim").addEventListener("submit", e => {
     e.preventDefault();
     e.target.outerHTML = direct
-      ? `<div class="okbox"><b>Richiesta pronta per chi l'ha trovato.</b><br>In questo prototipo non viene inviata. Nel servizio reale, se le risposte corrispondono, vi mettiamo in contatto per la restituzione.</div>`
+      ? `<div class="okbox"><b>Dichiarazione registrata il ${fmtDate(TODAY)} e inviata a chi l'ha trovato.</b><ol style="margin:6px 0 0;padding-left:18px"><li>Chi l'ha trovato confronta i tuoi dettagli con quelli nascosti.</li><li>Se corrispondono, vi mettiamo in contatto per la restituzione.</li><li>Alla consegna entrambi confermate sul sito: si genera la ricevuta digitale con la tua dichiarazione allegata.</li></ol><span class="note">In questo prototipo nulla viene inviato.</span></div>`
       : `<div class="okbox"><b>Richiesta pronta per ${esc(s.n)}.</b><br>In questo prototipo non viene inviata. Nel servizio reale l'ufficio ti contatta per il ritiro e ti indica gli orari dello sportello.</div>`;
   });
 }
@@ -901,8 +910,28 @@ function bind(){
       ${ruleHTML($("#fCat").value)}
       <div class="legal" style="margin-top:12px"><b>${law.ref}.</b> ${law.text}</div>
       <p class="note">Annuncio in bozza: <b>${esc($("#fWhat").value)}</b>, ${esc(CATS[$("#fCat").value])}, ${esc(p.n)}. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
+      <form class="handin" id="handin">
+        <b>L'hai già consegnato?</b>
+        <div class="row">
+          <label>A quale ufficio<select id="hOffice" required>${handinOffices(p, transport)}</select></label>
+          <label>Il giorno<input type="date" id="hDate" required max="2026-10-18" value="2026-10-18"></label>
+        </div>
+        <input id="hOther" placeholder="Nome dell'ufficio" hidden>
+        <button class="btn" type="submit">Segna come consegnato</button>
+      </form>
       <button class="btn ghost" type="button" onclick="location.hash='cerca';location.reload()">Ricomincia</button>`;
+    $("#hOffice").addEventListener("change", e => { const o = $("#hOther"); o.hidden = e.target.value !== "altro"; o.required = !o.hidden; });
+    $("#handin").addEventListener("submit", ev => {
+      ev.preventDefault();
+      const name = $("#hOffice").value === "altro" ? $("#hOther").value : $("#hOffice").selectedOptions[0].text;
+      ev.target.outerHTML = `<div class="okbox"><b>Consegnato a ${esc(name)} il ${fmtDate(new Date($("#hDate").value))}.</b><br>Finché l'ufficio non conferma, l'annuncio mostra "Consegnato, da confermare": è una tua dichiarazione. Quando l'ufficio lo registra diventa "In custodia". Conserva la ricevuta.</div>`;
+    });
   });
+}
+/* uffici proposti per la consegna: prima quelli dello stesso paese del luogo, poi i trasporti se pertinenti */
+function handinOffices(p, transport){
+  const near = R.sources.filter(x => x.c === p.c && (transport || !["ffs","apt","tpl","tno"].includes(x.id)));
+  return `<option value="">Scegli…</option>` + near.map(x => `<option value="${x.id}">${esc(x.n)}</option>`).join("") + `<option value="altro">Altro ufficio</option>`;
 }
 function ruleHTML(cat){
   if(!cat) return "";
