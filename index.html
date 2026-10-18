@@ -604,7 +604,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
    Per aggiungere una regione: un nuovo oggetto in REGIONS con luoghi, fonti e (se serve) un riquadro mappa.
    Le regole di legge stanno in LAW per paese, così ogni regione eredita quelle del suo stato. */
 const LAW = {
-  CH: { name:"Svizzera", ref:"art. 720–722 CC", keep:"5 anni", text:"Chi ha perso l'oggetto può reclamarlo per 5 anni. Poi la proprietà passa a chi l'ha trovato, che ha diritto a una ricompensa adeguata (di solito circa il 10%)." },
+  CH: { name:"Svizzera", ref:"art. 720–722 CC", keep:"5 anni", text:"Chi ha perso l'oggetto può reclamarlo per 5 anni. Poi la proprietà passa a chi l'ha trovato, che ha diritto a una ricompensa adeguata." },
   IT: { name:"Italia", ref:"art. 927–930 c.c.", keep:"1 anno", text:"L'oggetto resta in custodia un anno dalla pubblicazione all'albo pretorio. Al ritrovatore spetta un premio pari a un decimo del valore." }
 };
 
@@ -903,12 +903,17 @@ function openItem(id){
       <dt>Trovato</dt><dd>${esc(it.spot)}, ${esc(p.n)} (${law.name})</dd>
       <dt>Trovato il</dt><dd>${fmtDate(it.date)} 2026, ${ago(it.days)}</dd>
       ${it.reported
-        ? `<dt>Stato</dt><dd><b>Segnalato</b>: chi l'ha trovato non l'ha ancora consegnato all'ufficio.</dd><dt>${direct ? "Restituzione" : "Da consegnare a"}</dt><dd>${direct ? `Direttamente da chi l'ha trovato, oppure tramite ${dirLink(s, p)}` : `${dirLink(s, p)}. Chiavi, documenti e oggetti di valore si ritirano solo all'ufficio.`}</dd>`
+        ? `<dt>Stato</dt><dd><b>Segnalato</b>: chi l'ha trovato non l'ha ancora consegnato all'ufficio.</dd><dt>Dove si trova</dt><dd>Ancora presso chi l'ha trovato.${direct ? "" : ` Ti avvisiamo quando arriva all'ufficio.<br><span class="note">Verrà consegnato a ${esc(s.n)}. Chiavi, documenti e oggetti di valore si ritirano solo all'ufficio.</span>`}</dd>${direct ? `<dt>Restituzione</dt><dd>Direttamente da chi l'ha trovato, dopo aver verificato che è tuo.</dd>` : ""}`
         : `<dt>Consegnato in custodia</dt><dd>${fmtDate(it.custody)} 2026</dd><dt>In custodia presso</dt><dd>${dirLink(s, p)}</dd>`}
       <dt>Reclamabile per</dt><dd>${law.keep}</dd>
     </dl>
-    <div class="legal"><b>${law.name}, ${law.ref}.</b> ${law.text}</div>
-    <form class="steps" id="claim">
+    <div class="legal"><b>${law.name}, ${law.ref}${law.ref.endsWith(".") ? "" : "."}</b> ${law.text}</div>
+    ${it.reported && !direct ? `<form class="steps" id="claim">
+      <b>È tuo? Ti avvisiamo quando arriva all'ufficio</b>
+      <p class="note" style="margin:0">Per ora l'oggetto è ancora presso chi l'ha trovato. Appena ${esc(s.n)} lo registra ti scriviamo: allora potrai chiederne il ritiro rispondendo a due domande. Porta un documento d'identità.</p>
+      <label class="q">Email o numero di telefono<input id="c4" required autocomplete="email"></label>
+      <button class="btn" type="submit">Avvisami quando arriva all'ufficio</button>
+    </form>` : `<form class="steps" id="claim">
       <b>${direct ? "È tuo? Descrivilo per iscritto" : "È tuo? Rispondi a due domande"}</b>
       <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (colore, contenuto, segni particolari). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " RITROVO non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
       <label class="q">Descrivi un dettaglio che non è nell'annuncio<input id="c1" required placeholder="es. il colore, cosa c'era dentro, un segno particolare"></label>
@@ -920,11 +925,13 @@ function openItem(id){
       <label class="check"><input type="checkbox" required> Dichiaro che l'oggetto è mio e che i dettagli indicati sono veri.</label>
       <p class="note" style="margin:0">A tutela di chi l'ha trovato, RITROVO conserva questa dichiarazione scritta con data e ora. Alla consegna confermate entrambi con una ricevuta digitale.</p>` : ""}
       <button class="btn" type="submit">Invia la richiesta ${to}</button>
-    </form>`;
+    </form>`}`;
   $("#dlg").showModal();
   $("#claim").addEventListener("submit", e => {
     e.preventDefault();
-    e.target.outerHTML = direct
+    e.target.outerHTML = it.reported && !direct
+      ? `<div class="okbox"><b>Fatto. Ti avvisiamo appena ${esc(s.n)} registra l'oggetto.</b><br>Ti abbiamo mandato un link per confermare; in ogni avviso trovi il link per disattivarlo. <span class="note">In questo prototipo nulla viene inviato.</span></div>`
+      : direct
       ? `<div class="okbox"><b>Dichiarazione registrata il ${fmtDate(TODAY)} e inviata a chi l'ha trovato.</b><ol style="margin:6px 0 0;padding-left:18px"><li>Chi l'ha trovato confronta i tuoi dettagli con quelli nascosti.</li><li>Se corrispondono, vi mettiamo in contatto per la restituzione.</li><li>Alla consegna entrambi confermate sul sito: si genera la ricevuta digitale con la tua dichiarazione allegata.</li></ol><span class="note">In questo prototipo nulla viene inviato.</span></div>`
       : `<div class="okbox"><b>Richiesta pronta per ${esc(s.n)}.</b><br>In questo prototipo non viene inviata. Nel servizio reale l'ufficio ti contatta per il ritiro e ti indica gli orari dello sportello.</div>`;
   });
@@ -955,7 +962,7 @@ function openLaw(){
       <h3>Sempre all'ufficio</h3>
       <p>Chiavi, documenti, portafogli, telefoni, gioielli e altri oggetti di valore. L'ufficio verifica l'identità di chi li reclama e tiene un registro.</p>
       <h3>Il compenso per chi trova</h3>
-      <p><b>Svizzera</b> (${ch(722)}): se il proprietario non lo reclama entro 5 anni, l'oggetto diventa tuo. Se lo reclama, hai diritto al rimborso delle spese e a una ricompensa adeguata, di solito circa il 10% del valore.</p>
+      <p><b>Svizzera</b> (${ch(722)}): se il proprietario non lo reclama entro 5 anni, l'oggetto diventa tuo. Se lo reclama, hai diritto al rimborso delle spese e a una ricompensa adeguata.</p>
       <p><b>Italia</b> (${it(929)}, ${it(930)}): se nessuno lo reclama entro un anno dalla pubblicazione, l'oggetto diventa tuo. Se il proprietario lo ritira, ti spetta un premio del 10% del valore (5% sulla parte oltre 5'164,57 euro).</p>
       <h3>Privacy</h3>
       <p>Non scrivere dati personali né numeri di documenti. Descrivi l'oggetto senza i dettagli che lo identificano: servono per riconoscere il vero proprietario.</p>
