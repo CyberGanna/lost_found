@@ -391,7 +391,8 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       <h2 id="resTitle">▼ Ultimi oggetti trovati</h2>
       <button class="btn ghost" id="toAlert" type="button">Crea un avviso con questa ricerca</button>
     </div>
-    <details class="src-d"><summary>Fonti consultate: <span id="srcCount"></span></summary><div class="sources" id="sources" aria-label="Fonti consultate"></div></details>
+    <!-- Fonti nascoste finché gli uffici non sono collegati davvero: si riattivano togliendo hidden -->
+    <details class="src-d" hidden><summary>Fonti consultate: <span id="srcCount"></span></summary><div class="sources" id="sources" aria-label="Fonti consultate"></div></details>
     <div class="list" id="list"></div>
   </div>
   <aside class="mapbox" aria-label="Mappa">
