@@ -338,7 +338,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .dd-list .dd-group:first-child{border-top:0}
 .dd i.flag{display:inline-block;width:12px;height:8px;border-radius:1px;flex:none}
 @media (max-width:600px){ .dd-list{position:fixed;top:auto;bottom:0;left:0;right:0;max-height:60vh;border-width:3px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.25);padding-bottom:max(12px,env(safe-area-inset-bottom))} .dd-list li{padding:12px 16px} }
-.bigq{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"q x go" "ex x go";align-items:start;row-gap:0;column-gap:4px}
+.bigq{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"q x go";align-items:start;row-gap:0;column-gap:4px}
 .bigq textarea{grid-area:q;align-self:start;padding:6px 8px 0!important}
 .bigq .ex{grid-area:ex;justify-self:start;align-self:end;padding:0 8px 2px;font-size:.8rem}
 .bigq .clr{grid-area:x;align-self:center;border:0;background:none;font-size:1.6rem;line-height:1;color:var(--muted);cursor:pointer;padding:4px 8px}
@@ -411,6 +411,10 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 #enti .roadmap .step .eyebrow{color:#a8a8a8}
 #enti .roadmap .step.now{background:var(--signal);color:var(--ink);border-color:var(--signal);box-shadow:none}
 #enti .roadmap .step.now .eyebrow{color:var(--ink)}
+.mode-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.mode-row .ex{margin-bottom:14px;border:0;background:none;color:var(--ink);font:inherit;font-size:.95rem;font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:4px 2px;cursor:pointer;white-space:nowrap}
+.mode-row .ex:hover{text-decoration-thickness:2px}
+.bigq textarea{align-self:center!important;padding:6px 8px!important}
 </style>
 </head>
 <body>
@@ -444,15 +448,17 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <h1 class="hero-title">Perso? <span>Trovato?</span></h1>
     <div class="hero-main">
       <form class="simple" id="searchForm" role="search">
+        <div class="mode-row">
         <div class="mode" role="radiogroup" aria-label="Cosa vuoi fare">
           <label><input type="radio" name="mode" value="perso" checked><span>Ho perso</span></label>
           <label><input type="radio" name="mode" value="trovato"><span>Ho trovato</span></label>
+        </div>
+        <button class="ex" type="button" id="qEx" title="Compila con un esempio">Esempio</button>
         </div>
         <div class="bigq">
           <label for="q" class="sr">Descrivi l'oggetto</label>
           <textarea id="q" rows="1" placeholder="Cosa, dove, quando: scrivilo come lo diresti a un amico" autocomplete="off" enterkeyhint="go"></textarea>
           <button class="clr" type="button" id="qClr" aria-label="Cancella il testo" title="Cancella" hidden>×</button>
-          <button class="ex" type="button" id="qEx" title="Compila con un esempio">Esempio</button>
           <button class="btn go" type="submit" id="qGo" aria-label="Cerca" title="Cerca"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="square" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg></button>
         </div>
         <p class="note qhint" id="qHint">Resta sul generico: tipo di oggetto, zona, quando. Non scrivere colore, marca o contenuto: ti serviranno per dimostrare che è tuo.</p>
