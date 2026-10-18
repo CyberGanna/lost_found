@@ -395,6 +395,21 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .qalert.done{background:var(--lake-soft);border:3px solid var(--ink)}
 .qalert.done .qa-t{margin:0}
 @media (max-width:480px){ .qalert .qa-row{flex-direction:column} }
+#enti{background:#111;color:#fff;border-top:0}
+#enti .eyebrow{color:var(--signal)}
+#enti h2,#enti h3{color:#fff}
+#enti > .wrap > p.lead{color:#cfcfcf}
+#enti .panel{background:#1c1c1c;border:1px solid #444}
+#enti .panel .note{color:#cfcfcf}
+#enti .compare table{background:#1c1c1c}
+#enti .compare th,#enti .compare td{border-bottom-color:#3a3a3a;color:#eee}
+#enti .compare td.no{color:#a8a8a8}
+#enti .compare td.yes:not(.us){color:var(--signal)}
+#enti .compare th:nth-child(2),#enti .compare td.us{background:var(--signal);color:var(--ink)}
+#enti .roadmap .step{background:#1c1c1c;border:1px solid #444;color:#fff}
+#enti .roadmap .step .eyebrow{color:#a8a8a8}
+#enti .roadmap .step.now{background:var(--signal);color:var(--ink);border-color:var(--signal);box-shadow:none}
+#enti .roadmap .step.now .eyebrow{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -497,7 +512,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <div class="list" id="list"></div>
     <form class="qalert" id="qAlert" hidden>
       <p class="qa-t" id="qaT">Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.</p>
-      <div class="qa-row"><input id="qaMail" type="email" required autocomplete="email" placeholder="La tua email" aria-label="La tua email"><button class="btn" type="submit">Avvisami</button></div>
+      <div class="qa-row"><input id="qaMail" type="email" data-contact="email" required autocomplete="email" placeholder="La tua email" aria-label="La tua email"><button class="btn" type="submit">Avvisami</button></div>
       <p class="qa-n">Non serve registrarsi.</p>
     </form>
   </div>
@@ -593,7 +608,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 </section>
 </main>
 
-<footer><div class="wrap">RITROVO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al sindaco del comune (art. 927 segg. c.c.).</div></footer>
+<footer><div class="wrap">RITROVO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).</div></footer>
 
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 <div class="toast" id="toast" hidden></div>
@@ -770,7 +785,7 @@ const stem = w => w.length > 4 ? w.replace(/[aeio]$/,"") : w;
 function words(s){ return norm(s).split(/[^a-z0-9]+/).filter(w => w.length > 2 && !STOP.has(w) && !NOISE.has(w)).map(stem); }
 function score(it, q){
   if(!q.length) return 1;
-  const hay = norm(`${it.t} ${it.desc} ${CATS[it.cat]} ${CAT_WORDS[it.cat].join(" ")} ${it.spot}`).split(/[^a-z0-9]+/).filter(w => w.length > 2).map(stem);
+  const hay = norm(`${it.t} ${CATS[it.cat]} ${CAT_WORDS[it.cat].join(" ")} ${it.spot}`).split(/[^a-z0-9]+/).filter(w => w.length > 2).map(stem);
   return q.filter(w => hay.some(h => h.startsWith(w) || w.startsWith(h))).length / q.length;
 }
 
@@ -911,17 +926,18 @@ function openItem(id){
     ${it.reported && !direct ? `<form class="steps" id="claim">
       <b>È tuo? Ti avvisiamo quando arriva all'ufficio</b>
       <p class="note" style="margin:0">Per ora l'oggetto è ancora presso chi l'ha trovato. Appena ${esc(s.n)} lo registra ti scriviamo: allora potrai chiederne il ritiro rispondendo a due domande. Porta un documento d'identità.</p>
-      <label class="q">La tua email<input id="c4" type="email" required autocomplete="email"></label>
+      <label class="q">La tua email<input id="c4" type="email" data-contact="email" required autocomplete="email"></label>
       <button class="btn" type="submit">Avvisami quando arriva all'ufficio</button>
     </form>` : `<form class="steps" id="claim">
       <b>${direct ? "È tuo? Descrivilo per iscritto" : "È tuo? Rispondi a due domande"}</b>
       <p class="note" style="margin:0">L'annuncio pubblico non mostra i dettagli che identificano l'oggetto (colore, contenuto, segni particolari). Le tue risposte vanno ${to}, che le confronta con quei dettagli prima del ritiro.${direct ? " RITROVO non verifica l'identità: la restituzione è un accordo tra voi." : " Porta un documento d'identità."}</p>
       <label class="q">Descrivi uno o più dettagli dell'oggetto<input id="c1" required placeholder="es. il colore, cosa c'era dentro, un segno particolare"></label>
-      <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12"></label>
-      ${direct ? `<div class="row">
+      <label class="q">Quando e dove pensi di averlo perso?<input id="c2" required placeholder="es. venerdì sera, sul treno delle 18:12" value="${direct ? esc($("#q").value.trim()) : ""}"></label>
+      <div class="row">
         <label class="q">Nome e cognome<input id="c3" required autocomplete="name"></label>
-        <label class="q">Telefono o e-mail<input id="c4" required autocomplete="email"></label>
+        <label class="q">Telefono o e-mail<input id="c4" data-contact="any" required autocomplete="email"></label>
       </div>
+      ${direct ? `
       <label class="check"><input type="checkbox" required> Dichiaro che l'oggetto è mio e che i dettagli indicati sono veri.</label>
       <p class="note" style="margin:0">A tutela di chi l'ha trovato, RITROVO conserva questa dichiarazione scritta con data e ora. Alla consegna confermate entrambi con una ricevuta digitale.</p>` : ""}
       <button class="btn" type="submit">Invia la richiesta ${to}</button>
@@ -1038,13 +1054,20 @@ function bind(){
     $("#aWhat").value = $("#q").value; aUpdate();
     $("#avvisi").scrollIntoView({behavior:"smooth"}); setTimeout(() => $("#aWhat").focus(), 400);
   });
+  /* contatti: email con dominio, oppure telefono con almeno 9 cifre dove è ammesso */
+  const okContact = (v, any) => /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v) || (any && /^\+?[\d\s().\/-]+$/.test(v) && v.replace(/\D/g, "").length >= 9);
+  document.addEventListener("input", e => {
+    const c = e.target.dataset && e.target.dataset.contact; if(!c) return;
+    const v = e.target.value.trim();
+    e.target.setCustomValidity(!v || okContact(v, c === "any") ? "" : c === "any" ? "Scrivi un'email o un numero di telefono valido." : "Scrivi un'email valida.");
+  });
   $("#qAlert").addEventListener("submit", e => {
     e.preventDefault();
     alerts = alerts.filter(a => !a.example);
     alerts.unshift({what:$("#q").value, cat:$("#cat").value, where:$("#where").value});
     store.set(alerts); renderAlerts();
     const f = e.target; f.classList.add("done");
-    f.innerHTML = `<p class="qa-t">Fatto. Ti abbiamo mandato un link per confermare.</p><p class="qa-n">In ogni avviso trovi il link per disattivarlo.</p>`;
+    f.innerHTML = `<p class="qa-t">Fatto. Ti abbiamo mandato un link per confermare.</p><p class="qa-n">In ogni avviso trovi il link per disattivarlo. In questo prototipo nulla viene inviato.</p>`;
     render();
   });
   $("#alertForm").addEventListener("submit", e => {
