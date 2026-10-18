@@ -398,7 +398,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
       <ul class="trust"><li>Gratis</li><li>Senza registrazione</li><li>Svizzera e Italia</li></ul>
       <div class="disc">
         <p><b>Ritrovo non sostituisce l'ufficio oggetti trovati.</b></p>
-        <p>Chi trova un oggetto e <b>non conosce il proprietario</b> deve avvisare l'autorità: in Svizzera la polizia (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>; i cantoni possono designare un altro ufficio, esclusi gli oggetti di poco valore), in Italia consegnarlo al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
+        <p>Chi trova un oggetto e <b>non conosce il proprietario</b> deve avvisare l'autorità: in Svizzera la polizia o, se l'ha trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, il personale di quel servizio (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>), in Italia consegnarlo al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
         <p>Non pubblicare documenti, foto di persone o dati personali. Per restituire un oggetto l'ufficio verifica sempre chi lo reclama.</p>
       </div>
     </div>
@@ -453,7 +453,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
   <div class="wrap">
     <p class="eyebrow">Per chi trova</p>
     <h2>Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
-    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non conosce il proprietario</b> deve avvisare l'autorità: in Svizzera la polizia (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>; i cantoni possono designare un altro ufficio, esclusi gli oggetti di poco valore), in Italia consegnarlo al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
+    <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non conosce il proprietario</b> deve avvisare l'autorità: in Svizzera la polizia o, se l'ha trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, il personale di quel servizio (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>), in Italia consegnarlo al sindaco del comune (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. Ritrovo non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
     <div class="two">
       <form class="panel form" id="foundForm">
         <label>Cosa hai trovato, e dove<textarea id="fWhat" rows="2" required placeholder="es. zaino blu con dei libri, sul bus a Bellinzona"></textarea></label>
@@ -875,8 +875,10 @@ function openLaw(){
       <h3>Se conosci il proprietario</h3>
       <p>Restituiscilo a lui. In Svizzera e in Italia l'obbligo di avvisare o consegnare all'autorità vale solo se il proprietario <b>non</b> è noto.</p>
       <h3>Se non lo conosci</h3>
-      <p><b>Svizzera</b> (${ch(720)}): avvisa la polizia o l'ufficio designato dal cantone (in Ticino la polizia comunale). Per gli oggetti di valore inferiore a 10 franchi l'avviso non è obbligatorio. Se trovi l'oggetto in una casa abitata, in un negozio o su un mezzo di trasporto, consegnalo al gestore (per esempio FFS, AutoPostale o il negozio).</p>
+      <p><b>Svizzera</b> (${ch(720)}): avvisa la polizia o l'ufficio designato dal cantone (in Ticino la polizia comunale). Per gli oggetti di valore inferiore a 10 franchi l'avviso non è obbligatorio.</p>
+      <p><b>Mezzi e luoghi pubblici</b> (${ch(720)} cpv. 3): se lo trovi in una casa abitata o in un luogo destinato all'uso pubblico o ai trasporti, per esempio un bus, un treno, una stazione, un negozio o un ufficio, consegnalo al personale o allo sportello di quel servizio, non alla polizia. Una fermata del bus in strada invece è suolo pubblico: vale la regola normale, polizia o ufficio del comune.</p>
       <p><b>Italia</b> (${it(927)}): consegnalo senza ritardo al sindaco del comune dove l'hai trovato, di solito tramite la polizia locale. Il comune lo pubblica all'albo pretorio (${it(928)}).</p>
+      <p>Le aziende di trasporto (per esempio Trenord o ATM) hanno propri uffici oggetti smarriti per i loro mezzi e le loro stazioni.</p>
       <h3>Quando puoi restituirlo direttamente con Ritrovo</h3>
       <p>Se il proprietario si fa avanti su Ritrovo puoi restituirglielo tu, <b>solo se</b> sono vere tutte queste condizioni:</p>
       <ul>
