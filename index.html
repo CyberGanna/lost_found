@@ -277,6 +277,11 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .src-d{margin:0 0 12px;font-size:.88rem}
 .src-d summary{cursor:pointer;font-weight:700;color:var(--muted);width:max-content}
 .src-d .sources{margin-top:8px}
+
+/* la prima schermata (hero + come funziona) occupa tutta la finestra sotto la barra; l'elenco parte scorrendo */
+.fold{display:flex;flex-direction:column;min-height:calc(100svh - var(--top,110px) - env(safe-area-inset-top,0px))}
+.fold .hero{flex:1;display:flex;align-items:center}
+.fold .hero > .wrap{width:100%}
 </style>
 </head>
 <body>
@@ -304,6 +309,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 <div class="mockbar"><div class="wrap"><b>Prototipo.</b> Oggetti, uffici e numeri di pratica sono dati di esempio, non collegati alle fonti reali.</div></div>
 
 <main>
+<div class="fold">
 <section class="hero" id="cerca">
   <div class="wrap hero-grid">
     <div class="hero-main">
@@ -358,6 +364,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <div><b>3. Ti avvisiamo</b><span class="note">Se non c'è ancora, ricevi un messaggio appena un ufficio lo registra.</span></div>
   </div>
 </section>
+</div>
 
 <section class="wrap results" id="risultati" aria-label="Ultimi oggetti trovati">
   <div>
@@ -753,6 +760,8 @@ function bind(){
     $("#q").placeholder = r.value === "perso" ? "Scrivi qui, es. portafoglio marrone a Como" : "Scrivi qui, es. chiavi trovate sul bus a Lugano";
   }));
   drawTiles();
+  const setTop = () => document.documentElement.style.setProperty("--top", (document.querySelector("header.top").offsetHeight + document.querySelector(".mockbar").offsetHeight) + "px");
+  setTop(); window.addEventListener("resize", setTop);
   const upd = () => $("#srcCount").textContent = `${enabledSrc.size} di ${R.sources.length}`; upd(); $("#sources").addEventListener("change", upd);
   smartField({input:$("#q"), chips:$("#qUnderstood"), cat:$("#cat"), where:$("#where"), when:$("#when"), onChange:render});
   ["#cat","#where","#when"].forEach(s => $(s).addEventListener("input", render));
