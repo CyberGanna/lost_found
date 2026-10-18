@@ -317,6 +317,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
 .rule{font-size:.92rem;line-height:1.45;padding:10px 12px;border:2px solid var(--ink);border-radius:2px;margin-top:12px}
 .rule:empty{display:none}
 #qUnderstood{display:none}
+@media (min-width:901px) and (max-width:1279px){ #q:placeholder-shown,#q.meas{font-size:1rem} }
 @media (max-width:600px){ #q::placeholder{font-size:.88em} }
 .dd.flash .dd-btn{animation:ddflash 1.6s ease-out}
 @keyframes ddflash{0%,40%{background:var(--signal);box-shadow:0 0 0 4px var(--ink)}100%{background:var(--surface);box-shadow:none}}
@@ -516,7 +517,7 @@ ol.flow li::before{border-radius:0;background:var(--ink);color:var(--signal)}
     <p class="lead">La <span class="tip" tabindex="0" role="button" aria-describedby="tipLegge">legge<span class="tip-box" role="tooltip" id="tipLegge"><span>Chi trova un oggetto e <b>non sa a chi appartiene</b> deve avvisare l'autorità. In <span class="mid">Svizzera</span> va avvisata la polizia; se l'oggetto è su un mezzo pubblico, in stazione o in un ufficio pubblico, si consegna al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>). In <span class="mid">Italia</span> va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</span><span>Per gli oggetti comuni, a certe condizioni, è possibile anche la restituzione diretta.</span><button class="more" type="button" data-law>Leggi di più…</button></span></span></span> chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
     <div class="two">
       <form class="panel form" id="foundForm">
-        <label>Cosa hai trovato, e dove <span class="note">Non scrivere colore, marca o contenuto: mettili nel dettaglio riservato qui sotto.</span><textarea id="fWhat" rows="2" required placeholder="es. zaino con dei libri, sul bus a Bellinzona"></textarea></label>
+        <label>Che oggetto è, e dove l'hai trovato <span class="note">Pubblichiamo solo il tipo di oggetto e il luogo. Tutti gli altri dettagli scrivili nel campo riservato qui sotto.</span><textarea id="fWhat" rows="2" required placeholder="es. zaino, sul bus a Bellinzona"></textarea></label>
         <div class="understood" id="fUnderstood" aria-live="polite" style="padding:0"></div>
         <div class="row">
           <label>Categoria <span class="note">affina</span><select id="fCat"></select></label>
@@ -696,26 +697,26 @@ function parse(text){
 const TODAY = new Date("2026-10-18T12:00:00");
 const d = n => new Date(TODAY - n*864e5);
 const ITEMS = [
-  {id:"TI-LUG-26-04817", cat:"portafoglio", t:"Portafoglio in pelle", desc:"Portafoglio a libro in pelle. Documenti custoditi a parte.", p:"lugano", spot:"Piazza della Riforma", src:"lug", days:1},
-  {id:"FFS-26-118204", cat:"telefono", t:"iPhone con cover", desc:"Smartphone Apple con cover in silicone. Schermo integro.", p:"bellinzona", spot:"Treno RE80 Bellinzona–Milano, carrozza 3", src:"ffs", days:2},
-  {id:"CO-RIN-2026-0391", cat:"chiavi", t:"Mazzo di chiavi con telecomando auto", desc:"Alcune chiavi di casa e una chiave d'auto con telecomando.", p:"como", spot:"Lungolago Mafalda di Savoia", src:"com", days:3},
+  {id:"TI-LUG-26-04817", cat:"portafoglio", t:"Portafoglio", desc:"Portafoglio a libro in pelle. Documenti custoditi a parte.", p:"lugano", spot:"Piazza della Riforma", src:"lug", days:1},
+  {id:"FFS-26-118204", cat:"telefono", t:"Smartphone", desc:"Smartphone Apple con cover in silicone. Schermo integro.", p:"bellinzona", spot:"Treno RE80 Bellinzona–Milano, carrozza 3", src:"ffs", days:2},
+  {id:"CO-RIN-2026-0391", cat:"chiavi", t:"Mazzo di chiavi", desc:"Alcune chiavi di casa e una chiave d'auto con telecomando.", p:"como", spot:"Lungolago Mafalda di Savoia", src:"com", days:3},
   {id:"TI-LOC-26-00912", cat:"occhiali", t:"Occhiali da sole", desc:"Montatura squadrata, con astuccio rigido.", p:"locarno", spot:"Piazza Grande", src:"loc", days:4},
-  {id:"APT-26-7741", cat:"borsa", t:"Zaino da escursione", desc:"Zaino da escursione di media capienza.", p:"airolo", spot:"Bus 111 Airolo–Nufenen", src:"apt", days:5},
-  {id:"TNO-26-55120", cat:"abbigliamento", t:"Giacca impermeabile", desc:"Giacca leggera con cappuccio.", p:"como", spot:"Treno S11 Chiasso–Milano", src:"tno", days:2},
-  {id:"TI-LUG-26-04822", cat:"gioielli", t:"Orologio da polso", desc:"Orologio analogico con cinturino in metallo.", p:"lugano", spot:"Parco Ciani", src:"lug", days:6},
-  {id:"TPL-26-3310", cat:"telefono", t:"Auricolari wireless con astuccio", desc:"Auricolari nella custodia di ricarica.", p:"lugano", spot:"Linea 2, fermata Centro", src:"tpl", days:1},
-  {id:"VA-RIN-2026-0217", cat:"bici", t:"Monopattino elettrico", desc:"Monopattino pieghevole, senza caricatore.", p:"varese", spot:"Stazione Varese Nord", src:"var", days:9},
-  {id:"TI-BEL-26-01455", cat:"portafoglio", t:"Porta tessere con abbonamento", desc:"Porta tessere in tessuto con un abbonamento dei trasporti. Documenti custoditi a parte.", p:"bellinzona", spot:"Viale Stazione", src:"bel", days:3},
-  {id:"FFS-26-118377", cat:"borsa", t:"Borsa a tracolla in tela", desc:"Borsa a tracolla in tela.", p:"mendrisio", spot:"Stazione Mendrisio, binario 2", src:"ffs", days:7},
-  {id:"VB-RIN-2026-0088", cat:"altro", t:"Passeggino pieghevole", desc:"Passeggino leggero con parasole.", p:"verbania", spot:"Imbarcadero Pallanza", src:"vco", days:12},
-  {id:"TNO-26-55301", cat:"telefono", t:"Tablet con cover", desc:"Tablet 10 pollici con custodia a libro.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
-  {id:"TI-LUG-26-04790", cat:"chiavi", t:"Chiave singola con portachiavi", desc:"Chiave di sicurezza con portachiavi.", p:"lugano", spot:"Lido di Lugano", src:"lug", days:15},
-  {id:"APT-26-7790", cat:"abbigliamento", t:"Sciarpa di lana", desc:"Sciarpa lunga di lana.", p:"ascona", spot:"Bus 316 Locarno–Ascona", src:"apt", days:8},
-  {id:"CO-RIN-2026-0415", cat:"portafoglio", t:"Portafoglio con portamonete", desc:"Portafoglio da uomo in pelle con portamonete. Tessere custodite a parte.", p:"como", spot:"Stazione Como San Giovanni", src:"com", days:2},
-  {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio con cerniera", desc:"Portafoglio piccolo con chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
-  {id:"FFS-26-117950", cat:"bici", t:"Bicicletta da città", desc:"Bici da città con cestino anteriore.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
+  {id:"APT-26-7741", cat:"borsa", t:"Zaino", desc:"Zaino da escursione di media capienza.", p:"airolo", spot:"Bus 111 Airolo–Nufenen", src:"apt", days:5},
+  {id:"TNO-26-55120", cat:"abbigliamento", t:"Giacca", desc:"Giacca leggera con cappuccio.", p:"como", spot:"Treno S11 Chiasso–Milano", src:"tno", days:2},
+  {id:"TI-LUG-26-04822", cat:"gioielli", t:"Orologio", desc:"Orologio analogico con cinturino in metallo.", p:"lugano", spot:"Parco Ciani", src:"lug", days:6},
+  {id:"TPL-26-3310", cat:"telefono", t:"Auricolari", desc:"Auricolari nella custodia di ricarica.", p:"lugano", spot:"Linea 2, fermata Centro", src:"tpl", days:1},
+  {id:"VA-RIN-2026-0217", cat:"bici", t:"Monopattino", desc:"Monopattino pieghevole, senza caricatore.", p:"varese", spot:"Stazione Varese Nord", src:"var", days:9},
+  {id:"TI-BEL-26-01455", cat:"portafoglio", t:"Porta tessere", desc:"Porta tessere in tessuto con un abbonamento dei trasporti. Documenti custoditi a parte.", p:"bellinzona", spot:"Viale Stazione", src:"bel", days:3},
+  {id:"FFS-26-118377", cat:"borsa", t:"Borsa", desc:"Borsa a tracolla in tela.", p:"mendrisio", spot:"Stazione Mendrisio, binario 2", src:"ffs", days:7},
+  {id:"VB-RIN-2026-0088", cat:"altro", t:"Passeggino", desc:"Passeggino leggero con parasole.", p:"verbania", spot:"Imbarcadero Pallanza", src:"vco", days:12},
+  {id:"TNO-26-55301", cat:"telefono", t:"Tablet", desc:"Tablet 10 pollici con custodia a libro.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
+  {id:"TI-LUG-26-04790", cat:"chiavi", t:"Chiave", desc:"Chiave di sicurezza con portachiavi.", p:"lugano", spot:"Lido di Lugano", src:"lug", days:15},
+  {id:"APT-26-7790", cat:"abbigliamento", t:"Sciarpa", desc:"Sciarpa lunga di lana.", p:"ascona", spot:"Bus 316 Locarno–Ascona", src:"apt", days:8},
+  {id:"CO-RIN-2026-0415", cat:"portafoglio", t:"Portafoglio", desc:"Portafoglio da uomo in pelle con portamonete. Tessere custodite a parte.", p:"como", spot:"Stazione Como San Giovanni", src:"com", days:2},
+  {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio", desc:"Portafoglio piccolo con chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
+  {id:"FFS-26-117950", cat:"bici", t:"Bicicletta", desc:"Bici da città con cestino anteriore.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
   {id:"VA-RIN-2026-0221", cat:"occhiali", t:"Occhiali da vista", desc:"Montatura tonda, con astuccio.", p:"luino", spot:"Mercato del mercoledì", src:"var", days:6},
-  {id:"TI-LUG-26-04862", cat:"occhiali", t:"Occhiali da sole graduati", desc:"Occhiali da sole con lenti graduate, senza astuccio.", p:"lugano", spot:"Via Nassa", src:"lug", days:1}
+  {id:"TI-LUG-26-04862", cat:"occhiali", t:"Occhiali da sole", desc:"Occhiali da sole con lenti graduate, senza astuccio.", p:"lugano", spot:"Via Nassa", src:"lug", days:1}
 ].map((it,i) => { const lag = Math.min(it.days, i % 3), reported = [0, 5, 16].includes(i);
   return {...it, date:d(it.days), reported, custody: reported ? null : d(it.days - lag)}; });
 
@@ -896,7 +897,6 @@ function openItem(id){
   $("#dlgBody").innerHTML = `
     <div class="dlg-head"><div><p class="eyebrow">${esc(CATS[it.cat])} · <span class="mono">${it.id}</span></p><h2>${esc(it.t)}</h2></div>
       <button class="x" type="button" aria-label="Chiudi" data-close>×</button></div>
-    <p>${esc(it.desc)}</p>
     <dl class="facts">
       <dt>Trovato</dt><dd>${esc(it.spot)}, ${esc(p.n)} (${law.name})</dd>
       <dt>Trovato il</dt><dd>${fmtDate(it.date)} 2026, ${ago(it.days)}</dd>
@@ -992,8 +992,8 @@ function bind(){
   const upd = () => $("#srcCount").textContent = `${enabledSrc.size} di ${R.sources.length}`; upd(); $("#sources").addEventListener("change", upd);
   /* campo su più righe: cresce col testo, Invio cerca, Maiusc+Invio va a capo */
   const qa = $("#q"), grow = () => {
-    const empty = !qa.value; if(empty) qa.value = qa.placeholder;   // misura anche il segnaposto, che su telefono va a capo
-    qa.style.height = "auto"; qa.style.height = qa.scrollHeight + "px"; if(empty) qa.value = "";
+    const empty = !qa.value; if(empty){ qa.classList.add("meas"); qa.value = qa.placeholder; }   // misura anche il segnaposto, che su telefono va a capo
+    qa.style.height = "auto"; qa.style.height = qa.scrollHeight + "px"; if(empty){ qa.value = ""; qa.classList.remove("meas"); }
   };
   qa.addEventListener("input", grow);
   const clr = $("#qClr"), showClr = () => { clr.hidden = !qa.value; grow(); };
@@ -1062,7 +1062,7 @@ function bind(){
       <p class="why"><b>Perché:</b> ${sug.why}</p>
       ${ruleHTML($("#fCat").value)}
       <div class="legal" style="margin-top:12px"><b>${law.ref}.</b> ${law.text}</div>
-      <p class="note">Annuncio in bozza: <b>${esc($("#fWhat").value)}</b>, ${esc(CATS[$("#fCat").value])}, ${esc(p.n)}. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
+      <p class="note">Annuncio in bozza: <b>${esc(CATS[$("#fCat").value])}, ${esc(p.n)}</b>. ${$("#fSecret").value ? "Il dettaglio per la verifica resta riservato all'ufficio." : ""} Nel servizio reale appare online appena l'ufficio conferma la consegna.</p>
       <form class="handin" id="handin">
         <b>L'hai già consegnato?</b>
         <div class="row">
