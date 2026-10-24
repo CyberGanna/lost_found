@@ -327,6 +327,8 @@ dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100dvh - 4
 .vid-again{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:34;display:inline-flex;align-items:center;gap:8px;background:var(--white);color:var(--ink);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:8px 14px;font-family:var(--display);font-stretch:80%;font-weight:900;text-transform:uppercase;letter-spacing:.04em;font-size:.95rem;cursor:pointer}
 .vid-again:hover,.vid-again:focus-visible{background:var(--ink);color:var(--signal)}
 .vid-again[hidden]{display:none}
+/* sul telefono il pulsante sta in alto a destra, subito sotto l'intestazione */
+@media (max-width:700px){ .vid-again{left:auto;right:max(12px,env(safe-area-inset-right,0px));bottom:auto;top:calc(env(safe-area-inset-top,0px) + var(--hdr,64px) + 10px);padding:6px 10px;font-size:.85rem;box-shadow:3px 3px 0 var(--ink)} }
 @media (prefers-reduced-motion:reduce){ .vid-ask{transition:none} }
 </style>
 
@@ -853,6 +855,9 @@ $("#contactUs").addEventListener("click", () => {
   const ask = $("#vidAsk"), vd = $("#vidDlg"), v = $("#vid"), again = $("#vidAgain");
   let seen = null; try{ seen = localStorage.getItem("ritrovo-video"); }catch(_){}
   if(seen === "si") again.hidden = false;
+  // altezza reale dell'intestazione (sul telefono va su due righe), per il pulsante in alto
+  const hdr = () => document.documentElement.style.setProperty("--hdr", document.querySelector("header.top").offsetHeight + "px");
+  hdr(); addEventListener("resize", hdr);
   const done = val => { try{ localStorage.setItem("ritrovo-video", val); }catch(_){} ask.classList.remove("on"); setTimeout(() => ask.hidden = true, 350); };
   if(!seen){ setTimeout(() => { ask.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => ask.classList.add("on"))); }, 1200); }
   $("#vidNo").addEventListener("click", () => done("no"));
