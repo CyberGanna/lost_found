@@ -361,7 +361,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
   <div class="wrap">
     <div class="res-head">
       <h2 id="resTitle" class="reveal">▼ Ultimi oggetti trovati</h2>
-      <span class="res-tools"><button class="btn ghost small" type="button" id="showAll" hidden>Mostra tutto</button><span class="count" id="resCount"></span></span>
+      <span class="res-tools"><button class="btn ghost small" type="button" id="showAll" hidden>Mostra tutto</button><button class="btn ghost small" type="button" id="hideBtn" hidden>Nascondi gli oggetti trovati</button><span class="count" id="resCount"></span></span>
     </div>
     <div class="res-grid">
       <div class="list-col">
@@ -592,7 +592,7 @@ function renderList(items, title){
     </button>`;
   }).join("") : `<div class="empty"><b>Nessun oggetto trovato con questa descrizione.</b><br>Prova con una parola più semplice, per esempio “portafoglio” o “chiavi”.</div>`;
   const open = !!UI.revealed;
-  $("#revealBox").hidden = open; $("#list").hidden = !open; $("#mapFrame").hidden = !open; $("#resCount").hidden = !open;
+  $("#revealBox").hidden = open; $("#list").hidden = !open; $("#mapFrame").hidden = !open; $("#resCount").hidden = !open; $("#hideBtn").hidden = !open;
   $(".res-grid").classList.toggle("closed", !open);
   lastTitle = title;
   $("#qAlert").hidden = !(title) || !open;
@@ -814,6 +814,9 @@ document.addEventListener("click", e => {
 });
 
 renderList(ITEMS);
+$("#hideBtn").addEventListener("click", () => {
+  UI.revealed = false; renderList(current, lastTitle); scrollToEl("#risultati");
+});
 $("#revealBtn").addEventListener("click", () => {
   UI.revealed = true; renderList(current, lastTitle);
   if(window.gsap && !REDUCE) gsap.from("#list .tag", {y:40, rotateX:-25, opacity:0, duration:.7, ease:"expo.out", stagger:.05, clearProps:"transform,opacity"});
