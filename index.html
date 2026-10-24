@@ -90,20 +90,14 @@ nav.main a:hover::after,nav.main a:focus-visible::after{transform:scaleX(1)}
 .disc-short a{font-weight:700}
 .hero-stage{position:relative;height:clamp(340px,40vw,500px);cursor:pointer;touch-action:pan-y}
 .hero-stage .stage-note{position:absolute;right:0;bottom:6px;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-.cue-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;padding-bottom:22px}
+.cue-row{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:22px;padding-bottom:22px}
 .scroll-cue{display:inline-flex;align-items:center;gap:10px;border:3px solid var(--ink);background:var(--white);text-decoration:none;font-family:var(--display);font-weight:800;font-stretch:85%;text-transform:uppercase;letter-spacing:.03em;padding:10px 18px}
 .scroll-cue:hover{background:var(--ink);color:var(--signal)}
 .scroll-cue .arr{display:inline-block}
 @media (prefers-reduced-motion:no-preference){ .scroll-cue .arr{animation:nudge 1.4s cubic-bezier(.7,0,.3,1) infinite} @keyframes nudge{0%,100%{transform:translateY(-3px)}50%{transform:translateY(4px)}} }
-.pet{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem}
-.pet b{background:var(--ch);color:var(--white);font-family:var(--display);font-stretch:72%;font-weight:900;padding:2px 8px;letter-spacing:.04em}
-@media (prefers-reduced-motion:no-preference){ .pet b{animation:blink 1.6s ease-in-out infinite alternate} @keyframes blink{to{opacity:.35}} }
 #objLabel{position:fixed;left:0;top:0;z-index:15;pointer-events:none;background:var(--white);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:3px 9px;font-size:.8rem;line-height:1.3;opacity:0;transition:opacity .25s;white-space:nowrap;will-change:transform}
 #objLabel b{font-family:var(--display);font-stretch:80%;text-transform:uppercase;font-size:.9rem}
 #objLabel.on{opacity:1}
-#petBadge{position:fixed;left:0;top:0;z-index:14;pointer-events:none;background:var(--ch);color:var(--white);font-family:var(--display);font-stretch:72%;font-weight:900;text-transform:uppercase;letter-spacing:.05em;font-size:1rem;padding:3px 10px;border:2px solid var(--ink);transform:translate(-50%,-100%) rotate(-4deg);opacity:0}
-@media (prefers-reduced-motion:no-preference){ #petBadge.on{animation:badge 1.6s ease-in-out infinite alternate} @keyframes badge{from{opacity:1}to{opacity:.45}} }
-#petBadge.on{opacity:1}
 @media (max-width:900px){
   .hero-grid{grid-template-columns:minmax(0,1fr)}
   .hero-stage{height:min(420px,100vw);margin-top:28px}
@@ -318,7 +312,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
 .okbox{background:var(--signal);border:3px solid var(--ink);padding:14px 16px}
 .okbox ol{margin:6px 0 0;padding-left:18px}
 .dir span{font-size:.82rem;margin-left:6px;padding:1px 6px;background:var(--signal);border:1px solid var(--ink);white-space:nowrap}
-#objLabel.common{background:var(--ok-soft)} #objLabel.office{background:var(--no-soft)} #objLabel.pet{background:var(--white)}
+#objLabel.common{background:var(--ok-soft)} #objLabel.office{background:var(--no-soft)}
 @media (prefers-reduced-motion:reduce){ .tag,.grid3 .card{transition:none;transform:none!important} }
 /* invito al video tutorial: piccolo cartello in basso, si chiude con X; Sì apre il video */
 .vid-ask{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:35;display:flex;align-items:center;gap:12px;background:var(--signal);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:10px 10px 10px 16px;max-width:calc(100% - 32px);transform:translateY(20px);opacity:0;transition:transform .35s,opacity .35s}
@@ -336,7 +330,6 @@ dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100dvh - 4
 <body>
 <canvas id="gl" aria-hidden="true"></canvas>
 <div id="objLabel" aria-hidden="true"></div>
-<div id="petBadge" aria-hidden="true">Novità</div>
 
 <header class="top">
   <div class="wrap">
@@ -381,7 +374,6 @@ dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100dvh - 4
     </div>
   </div>
   <div class="wrap cue-row">
-    <span class="pet"><b>NOVITÀ</b> Presto anche gli animali smarriti e trovati</span>
     <a class="scroll-cue mag" href="#risultati"><span class="arr" aria-hidden="true">▼</span> Scorri per vedere gli ultimi oggetti trovati</a>
   </div>
 </section>
@@ -1277,13 +1269,13 @@ addEventListener("pointermove", e => {
   pointer.x = e.clientX/W*2 - 1; pointer.y = -(e.clientY/H*2 - 1); pointer.moved = performance.now();
   const r = slots.hero.getBoundingClientRect(); pointer.inHero = e.pointerType === "mouse" && e.clientX > r.left - 40 && e.clientX < r.right + 40 && e.clientY > r.top - 40 && e.clientY < r.bottom + 40;
 }, {passive:true});
-const label = document.getElementById("objLabel"), petBadge = document.getElementById("petBadge");
+const label = document.getElementById("objLabel");
 /* etichetta piccola sotto l'oggetto: il testo cambia solo quando cambia l'oggetto */
 function setLabel(i){
   if(i < 0) return;
-  const o = OBJS[i], kind = o.cat === "animale" ? "pet" : OFFICE_ONLY.has(o.cat) ? "office" : "common";
+  const o = OBJS[i], kind = OFFICE_ONLY.has(o.cat) ? "office" : "common";
   label.className = (label.classList.contains("on") ? "on " : "") + kind;
-  label.innerHTML = kind === "pet" ? `<b>Novità: PET</b> presto` : `<b>${CATS[o.cat]}</b> ${COUNTS[o.cat] || 0} trovati`;
+  label.innerHTML = `<b>${CATS[o.cat]}</b>${COUNTS[o.cat] ? ` ${COUNTS[o.cat]} trovati` : ""}`;
 }
 const COUNTS = {}; ITEMS.forEach(it => COUNTS[it.cat] = (COUNTS[it.cat] || 0) + 1);
 let hot = -1;
@@ -1292,7 +1284,7 @@ slots.hero.addEventListener("click", e => {
   if(idx < 0){ // tocco: oggetto più vicino al punto toccato
     let best = 1e9; OBJS.forEach(o => { const s = o.screen; if(!s) return; const d = Math.hypot(s.x - e.clientX, s.y - e.clientY); if(d < best){ best = d; idx = o.i; } });
   }
-  if(idx >= 0 && OBJS[idx].cat !== "animale") window.filterCat(OBJS[idx].cat);
+  if(idx >= 0) window.filterCat(OBJS[idx].cat);
 });
 
 /* pin attivo = scheda più vicina al centro dello schermo */
@@ -1369,8 +1361,6 @@ function frame(){
   label.classList.toggle("on", hot >= 0 && lensVis > .5);
   if(hot >= 0){ const s = toScreen(OBJS[hot].m); label.style.transform = `translate3d(${s.x}px,${s.y + sHero/viewH*H*.8}px,0) translateX(-50%)`; }
   OBJS.forEach(o => o.screen = toScreen(o.m));
-  { const pw = OBJS.find(o => o.cat === "animale"), s = pw.screen, on = er2 < .1 && sm.hero < .8 && pw.m.visible;
-    petBadge.style.left = s.x + "px"; petBadge.style.top = (s.y - pw.m.scale.x/viewH*H*.85) + "px"; petBadge.classList.toggle("on", on && pw.i !== hot); }
 
   /* annuncio su due lati */
   { const sa = Math.min(rs.w/4.6, rs.h/3.4);
