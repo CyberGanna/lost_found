@@ -995,11 +995,20 @@ function rod(a, b, r, color, ol=true){
 const grp = (...kids) => { const g = new THREE.Group(); kids.forEach(k => g.add(k)); return g; };
 
 /* i sei oggetti, tutti costruiti via codice */
-function wallet(){ return grp(
-  part("rbox", [1.5, 1.05, .28, .1], C.white),
-  part("rbox", [1.52, .46, .08, .04], C.ink, [0, .3, .16]),
-  part("sphere", [.08], C.red, [.48, .1, .22])
-); }
+/* portafoglio in pelle nera con le carte che spuntano, cucitura e linguetta col bottone */
+function wallet(){
+  const stitch = (w, h, pos) => part("box", [w, h, .01], C.signal, pos, [0,0,0], false);
+  return grp(
+    part("rbox", [1.0, .62, .03, .03], C.white, [-.12, .5, -.02], [0, 0, .1]),
+    part("box", [.96, .09, .01], C.ink, [-.13, .62, .0], [0, 0, .1], false),
+    part("rbox", [1.0, .62, .03, .03], C.red, [.14, .44, .03], [0, 0, -.07]),
+    part("rbox", [1.5, 1.0, .24, .1], C.ink),
+    stitch(1.26, .025, [0, .38, .126]), stitch(1.26, .025, [0, -.38, .126]),
+    stitch(.025, .76, [-.63, 0, .126]), stitch(.025, .76, [.63, 0, .126]),
+    part("rbox", [.62, .34, .06, .06], C.ink, [.62, .04, .15]),
+    part("cyl", [.08, .08, .05, 24], C.signal, [.74, .04, .2], [Math.PI/2, 0, 0])
+  );
+}
 function phone(){ return grp(
   part("rbox", [.8, 1.55, .14, .12], C.ink),
   part("box", [.66, 1.22, .02], C.white, [0, -.04, .075], [0,0,0], false),
@@ -1275,7 +1284,7 @@ function setLabel(i){
   if(i < 0) return;
   const o = OBJS[i], kind = OFFICE_ONLY.has(o.cat) ? "office" : "common";
   label.className = (label.classList.contains("on") ? "on " : "") + kind;
-  label.innerHTML = `<b>${CATS[o.cat]}</b>${COUNTS[o.cat] ? ` ${COUNTS[o.cat]} trovati` : ""}`;
+  label.innerHTML = `<b>${CATS[o.cat]}</b>${COUNTS[o.cat] ? ` ${COUNTS[o.cat]} ${COUNTS[o.cat] === 1 ? "trovato" : "trovati"}` : ""}`;
 }
 const COUNTS = {}; ITEMS.forEach(it => COUNTS[it.cat] = (COUNTS[it.cat] || 0) + 1);
 let hot = -1;
