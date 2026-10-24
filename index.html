@@ -1082,7 +1082,7 @@ LAKES.forEach(l => {
   mapInner.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 48, .016, 8), toon(C.lake)));
 });
 function flatLabel(text, color, x, y, size){
-  const tex = textTexture(512, 128, (ctx, w, h) => { condensed(ctx); ctx.font = `900 92px Archivo, "Arial Narrow", sans-serif`; ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, w/2, h/2 + 4); });
+  const tex = textTexture(512, 128, (ctx, w, h) => { condensed(ctx); ctx.font = `900 92px Archivo, "Arial Narrow", sans-serif`; for(let fs = 92; fs > 40 && ctx.measureText(text).width > w - 24; fs -= 4) ctx.font = `900 ${fs}px Archivo, "Arial Narrow", sans-serif`; ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(text, w/2, h/2 + 4); });
   const m = new THREE.Mesh(new THREE.PlaneGeometry(size, size/4), new THREE.MeshBasicMaterial({map:tex, transparent:true}));
   m.position.set(x, y, .04); return m;
 }
@@ -1161,32 +1161,46 @@ const ann = new THREE.Group(), card = new THREE.Group(); ann.add(card); scene.ad
   const body = new THREE.Mesh(new RoundedBoxGeometry(2.6, 1.6, .06, 3, .05), toon(C.white));
   const hull = new THREE.Mesh(new RoundedBoxGeometry(2.66, 1.66, .08, 3, .07), new THREE.MeshBasicMaterial({color:C.ink, side:THREE.BackSide}));
   card.add(body, hull);
-  const hole = new THREE.Mesh(new THREE.TorusGeometry(.09, .03, 10, 32), toon(C.ink)); hole.position.set(1.12, .55, 0); card.add(hole);
-  const string = rod([1.12, .64, 0], [1.6, 1.25, -.1], .012, C.signal, false); card.add(string);
   card.userData.front = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 1.5), new THREE.MeshBasicMaterial({transparent:true}));
   card.userData.front.position.z = .032;
-  card.userData.back = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 1.5), new THREE.MeshBasicMaterial({transparent:true}));
-  card.userData.back.position.z = -.032; card.userData.back.rotation.y = Math.PI;
-  card.add(card.userData.front, card.userData.back);
-  /* onde: l'annuncio arriva a tutti */
+  card.add(card.userData.front);
+  /* onde: l'annuncio parte dall'ufficio e arriva alle località intorno */
   ann.userData.waves = [0, 1, 2].map(i => {
-    const m = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.04, 64), new THREE.MeshBasicMaterial({color:C.signal, transparent:true, side:THREE.DoubleSide}));
+    const m = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.03, 64), new THREE.MeshBasicMaterial({color:C.signal, transparent:true, side:THREE.DoubleSide}));
     m.position.z = -.3; ann.add(m); return m;
   });
 })();
-function annFace(side){
-  const ch = side === "A";
+/* località del Ticino sul cerchio: si accendono quando l'onda le raggiunge */
+const ANN_R = 1.9;
+const annTowns = ["Bellinzona", "Locarno", "Biasca", "Mendrisio", "Chiasso", "Lugano"].map((n, i) => {
+  const a = Math.PI/2 + i/6*Math.PI*2, g = new THREE.Group();
+  g.position.set(Math.cos(a)*ANN_R*1.15, Math.sin(a)*ANN_R, -.2);
+  const dot = new THREE.Mesh(new THREE.CircleGeometry(.07, 24), new THREE.MeshBasicMaterial({color:C.signal, transparent:true}));
+  g.add(dot); g.userData.dot = dot; ann.add(g); return g;
+});
+function setAnnTowns(){
+  annTowns.forEach((g, i) => {
+    if(g.userData.label) g.remove(g.userData.label);
+    const l = flatLabel(["BELLINZONA", "LOCARNO", "BIASCA", "MENDRISIO", "CHIASSO", "LUGANO"][i], "#ffffff", 0, -.2, 1.1);
+    l.material.opacity = .5; g.add(l); g.userData.label = l;
+  });
+}
+function annFace(){
+  const ch = true;
   return textTexture(1000, 600, (ctx, w, h) => {
     ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = ch ? "#e2001a" : "#ffd100"; ctx.fillRect(0, 0, w, 130);
     condensed(ctx);
     ctx.fillStyle = ch ? "#ffffff" : "#111111"; ctx.font = `900 82px Archivo, "Arial Narrow", sans-serif`; ctx.textBaseline = "middle";
-    const head = ch ? "PUBBLICATO DALL'UFFICIO" : "VISTO DA CHI L'HA PERSO";
+    const head = "PUBBLICATO DALL'UFFICIO";
     for(let fs = 82; fs > 40 && ctx.measureText(head).width > w - 80; fs -= 4) ctx.font = `900 ${fs}px Archivo, "Arial Narrow", sans-serif`;
     ctx.fillText(head, 40, 70);
     ctx.fillStyle = "#111111"; ctx.font = `600 40px "JetBrains Mono", monospace`; ctx.fillText("TI-LUG-26-04817", 40, 205);
-    ctx.fillStyle = "#e2001a"; ctx.fillRect(640, 180, 150, 50); ctx.fillStyle = "#ffffff"; ctx.font = `900 34px Archivo, sans-serif`; ctx.fillText("NUOVO", 660, 207);
-    ctx.fillStyle = "#111111"; ctx.font = `900 128px Archivo, "Arial Narrow", sans-serif`; ctx.fillText("PORTAFOGLIO", 36, 320);
+    ctx.font = `900 34px Archivo, sans-serif`; const nw = ctx.measureText("NUOVO").width + 40;
+    ctx.fillStyle = "#e2001a"; ctx.fillRect(w - 40 - nw, 180, nw, 50); ctx.fillStyle = "#ffffff"; ctx.fillText("NUOVO", w - 20 - nw, 207);
+    ctx.fillStyle = "#111111"; ctx.font = `900 128px Archivo, "Arial Narrow", sans-serif`;
+    for(let fs = 128; fs > 60 && ctx.measureText("PORTAFOGLIO").width > w - 80; fs -= 4) ctx.font = `900 ${fs}px Archivo, "Arial Narrow", sans-serif`;
+    ctx.fillText("PORTAFOGLIO", 40, 320);
     ctx.font = `700 46px "Atkinson Hyperlegible", sans-serif`;
     ctx.fillStyle = "#e2001a"; ctx.fillRect(40, 430, 34, 24);
     ctx.fillStyle = "#111111"; ctx.fillText("Lugano · Piazza della Riforma", 90, 444);
@@ -1194,8 +1208,8 @@ function annFace(side){
   });
 }
 function setAnnFaces(){
-  card.userData.front.material.map = annFace("A"); card.userData.front.material.needsUpdate = true;
-  card.userData.back.material.map = annFace("B"); card.userData.back.material.needsUpdate = true;
+  card.userData.front.material.map = annFace(); card.userData.front.material.needsUpdate = true;
+  setAnnTowns();
 }
 setAnnFaces();
 
@@ -1322,9 +1336,16 @@ function frame(){
   /* annuncio su due lati */
   { const sa = Math.min(rs.w/4.6, rs.h/3.4);
     ann.position.set(rs.x, rs.y + .05*rs.h, 0); ann.scale.setScalar(Math.max(sa*(.6 + .4*er2), .0001)); ann.visible = er2 > .02;
-    card.rotation.set(sm.py*.15 + Math.sin(t*.7)*.06, (1 - er2)*Math.PI + t*.55 + sm.px*.5, Math.sin(t*.5)*.04);
-    card.position.y = Math.sin(t*1.1)*.06;
-    ann.userData.waves.forEach((w, i) => { const ph = (t*.35 + i/3) % 1; w.scale.setScalar(1 + ph*1.6); w.material.opacity = (1 - ph)*.7*er2; }); }
+    // la scheda resta di fronte (solo un leggero ondeggiare), le onde partono da lei
+    card.rotation.set(sm.py*.12 + Math.sin(t*.6)*.04, (1 - er2)*1.4 + Math.sin(t*.4)*.12 + sm.px*.25, Math.sin(t*.5)*.02);
+    card.position.y = Math.sin(t*.9)*.04;
+    const fronts = ann.userData.waves.map((w, i) => { const ph = (t*.22 + i/3) % 1; w.scale.setScalar(1 + ph*1.5); w.material.opacity = (1 - ph)*.6*er2; return 1 + ph*1.5; });
+    annTowns.forEach(g => {
+      const d = Math.hypot(g.position.x, g.position.y), hit = Math.max(...fronts.map(f => clamp(1 - Math.abs(f - d)/.35)));
+      g.userData.glow = lerp(g.userData.glow || 0, hit, k*.6);
+      g.userData.dot.scale.setScalar(1 + g.userData.glow*.8);
+      g.userData.dot.material.opacity = er2; if(g.userData.label) g.userData.label.material.opacity = (.45 + g.userData.glow*.55)*er2;
+    }); }
   /* --- mappa --- */
   const ms = slotWorld(slots.map);
   const mi = smooth(sm.map), mo = smooth(sm.mapOut);
