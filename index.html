@@ -98,8 +98,8 @@ nav.main a:hover::after,nav.main a:focus-visible::after{transform:scaleX(1)}
 .pet{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.92rem}
 .pet b{background:var(--ch);color:var(--white);font-family:var(--display);font-stretch:72%;font-weight:900;padding:2px 8px;letter-spacing:.04em}
 @media (prefers-reduced-motion:no-preference){ .pet b{animation:blink 1.6s ease-in-out infinite alternate} @keyframes blink{to{opacity:.35}} }
-#objLabel{position:fixed;left:0;top:0;z-index:15;pointer-events:none;background:var(--white);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:8px 12px;font-size:.9rem;line-height:1.3;transform:translate(-50%,-100%);opacity:0;transition:opacity .15s;white-space:nowrap}
-#objLabel b{font-family:var(--display);font-stretch:80%;text-transform:uppercase;font-size:1.05rem;display:block}
+#objLabel{position:fixed;left:0;top:0;z-index:15;pointer-events:none;background:var(--white);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:3px 9px;font-size:.8rem;line-height:1.3;opacity:0;transition:opacity .25s;white-space:nowrap;will-change:transform}
+#objLabel b{font-family:var(--display);font-stretch:80%;text-transform:uppercase;font-size:.9rem}
 #objLabel.on{opacity:1}
 #petBadge{position:fixed;left:0;top:0;z-index:14;pointer-events:none;background:var(--ch);color:var(--white);font-family:var(--display);font-stretch:72%;font-weight:900;text-transform:uppercase;letter-spacing:.05em;font-size:1rem;padding:3px 10px;border:2px solid var(--ink);transform:translate(-50%,-100%) rotate(-4deg);opacity:0}
 @media (prefers-reduced-motion:no-preference){ #petBadge.on{animation:badge 1.6s ease-in-out infinite alternate} @keyframes badge{from{opacity:1}to{opacity:.45}} }
@@ -319,7 +319,6 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
 .okbox ol{margin:6px 0 0;padding-left:18px}
 .dir span{font-size:.82rem;margin-left:6px;padding:1px 6px;background:var(--signal);border:1px solid var(--ink);white-space:nowrap}
 #objLabel.common{background:var(--ok-soft)} #objLabel.office{background:var(--no-soft)} #objLabel.pet{background:var(--white)}
-#objLabel i{display:block;font-style:normal;font-size:.82rem;margin-top:4px;max-width:260px;white-space:normal}
 @media (prefers-reduced-motion:reduce){ .tag,.grid3 .card{transition:none;transform:none!important} }
 </style>
 
@@ -1034,8 +1033,8 @@ const OBJS = [
 ].map((o,i) => {
   const m = o.make(), sz = new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3());
   scene.add(m);
-  /* griglia ordinata 3×3, come le tessere del sito originale: ogni oggetto sta nella sua cella */
-  return {...o, m, i, hl:0, spin:0, seed:i*1.7, norm:1/Math.max(sz.x, sz.y), n:[(o.g[0] - 1)*.34, (1 - o.g[1])*.33]};
+  /* gli oggetti girano lentamente su un cerchio: a0 è l'angolo di partenza */
+  return {...o, m, i, hl:0, spin:0, seed:i*1.7, norm:1/Math.max(sz.x, sz.y), a0:Math.PI/2 - i/7*Math.PI*2};
 });
 const lens = magnifier(); scene.add(lens);
 
@@ -1226,8 +1225,15 @@ addEventListener("pointermove", e => {
   const r = slots.hero.getBoundingClientRect(); pointer.inHero = e.pointerType === "mouse" && e.clientX > r.left - 40 && e.clientX < r.right + 40 && e.clientY > r.top - 40 && e.clientY < r.bottom + 40;
 }, {passive:true});
 const label = document.getElementById("objLabel"), petBadge = document.getElementById("petBadge");
+/* etichetta piccola sotto l'oggetto: il testo cambia solo quando cambia l'oggetto */
+function setLabel(i){
+  if(i < 0) return;
+  const o = OBJS[i], kind = o.cat === "animale" ? "pet" : OFFICE_ONLY.has(o.cat) ? "office" : "common";
+  label.className = (label.classList.contains("on") ? "on " : "") + kind;
+  label.innerHTML = kind === "pet" ? `<b>Novità: PET</b> presto` : `<b>${CATS[o.cat]}</b> ${COUNTS[o.cat] || 0} trovati`;
+}
 const COUNTS = {}; ITEMS.forEach(it => COUNTS[it.cat] = (COUNTS[it.cat] || 0) + 1);
-let hot = -1, autoIdx = 0, autoT = 0;
+let hot = -1;
 slots.hero.addEventListener("click", e => {
   let idx = hot;
   if(idx < 0){ // tocco: oggetto più vicino al punto toccato
@@ -1274,30 +1280,28 @@ function frame(){
   /* --- oggetti: hero → esplosione → anello --- */
   const hs = slotWorld(slots.hero), rs = slotWorld(slots.ring);
   const cell = Math.min(hs.w/3, hs.h/3), sHero = cell*.55;
+  const R = Math.min(hs.w, hs.h)*.36, orbit = t*Math.PI*2/48; // un giro ogni 48 secondi
   const eh = smooth(clamp((sm.hero - .45)/.55)), er2 = smooth(sm.ring);
   // oggetto evidenziato dalla lente
-  let lensTarget;
-  if(pointer.inHero && performance.now() - pointer.moved < 4000){
-    lensTarget = new THREE.Vector3(pointer.x*viewW/2, pointer.y*viewH/2, 1.2);
-  } else {
-    autoT += dt; if(autoT > 2.4){ autoT = 0; autoIdx = (autoIdx + 1) % OBJS.length; }
-    const o = OBJS[autoIdx].m.position; lensTarget = new THREE.Vector3(o.x + .35*sHero, o.y + .25*sHero, 1.2);
-  }
+  // senza mouse la lente resta ferma a sinistra sul cerchio e gli oggetti le passano sotto
+  const lensTarget = pointer.inHero && performance.now() - pointer.moved < 4000
+    ? new THREE.Vector3(pointer.x*viewW/2, pointer.y*viewH/2, 1.2)
+    : new THREE.Vector3(hs.x - R + .3*sHero, hs.y + .3*sHero, 1.2);
   let newHot = -1, bestD = 1e9;
   OBJS.forEach(o => {
-    const n = o.n;
-    const hx = hs.x + n[0]*hs.w, hy = hs.y + n[1]*hs.h + Math.sin(t*1.2 + o.seed)*.04*cell;
-    const dir = new THREE.Vector2(n[0] || .1, n[1] || .1).normalize();
+    const a = o.a0 + orbit, dir = {x:Math.cos(a), y:Math.sin(a)};
+    const hx = hs.x + dir.x*R, hy = hs.y + dir.y*R;
     const px = hx + (dir.x*.4 + .5)*eh*viewW*.5, py = hy + (dir.y*.3 + .5)*eh*viewH*.6, pz = eh*1.2;
     o.m.position.set(px, py, pz);
     const d = Math.hypot(o.m.position.x - lensTarget.x + .3*sHero, o.m.position.y - lensTarget.y + .3*sHero);
     if(eh < .3 && er2 < .1 && d < bestD && d < 1.1*sHero){ bestD = d; newHot = o.i; }
   });
+  if(newHot !== hot) setLabel(newHot);
   hot = newHot;
   OBJS.forEach(o => {
     o.hl = lerp(o.hl, o.i === hot ? 1 : 0, k*.9);
-    o.spin += dt*o.hl*3;
-    const base = cell*.7*o.norm*(1 - eh*.4);
+    o.spin += dt*o.hl*1.2;
+    const base = cell*.62*o.norm*(1 - eh*.4);
     const vis = 1 - smooth(clamp((sm.hero - .88)/.12));
     const s = base*(1 + o.hl*.22)*vis;
     o.m.scale.setScalar(Math.max(s, .0001)); o.m.visible = s > .002;
@@ -1309,14 +1313,8 @@ function frame(){
   lens.scale.setScalar(Math.max(cell*.42*lensVis, .0001)); lens.visible = lensVis > .02;
   lens.rotation.set(sm.py*.3, sm.px*.3, Math.sin(t)*.06);
   // etichetta oggetto
-  if(hot >= 0 && lensVis > .5){
-    const o = OBJS[hot], s = toScreen(o.m);
-    const kind = o.cat === "animale" ? "pet" : OFFICE_ONLY.has(o.cat) ? "office" : "common";
-    label.className = "on " + kind;
-    label.innerHTML = kind === "pet" ? `<b>Novità: PET</b>Presto anche gli animali smarriti e trovati`
-      : `<b>${CATS[o.cat]}</b>${COUNTS[o.cat] || 0} trovati · tocca per vederli<i>${kind === "office" ? "<u>Oggetto personale o di valore:</u> va sempre consegnato a un ufficio pubblico, come la polizia o il Comune." : "<u>Oggetto comune:</u> chi lo trova può restituirlo direttamente al proprietario, dopo essersi accertato che sia davvero suo."}</i>`;
-    label.style.left = s.x + "px"; label.style.top = (s.y - sHero/viewH*H*.75) + "px";
-  } else label.className = "";
+  label.classList.toggle("on", hot >= 0 && lensVis > .5);
+  if(hot >= 0){ const s = toScreen(OBJS[hot].m); label.style.transform = `translate3d(${s.x}px,${s.y + sHero/viewH*H*.8}px,0) translateX(-50%)`; }
   OBJS.forEach(o => o.screen = toScreen(o.m));
   { const pw = OBJS.find(o => o.cat === "animale"), s = pw.screen, on = er2 < .1 && sm.hero < .8 && pw.m.visible;
     petBadge.style.left = s.x + "px"; petBadge.style.top = (s.y - pw.m.scale.x/viewH*H*.85) + "px"; petBadge.classList.toggle("on", on && pw.i !== hot); }
