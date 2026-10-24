@@ -328,7 +328,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
 .vid-ask .x{width:38px;height:38px}
 dialog.vid{max-width:min(1100px,calc(100% - 32px));background:var(--ink);border-color:var(--ink);box-shadow:10px 10px 0 var(--signal)}
 dialog.vid .x{position:absolute;top:8px;right:8px;z-index:2}
-dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100vh - 40px);background:var(--ink)}
+dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100dvh - 40px);background:var(--ink)}
 @media (prefers-reduced-motion:reduce){ .vid-ask{transition:none} }
 </style>
 
@@ -537,9 +537,7 @@ dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100vh - 40
 </div>
 <dialog class="vid" id="vidDlg" aria-label="Video tutorial">
   <button class="x" type="button" data-close aria-label="Chiudi il video">×</button>
-  <video id="vid" controls playsinline preload="none" poster="assets/video/ritrovato-spot.png">
-    <source src="assets/video/ritrovato-spot.mp4" type="video/mp4">
-  </video>
+  <video id="vid" controls playsinline preload="none"></video>
 </dialog>
 
 <script src="assets/js/gsap.min.js"></script>
@@ -859,7 +857,12 @@ $("#contactUs").addEventListener("click", () => {
   const done = val => { try{ localStorage.setItem("ritrovo-video", val); }catch(_){} ask.classList.remove("on"); setTimeout(() => ask.hidden = true, 350); };
   if(!seen){ setTimeout(() => { ask.hidden = false; requestAnimationFrame(() => requestAnimationFrame(() => ask.classList.add("on"))); }, 1200); }
   $("#vidNo").addEventListener("click", () => done("no"));
-  $("#vidYes").addEventListener("click", () => { done("si"); vd.showModal(); v.currentTime = 0; v.play().catch(() => {}); });
+  // telefono tenuto in verticale: versione 9:16, altrimenti quella orizzontale
+  $("#vidYes").addEventListener("click", () => {
+    done("si");
+    v.src = matchMedia("(orientation:portrait) and (max-width:820px)").matches ? "assets/video/ritrovato-spot-verticale.mp4" : "assets/video/ritrovato-spot.mp4";
+    vd.showModal(); v.play().catch(() => {});
+  });
   vd.addEventListener("click", e => { if(e.target === vd || e.target.closest("[data-close]")) vd.close(); });
   vd.addEventListener("close", () => v.pause());
 })();
