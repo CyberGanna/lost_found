@@ -1024,18 +1024,18 @@ function key(color){ return grp(
 function keys(){ const a = key(C.red), b = key(C.white);
   a.position.set(-.18, .02, 0); a.rotation.z = .35; b.position.set(.2, .02, .06); b.rotation.z = -.3;
   const g = grp(part("torus", [.3, .05], C.signal, [0, .42, 0]), a, b); g.position.y = .15; return g; }
-/* ventiquattrore rossa: coperchio, due serrature gialle, maniglia nera e angoli rinforzati */
+/* ventiquattrore classica: nera e sottile, coperchio con profilo giallo, serrature dorate, maniglia ad arco */
 function bag(){
-  const corner = (x, y) => part("rbox", [.16, .16, .4, .05], C.ink, [x, y, 0]);
   return grp(
-    part("rbox", [1.7, 1.12, .34, .08], C.red),
-    part("box", [1.66, .035, .01], C.ink, [0, .24, .175], [0,0,0], false),
-    part("rbox", [.2, .14, .06, .03], C.signal, [-.48, .24, .19]),
-    part("rbox", [.2, .14, .06, .03], C.signal, [.48, .24, .19]),
-    part("box", [.08, .14, .1], C.ink, [-.26, .64, 0]),
-    part("box", [.08, .14, .1], C.ink, [.26, .64, 0]),
-    part("rbox", [.68, .12, .14, .05], C.ink, [0, .74, 0]),
-    corner(-.8, .5), corner(.8, .5), corner(-.8, -.5), corner(.8, -.5)
+    part("rbox", [1.8, 1.2, .26, .12], C.ink),
+    part("box", [1.72, .03, .01], C.signal, [0, .26, .135], [0,0,0], false),
+    part("rbox", [.22, .12, .05, .03], C.signal, [-.52, .26, .15]),
+    part("rbox", [.22, .12, .05, .03], C.signal, [.52, .26, .15]),
+    part("box", [.1, .04, .01], C.ink, [-.52, .26, .18], [0,0,0], false),
+    part("box", [.1, .04, .01], C.ink, [.52, .26, .18], [0,0,0], false),
+    part("rbox", [.12, .1, .12, .03], C.signal, [-.3, .64, 0]),
+    part("rbox", [.12, .1, .12, .03], C.signal, [.3, .64, 0]),
+    part("torus", [.3, .055, Math.PI], C.ink, [0, .66, 0])
   );
 }
 function glasses(){ return grp(
