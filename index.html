@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RITROVATO 3D</title>
-<meta name="description" content="Perso? Trovato? Cerca gli oggetti smarriti in Ticino e nella zona di confine, in Svizzera e in Italia.">
+<meta name="description" content="Perso? Trovato? Cerca gli oggetti smarriti in Ticino.">
 <link rel="stylesheet" href="assets/fonts.css">
 <style>
 /* Layout: segnaletica stradale svizzera in 3D. Una tela WebGL fissa sta sopra gli sfondi delle sezioni e sotto i testi;
    ogni scena 3D è agganciata a uno "slot" HTML (palco della hero, cornice della mappa, cartello, anello) e lo segue nello scroll. */
 :root{
   --signal:#ffd100; --ink:#111111; --paper:#f4f3ee; --white:#ffffff;
-  --ch:#e2001a; --it:#1f8a4c; --muted:#55524a; --line:#d8d4c8; --lake:#aed3d5;
+  --ch:#e2001a; --ok:#1f8a4c; --muted:#55524a; --line:#d8d4c8; --lake:#aed3d5;
   --ok-soft:#c9ecc4; --no-soft:#f6c6c1;
   --display:"Archivo","Arial Narrow",system-ui,sans-serif;
   --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
@@ -151,7 +151,7 @@ nav.main a:hover::after,nav.main a:focus-visible::after{transform:scaleX(1)}
 .tag.act .desc{color:var(--ink)}
 .tag .meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem;font-weight:700}
 .flag{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:0}
-.flag.CH{background:var(--ch)} .flag.IT{background:var(--it)}
+.flag.CH{background:var(--ch)}
 .pill{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border:1.5px solid var(--ink)}
 .pill.new{background:var(--ch);color:var(--white);border-color:var(--ch)}
 .empty{padding:28px;border:3px dashed var(--ink);background:var(--white)}
@@ -161,6 +161,10 @@ nav.main a:hover::after,nav.main a:focus-visible::after{transform:scaleX(1)}
 .map-frame .mf-bot{bottom:0;align-items:flex-end;flex-wrap:wrap}
 .map-frame .here{background:var(--signal);border:2px solid var(--ink);padding:6px 10px;font-size:.95rem;max-width:100%}
 .legend{display:flex;gap:12px;align-items:center}
+.reveal-box{background:var(--signal);border:3px solid var(--ink);padding:28px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;box-shadow:8px 8px 0 var(--ink);max-width:640px}
+.reveal-box .rb-t{font-family:var(--display);font-stretch:80%;font-weight:900;text-transform:uppercase;font-size:1.6rem;line-height:1}
+.reveal-box .btn{margin-top:6px;font-size:1.1rem;padding:14px 26px}
+.res-grid.closed{grid-template-columns:minmax(0,1fr)}
 .qalert{margin-top:6px;padding:20px;background:var(--signal);border:3px solid var(--ink)}
 .qalert .qa-t{font-weight:700;font-size:1.15rem;margin-bottom:10px}
 .qa-row{display:flex;gap:8px}
@@ -195,7 +199,7 @@ ol.flow li::before{content:counter(f);width:42px;height:42px;background:var(--in
 ol.flow b{display:block;font-size:1.05rem}
 ol.flow .note{color:var(--muted);font-size:.95rem}
 .sign-slot{position:relative;height:clamp(300px,34vw,440px)}
-.law{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;border:3px solid var(--ink);background:var(--white);margin-top:8px}
+.law{display:grid;grid-template-columns:minmax(0,1fr);gap:0;border:3px solid var(--ink);background:var(--white);margin-top:8px}
 .law > div{padding:18px 20px;min-width:0}
 .law > div + div{border-left:3px solid var(--ink)}
 .law h3{font-stretch:80%;text-transform:uppercase;font-size:1.2rem;display:flex;align-items:center;gap:8px;margin-bottom:8px}
@@ -214,7 +218,7 @@ ol.flow .note{color:var(--muted);font-size:.95rem}
 .alerts{display:flex;flex-direction:column;gap:10px;margin-top:24px;max-width:780px}
 .alert-row{display:flex;justify-content:space-between;gap:12px;align-items:center;border:3px solid var(--ink);background:var(--white);padding:12px 14px}
 .alert-row .note{color:var(--muted);font-size:.9rem}
-.yes{color:var(--it);font-weight:700}
+.yes{color:var(--ok);font-weight:700}
 
 /* ---------- ENTI ---------- */
 .enti{padding-block:88px 96px;position:relative}
@@ -233,7 +237,7 @@ ol.flow .note{color:var(--muted);font-size:.95rem}
 .road h3{font-stretch:80%;text-transform:uppercase;font-size:1.5rem;margin-bottom:18px}
 .road-line{position:relative;height:6px;background:#333;margin-bottom:18px}
 .road-line i{position:absolute;inset:0;background:var(--signal);transform-origin:left;transform:scaleX(.25)}
-.road-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.road-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .road-steps div{border:2px solid #444;padding:14px;min-width:0}
 .road-steps div .eyebrow{color:#a8a8a8;display:block;margin-bottom:4px}
 .road-steps div.now{background:var(--signal);color:var(--ink);border-color:var(--signal)}
@@ -297,7 +301,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
   <div class="wrap">
     <a class="brand" href="#cerca" aria-label="Ritrovato, home">
       <span class="brand-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M7.8 10.6l2 2 3.6-4"/></svg></span>
-      <span><b>Ritrovato</b><small>Ticino e zona di confine</small></span>
+      <span><b>Ritrovato</b><small>Oggetti trovati in Ticino</small></span>
     </a>
     <nav class="main" aria-label="Sezioni">
       <a href="#cerca">Cerca</a>
@@ -328,7 +332,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
         </div>
         <p class="qhint" id="qHint">Scrivi solo il tipo di oggetto. Colore, marca e contenuto tienili per te: ti serviranno per dimostrare che è tuo.</p>
       </form>
-      <ul class="trust"><li>Gratis</li><li>Senza registrazione</li><li>Svizzera e Italia</li></ul>
+      <ul class="trust"><li>Gratis</li><li>Senza registrazione</li><li>In tutto il Ticino</li></ul>
       <p class="disc-short"><b>RITROVATO non sostituisce l'ufficio oggetti trovati.</b> Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità. <button class="more" type="button" data-law>Cosa dice la legge</button></p>
     </div>
     <div class="hero-stage" id="heroStage" role="group" aria-label="Oggetti trovati per categoria: tocca un oggetto per vedere gli ultimi ritrovamenti">
@@ -347,7 +351,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
     <h2 id="howT" class="reveal">Come funziona</h2>
     <div class="steps">
       <div class="step"><span class="n">1</span><b>Descrivi</b><p>Scrivi l'oggetto e dove l'hai perso, come lo diresti a un amico.</p></div>
-      <div class="step"><span class="n">2</span><b>Cerchiamo per te</b><p>Confrontiamo la tua descrizione con gli oggetti trovati nella zona, in Svizzera e in Italia.</p></div>
+      <div class="step"><span class="n">2</span><b>Cerchiamo per te</b><p>Confrontiamo la tua descrizione con gli oggetti trovati nella zona, in tutto il Ticino.</p></div>
       <div class="step"><span class="n">3</span><b>Ti avvisiamo</b><p>Se non c'è ancora, ricevi un messaggio appena un ufficio lo registra.</p></div>
     </div>
   </div>
@@ -361,6 +365,11 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
     </div>
     <div class="res-grid">
       <div class="list-col">
+        <div class="reveal-box" id="revealBox">
+          <p class="rb-t">Gli oggetti trovati sono nascosti.</p>
+          <p>Cerca il tuo qui sopra, oppure guarda tutti quelli trovati negli ultimi 30 giorni in Ticino.</p>
+          <button class="btn mag" type="button" id="revealBtn">Mostra gli oggetti trovati</button>
+        </div>
         <div class="list" id="list"></div>
         <form class="qalert" id="qAlert" hidden>
           <p class="qa-t">Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.</p>
@@ -368,11 +377,11 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
           <p class="qa-n">Non serve registrarsi. Ti scriviamo solo per questo avviso. <a href="privacy.html">Privacy</a></p>
         </form>
       </div>
-      <aside class="map-frame" id="mapFrame" aria-label="Mappa del Ticino e della zona di confine con gli oggetti trovati">
-        <div class="mf-top"><span>Ticino e zona di confine</span><span class="mono" id="mfCount"></span></div>
+      <aside class="map-frame" id="mapFrame" aria-label="Mappa del Ticino con gli oggetti trovati">
+        <div class="mf-top"><span>Ticino</span><span class="mono" id="mfCount"></span></div>
         <div class="mf-bot">
           <span class="here" id="mapHere">Lugano · Piazza della Riforma</span>
-          <span class="legend"><span><i class="flag CH"></i>Svizzera</span><span><i class="flag IT"></i>Italia</span></span>
+          <span class="legend"><span><i class="flag CH"></i>Oggetto trovato</span></span>
         </div>
       </aside>
     </div>
@@ -383,7 +392,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
   <div class="wrap">
     <p class="eyebrow">Per chi trova</p>
     <h2 id="foundT" class="reveal">Hai trovato qualcosa? Ti diciamo a chi consegnarlo.</h2>
-    <p class="lead">La legge chiede di annunciare o consegnare l'oggetto all'autorità, in Svizzera come in Italia. RITROVATO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
+    <p class="lead">La legge chiede di annunciare o consegnare l'oggetto all'autorità. RITROVATO non lo sostituisce: ti indica l'ufficio giusto e prepara l'annuncio, così il proprietario lo vede subito.</p>
     <div class="found-grid">
       <div class="found-left">
         <form class="panel" id="foundForm">
@@ -401,7 +410,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
         <div class="panel">
           <ol class="flow">
             <li><div><b>Descrivi l'oggetto</b><span class="note">Tipo di oggetto e luogo bastano. I dati sensibili restano nascosti.</span></div></li>
-            <li><div><b>Ti indichiamo l'ufficio</b><span class="note">In base al luogo: polizia comunale in Ticino, ufficio oggetti rinvenuti del comune in Italia, oppure l'azienda di trasporto se eri su un treno o un bus.</span></div></li>
+            <li><div><b>Ti indichiamo l'ufficio</b><span class="note">In base al luogo: la polizia comunale, oppure l'azienda di trasporto se eri su un treno o un bus.</span></div></li>
             <li><div><b>Consegni e ricevi la ricevuta</b><span class="note">L'ufficio registra l'oggetto e l'annuncio appare qui per tutti. Obbligatorio per chiavi, documenti e oggetti di valore; gli oggetti comuni puoi anche restituirli tu.</span></div></li>
             <li><div><b>Il proprietario riceve un avviso</b><span class="note">Se ha creato un avviso compatibile, lo informiamo subito.</span></div></li>
           </ol>
@@ -412,12 +421,8 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
 
     <div class="law" id="legge" style="margin-top:48px">
       <div>
-        <h3><i class="flag CH"></i>Svizzera</h3>
-        <p>Si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</p>
-      </div>
-      <div>
-        <h3><i class="flag IT"></i>Italia</h3>
-        <p>Va consegnato al Comune in cui è stato trovato, cioè all'ufficio oggetti smarriti, spesso presso la Polizia locale (<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art927.html" target="_blank" rel="noopener">art. 927 c.c.</a>).</p>
+        <h3><i class="flag CH"></i>Cosa dice la legge in Svizzera</h3>
+        <p>Chi trova un oggetto e non sa a chi appartiene deve avvisare l'autorità: si avvisa la polizia. Se l'hai trovato su un mezzo pubblico, in stazione o in un ufficio pubblico, lo consegni al personale (<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_720" target="_blank" rel="noopener">art. 720 CC</a>).</p>
       </div>
       <div class="full">
         <p>Se il proprietario si fa avanti su RITROVATO, per gli oggetti comuni puoi <b>restituirlo direttamente</b>, dopo esserti accertato che sia davvero suo.</p>
@@ -432,7 +437,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
   <div class="wrap">
     <p class="eyebrow">Per chi ha perso</p>
     <h2 id="alT" class="reveal">I tuoi avvisi</h2>
-    <p class="lead">Per creare un avviso cerca l'oggetto qui sopra e lascia la tua email sotto i risultati. Ti scriviamo appena un ufficio in Ticino o oltre confine registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
+    <p class="lead">Per creare un avviso cerca l'oggetto qui sopra e lascia la tua email sotto i risultati. Ti scriviamo appena un ufficio in Ticino registra qualcosa di compatibile. Gli avvisi di questo prototipo restano solo in questo browser.</p>
     <div class="alerts" id="alerts"></div>
   </div>
 </section>
@@ -442,25 +447,23 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
     <div class="enti-top">
       <div>
         <p class="eyebrow">Per comuni, polizie e aziende di trasporto</p>
-        <h2 id="entiT" class="reveal">Un solo annuncio, visto su entrambi i lati del confine.</h2>
-        <p class="lead">Ai comuni italiani senza ricerca online offriamo un registro gratuito per i piccoli enti.</p>
+        <h2 id="entiT" class="reveal">Un solo annuncio, visto in tutto il Ticino.</h2>
+        <p class="lead">Ai piccoli comuni senza ricerca online offriamo un registro gratuito.</p>
         <p class="cta-enti"><span>Siete un ufficio comunale o un servizio oggetti smarriti interessato a RITROVATO?</span> <button class="btn signal mag" type="button" id="contactUs">Contattateci</button></p>
       </div>
       <div class="ring-slot" id="ringSlot" aria-hidden="true"></div>
     </div>
     <div class="grid3">
-      <div class="card tilt"><h3>Aggregatore</h3><p>Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono, in Svizzera e in Italia.</p></div>
-      <div class="card tilt"><h3>Registro per piccoli comuni</h3><p>Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (1 anno in Italia, 5 in Svizzera).</p></div>
+      <div class="card tilt"><h3>Aggregatore</h3><p>Riuniamo in un'unica ricerca gli oggetti degli uffici che aderiscono: polizie comunali, FFS, AutoPostale e trasporti locali.</p></div>
+      <div class="card tilt"><h3>Registro per piccoli comuni</h3><p>Inserimento in un minuto da telefono, ricevuta per il ritrovatore, scadenze di legge calcolate (5 anni in Svizzera).</p></div>
       <div class="card tilt"><h3>Verifica del proprietario</h3><p>Domande sui dettagli nascosti prima della restituzione, per ridurre truffe e falsi proprietari. Conforme a nLPD e GDPR.</p></div>
     </div>
     <div class="road">
       <h3>Dove arriviamo</h3>
       <div class="road-line"><i id="roadFill"></i></div>
       <div class="road-steps">
-        <div class="now"><span class="eyebrow">Ora</span>Ticino + Como, Varese, Verbano</div>
-        <div><span class="eyebrow">Poi</span>Lombardia e Piemonte, con i trasporti regionali</div>
-        <div><span class="eyebrow">Dopo</span>Tutta la Svizzera, in DE e FR</div>
-        <div><span class="eyebrow">Infine</span>Tutta l'Italia, con il registro per piccoli comuni</div>
+        <div class="now"><span class="eyebrow">Ora</span>Ticino</div>
+        <div><span class="eyebrow">Poi</span>Tutta la Svizzera, in DE e FR</div>
       </div>
     </div>
   </div>
@@ -468,7 +471,7 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
 </main>
 
 <footer>
-  <div class="wrap foot">RITROVATO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC), in Italia la consegna al Comune (art. 927 segg. c.c.).
+  <div class="wrap foot">RITROVATO è un prototipo. Non sostituisce gli uffici oggetti trovati: in Svizzera vale l'obbligo di annuncio e consegna (art. 720 segg. CC).
     <nav class="legal-links" aria-label="Informazioni legali"><a href="privacy.html">Privacy</a> · <a href="note-legali.html">Note legali</a> · <a href="condizioni-uso.html">Condizioni d'uso</a></nav></div>
 </footer>
 
@@ -493,16 +496,12 @@ const PLACES = {
   airolo:{n:"Airolo",c:"CH",lon:8.61,lat:46.53}, biasca:{n:"Biasca",c:"CH",lon:8.97,lat:46.36},
   bellinzona:{n:"Bellinzona",c:"CH",lon:9.02,lat:46.19}, locarno:{n:"Locarno",c:"CH",lon:8.80,lat:46.17},
   ascona:{n:"Ascona",c:"CH",lon:8.77,lat:46.155}, lugano:{n:"Lugano",c:"CH",lon:8.95,lat:46.005},
-  mendrisio:{n:"Mendrisio",c:"CH",lon:8.985,lat:45.87}, chiasso:{n:"Chiasso",c:"CH",lon:9.03,lat:45.835},
-  como:{n:"Como",c:"IT",lon:9.085,lat:45.805}, varese:{n:"Varese",c:"IT",lon:8.825,lat:45.82},
-  luino:{n:"Luino",c:"IT",lon:8.74,lat:46.00}, ponte_tresa:{n:"Lavena Ponte Tresa",c:"IT",lon:8.86,lat:45.965},
-  menaggio:{n:"Menaggio",c:"IT",lon:9.24,lat:46.02}, verbania:{n:"Verbania",c:"IT",lon:8.55,lat:45.925}
+  mendrisio:{n:"Mendrisio",c:"CH",lon:8.985,lat:45.87}, chiasso:{n:"Chiasso",c:"CH",lon:9.03,lat:45.835}
 };
-const SOURCES = {lug:"Polizia Città di Lugano",bel:"Polizia comunale Bellinzona",loc:"Polizia comunale Locarno",ffs:"FFS oggetti trovati",apt:"AutoPostale Ticino",tpl:"TPL Lugano",com:"Comune di Como, oggetti rinvenuti",var:"Comune di Varese, oggetti rinvenuti",tno:"Trenord",vco:"Comune di Verbania"};
+const SOURCES = {lug:"Polizia Città di Lugano",bel:"Polizia comunale Bellinzona",loc:"Polizia comunale Locarno",ffs:"FFS oggetti trovati",apt:"AutoPostale Ticino",tpl:"TPL Lugano"};
 const OFFICES = {
   CH:{ n:"Polizia comunale del luogo", d:"In Ticino gli oggetti si consegnano alla polizia comunale. A Lugano: Polizia Città di Lugano, sportello oggetti trovati." },
-  IT:{ n:"Ufficio oggetti rinvenuti del comune", d:"In Italia l'oggetto va consegnato al sindaco del comune in cui è stato trovato, di solito tramite la polizia locale." },
-  transport:{ CH:"FFS o AutoPostale, al più vicino sportello in stazione", IT:"Trenord, presso il personale di bordo o in stazione" }
+  transport:{ CH:"FFS o AutoPostale, al più vicino sportello in stazione" }
 };
 const OFFICE_ONLY = new Set(["portafoglio","chiavi","telefono","gioielli"]);
 const CATS = { portafoglio:"Portafogli e documenti", telefono:"Elettronica", chiavi:"Chiavi", borsa:"Borse e zaini", abbigliamento:"Abbigliamento", gioielli:"Gioielli e orologi", occhiali:"Occhiali", bici:"Biciclette e monopattini", animale:"Animali domestici", altro:"Altro" };
@@ -521,31 +520,23 @@ const SYN = {
 const TODAY = new Date(); TODAY.setHours(12,0,0,0);
 const dAgo = n => new Date(TODAY - n*864e5);
 const LAW = {
-  CH: { name:"Svizzera", ref:"art. 720–722 CC", keep:"5 anni", text:"Chi ha perso l'oggetto può reclamarlo per 5 anni. Poi la proprietà passa a chi l'ha trovato, che ha diritto a una ricompensa adeguata." },
-  IT: { name:"Italia", ref:"art. 927–930 c.c.", keep:"1 anno", text:"L'oggetto resta in custodia un anno dalla pubblicazione all'albo pretorio. Al ritrovatore spetta un premio pari a un decimo del valore." }
+  CH: { name:"Svizzera", ref:"art. 720–722 CC", keep:"5 anni", text:"Chi ha perso l'oggetto può reclamarlo per 5 anni. Poi la proprietà passa a chi l'ha trovato, che ha diritto a una ricompensa adeguata." }
 };
 const ITEMS = [
   {id:"TI-LUG-26-04817", cat:"portafoglio", t:"Portafoglio", desc:"Portafoglio a libro in pelle. Documenti custoditi a parte.", p:"lugano", spot:"Piazza della Riforma", src:"lug", days:1},
   {id:"FFS-26-118204", cat:"telefono", t:"Smartphone", desc:"Smartphone Apple con cover in silicone. Schermo integro.", p:"bellinzona", spot:"Treno RE80 Bellinzona–Milano, carrozza 3", src:"ffs", days:2},
-  {id:"CO-RIN-2026-0391", cat:"chiavi", t:"Mazzo di chiavi", desc:"Alcune chiavi di casa e una chiave d'auto con telecomando.", p:"como", spot:"Lungolago Mafalda di Savoia", src:"com", days:3},
   {id:"TI-LOC-26-00912", cat:"occhiali", t:"Occhiali da sole", desc:"Montatura squadrata, con astuccio rigido.", p:"locarno", spot:"Piazza Grande", src:"loc", days:4},
   {id:"APT-26-7741", cat:"borsa", t:"Zaino", desc:"Zaino da escursione di media capienza.", p:"airolo", spot:"Bus 111 Airolo–Nufenen", src:"apt", days:5},
-  {id:"TNO-26-55120", cat:"abbigliamento", t:"Giacca", desc:"Giacca leggera con cappuccio.", p:"como", spot:"Treno S11 Chiasso–Milano", src:"tno", days:2},
   {id:"TI-LUG-26-04822", cat:"gioielli", t:"Orologio", desc:"Orologio analogico con cinturino in metallo.", p:"lugano", spot:"Parco Ciani", src:"lug", days:6},
   {id:"TPL-26-3310", cat:"telefono", t:"Auricolari", desc:"Auricolari nella custodia di ricarica.", p:"lugano", spot:"Linea 2, fermata Centro", src:"tpl", days:1},
-  {id:"VA-RIN-2026-0217", cat:"bici", t:"Monopattino", desc:"Monopattino pieghevole, senza caricatore.", p:"varese", spot:"Stazione Varese Nord", src:"var", days:9},
   {id:"TI-BEL-26-01455", cat:"portafoglio", t:"Porta tessere", desc:"Porta tessere in tessuto con un abbonamento dei trasporti. Documenti custoditi a parte.", p:"bellinzona", spot:"Viale Stazione", src:"bel", days:3},
   {id:"FFS-26-118377", cat:"borsa", t:"Borsa", desc:"Borsa a tracolla in tela.", p:"mendrisio", spot:"Stazione Mendrisio, binario 2", src:"ffs", days:7},
-  {id:"VB-RIN-2026-0088", cat:"altro", t:"Passeggino", desc:"Passeggino leggero con parasole.", p:"verbania", spot:"Imbarcadero Pallanza", src:"vco", days:12},
-  {id:"TNO-26-55301", cat:"telefono", t:"Tablet", desc:"Tablet 10 pollici con custodia a libro.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"tno", days:4},
+  {id:"FFS-26-118455", cat:"telefono", t:"Tablet", desc:"Tablet 10 pollici con custodia a libro.", p:"chiasso", spot:"Treno RE80, stazione di Chiasso", src:"ffs", days:4},
   {id:"TI-LUG-26-04790", cat:"chiavi", t:"Chiave", desc:"Chiave di sicurezza con portachiavi.", p:"lugano", spot:"Lido di Lugano", src:"lug", days:15},
   {id:"APT-26-7790", cat:"abbigliamento", t:"Sciarpa", desc:"Sciarpa lunga di lana.", p:"ascona", spot:"Bus 316 Locarno–Ascona", src:"apt", days:8},
-  {id:"CO-RIN-2026-0415", cat:"portafoglio", t:"Portafoglio", desc:"Portafoglio da uomo in pelle con portamonete. Tessere custodite a parte.", p:"como", spot:"Stazione Como San Giovanni", src:"com", days:2},
-  {id:"CO-RIN-2026-0402", cat:"portafoglio", t:"Portafoglio", desc:"Portafoglio piccolo con chiusura a cerniera.", p:"como", spot:"Piazza Cavour", src:"com", days:1},
   {id:"FFS-26-117950", cat:"bici", t:"Bicicletta", desc:"Bici da città con cestino anteriore.", p:"biasca", spot:"Stazione Biasca", src:"ffs", days:22},
-  {id:"VA-RIN-2026-0221", cat:"occhiali", t:"Occhiali da vista", desc:"Montatura tonda, con astuccio.", p:"luino", spot:"Mercato del mercoledì", src:"var", days:6},
   {id:"TI-LUG-26-04862", cat:"occhiali", t:"Occhiali da sole", desc:"Occhiali da sole con lenti graduate, senza astuccio.", p:"lugano", spot:"Via Nassa", src:"lug", days:1}
-].map((it,i) => { const lag = Math.min(it.days, i % 3), reported = [0, 5, 16].includes(i);
+].map((it,i) => { const lag = Math.min(it.days, i % 3), reported = ["TI-LUG-26-04817", "APT-26-7790"].includes(it.id);
   return {...it, date:dAgo(it.days), reported, custody: reported ? null : dAgo(it.days - lag)}; })
  .sort((a,b) => a.days - b.days);
 const ICONS = {
@@ -578,10 +569,10 @@ function catOf(text){
 }
 function placeOf(text){
   const t = norm(text);
-  return Object.keys(PLACES).find(k => t.includes(norm(PLACES[k].n)) || (k === "ponte_tresa" && t.includes("ponte tresa"))) || "";
+  return Object.keys(PLACES).find(k => t.includes(norm(PLACES[k].n))) || "";
 }
 
-let current = ITEMS;
+let current = ITEMS, lastTitle;
 function renderList(items, title){
   current = items;
   $("#resTitle").textContent = title || "▼ Ultimi oggetti trovati";
@@ -600,8 +591,12 @@ function renderList(items, title){
       <span class="hole" aria-hidden="true"></span>
     </button>`;
   }).join("") : `<div class="empty"><b>Nessun oggetto trovato con questa descrizione.</b><br>Prova con una parola più semplice, per esempio “portafoglio” o “chiavi”.</div>`;
-  $("#qAlert").hidden = !(title);
-  $("#showAll").hidden = !(title);
+  const open = !!UI.revealed;
+  $("#revealBox").hidden = open; $("#list").hidden = !open; $("#mapFrame").hidden = !open; $("#resCount").hidden = !open;
+  $(".res-grid").classList.toggle("closed", !open);
+  lastTitle = title;
+  $("#qAlert").hidden = !(title) || !open;
+  $("#showAll").hidden = !(title) || !open;
   $("#qAlert .qa-t").textContent = items.length ? "Non è tra questi? Lascia la tua email e ti avvisiamo appena compare." : "Non l'hai trovato? Lascia la tua email e ti avvisiamo appena compare.";
   UI.listCards = $$("#list .tag");
   UI.items = items;
@@ -618,8 +613,8 @@ function runSearch(){
     && (!q || it.cat === cat || words.some(x => norm(it.t + " " + it.desc).includes(x)))
     && (!w || (place ? it.p === place : norm(PLACES[it.p].n + " " + it.spot).includes(norm(w)))));
   const label = [q || "Tutti gli oggetti", w ? `a ${w}` : ""].filter(Boolean).join(" ");
-  renderList(res, `▼ ${label}`);
   lastSearch = {what:q || "Qualsiasi oggetto", cat, where:place};
+  UI.revealed = true; renderList(res, `▼ ${label}`);
   scrollToEl("#risultati");
 }
 let lastSearch = null;
@@ -639,6 +634,7 @@ $$('input[name="mode"]').forEach(r => r.addEventListener("change", () => {
 }));
 window.filterCat = cat => {
   $("#q").value = ""; $("#qWhere").value = "";
+  UI.revealed = true;
   renderList(ITEMS.filter(it => it.cat === cat), `▼ ${CATS[cat]}`);
   lastSearch = {what:CATS[cat], cat, where:""};
   scrollToEl("#risultati");
@@ -698,18 +694,16 @@ function openItem(it){
 }
 function openLaw(){
   const ch = n => `<a href="https://www.fedlex.admin.ch/eli/cc/24/233_245_233/it#art_${n}" target="_blank" rel="noopener">art. ${n} CC</a>`;
-  const it = n => `<a href="https://www.brocardi.it/codice-civile/libro-terzo/titolo-ii/capo-iii/sezione-i/art${n}.html" target="_blank" rel="noopener">art. ${n} c.c.</a>`;
   $("#dlgBody").innerHTML = `
     <div class="dlg-head"><div><p class="eyebrow">Cosa dice la legge</p><h2>Hai trovato un oggetto: cosa devi fare</h2></div>
       <button class="x" type="button" aria-label="Chiudi" data-close>×</button></div>
     <div class="lawdoc">
       <h3>Se conosci il proprietario</h3>
-      <p>Restituiscilo a lui. In Svizzera e in Italia l'obbligo di avvisare o consegnare all'autorità vale solo se il proprietario <b>non</b> è noto.</p>
+      <p>Restituiscilo a lui. L'obbligo di avvisare o consegnare all'autorità vale solo se il proprietario <b>non</b> è noto.</p>
       <h3>Se non lo conosci</h3>
       <p><b>Svizzera</b> (${ch(720)}): avvisa la polizia o l'ufficio designato dal cantone (in Ticino la polizia comunale). Per gli oggetti di valore inferiore a 10 franchi l'avviso non è obbligatorio.</p>
       <p><b>Mezzi e luoghi pubblici</b> (${ch(720)} cpv. 3): se lo trovi in una casa abitata o in un luogo destinato all'uso pubblico o ai trasporti, per esempio un bus, un treno, una stazione, un negozio o un ufficio, consegnalo al personale o allo sportello di quel servizio, non alla polizia. Una fermata del bus in strada invece è suolo pubblico: vale la regola normale, polizia o ufficio del comune.</p>
-      <p><b>Italia</b> (${it(927)}): consegnalo senza ritardo al sindaco del comune dove l'hai trovato, di solito tramite la polizia locale. Il comune lo pubblica all'albo pretorio (${it(928)}).</p>
-      <p>Le aziende di trasporto (per esempio Trenord o ATM) hanno propri uffici oggetti smarriti per i loro mezzi e le loro stazioni.</p>
+      <p>Le aziende di trasporto (per esempio FFS, AutoPostale o TPL) hanno propri uffici oggetti smarriti per i loro mezzi e le loro stazioni.</p>
       <h3>Quando puoi restituirlo direttamente con RITROVATO</h3>
       <p>Se il proprietario si fa avanti su RITROVATO puoi restituirglielo tu, <b>solo se</b> sono vere tutte queste condizioni:</p>
       <ul>
@@ -722,7 +716,6 @@ function openLaw(){
       <p>Chiavi, documenti, portafogli, telefoni, gioielli e altri oggetti di valore. L'ufficio verifica l'identità di chi li reclama e tiene un registro.</p>
       <h3>Il compenso per chi trova</h3>
       <p><b>Svizzera</b> (${ch(722)}): se il proprietario non lo reclama entro 5 anni, l'oggetto diventa tuo. Se lo reclama, hai diritto al rimborso delle spese e a una ricompensa adeguata.</p>
-      <p><b>Italia</b> (${it(929)}, ${it(930)}): se nessuno lo reclama entro un anno dalla pubblicazione, l'oggetto diventa tuo. Se il proprietario lo ritira, ti spetta un premio del 10% del valore (5% sulla parte oltre 5'164,57 euro).</p>
       <h3>Privacy</h3>
       <p>Non scrivere dati personali né numeri di documenti. Descrivi l'oggetto senza i dettagli che lo identificano: servono per riconoscere il vero proprietario.</p>
     </div>`;
@@ -758,10 +751,10 @@ $("#foundForm").addEventListener("submit", e => {
   e.preventDefault();
   const what = $("#fWhat").value, where = $("#fPlace").value;
   const cat = catOf(what), place = placeOf(where);
-  const transport = /\b(bus|treno|stazione|tram|battello|imbarcadero|linea|autopostale|ffs|trenord)\b/.test(norm(where));
+  const transport = /\b(bus|treno|stazione|tram|battello|imbarcadero|linea|autopostale|ffs|tpl)\b/.test(norm(where));
   let html = "";
   if(!place){
-    html += `<div class="rule where"><b class="big">Dove l'hai trovato?</b>Non lo abbiamo capito dal testo. Scrivi il comune, per esempio Lugano, Locarno o Como.</div>`;
+    html += `<div class="rule where"><b class="big">Dove l'hai trovato?</b>Non lo abbiamo capito dal testo. Scrivi il comune, per esempio Lugano, Locarno o Bellinzona. Per ora RITROVATO copre il Ticino.</div>`;
   } else {
     const pl = PLACES[place];
     const office = transport ? OFFICES.transport[pl.c] : OFFICES[pl.c].n;
@@ -821,6 +814,10 @@ document.addEventListener("click", e => {
 });
 
 renderList(ITEMS);
+$("#revealBtn").addEventListener("click", () => {
+  UI.revealed = true; renderList(current, lastTitle);
+  if(window.gsap && !REDUCE) gsap.from("#list .tag", {y:40, rotateX:-25, opacity:0, duration:.7, ease:"expo.out", stagger:.05, clearProps:"transform,opacity"});
+});
 $("#showAll").addEventListener("click", () => { $("#q").value = ""; $("#qWhere").value = ""; renderList(ITEMS); });
 
 /* ---------- MOTION (GSAP + Lenis) ---------- */
@@ -877,7 +874,7 @@ camera.position.set(0, 0, 12);
 scene.add(new THREE.AmbientLight(0xffffff, 1.4));
 const sun = new THREE.DirectionalLight(0xffffff, 2.4); sun.position.set(4, 6, 8); scene.add(sun);
 
-const C = {ink:0x111111, white:0xffffff, signal:0xffd100, red:0xe2001a, green:0x1f8a4c, lake:0xaed3d5, paper:0xf4f3ee, it:0xe6e2d3};
+const C = {ink:0x111111, white:0xffffff, signal:0xffd100, red:0xe2001a, green:0x1f8a4c, lake:0xaed3d5, paper:0xf4f3ee};
 const grad = new THREE.DataTexture(new Uint8Array([120,120,120,255, 200,200,200,255, 255,255,255,255]), 3, 1, THREE.RGBAFormat);
 grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.needsUpdate = true;
 const mats = {};
@@ -992,17 +989,16 @@ function textTexture(w, h, draw){
 }
 const condensed = ctx => { try{ ctx.fontStretch = "condensed"; }catch(_){} };
 
-/* ---------- MAPPA DEL CONFINE ---------- */
-const LON0 = 8.875, LAT0 = 46.09, KY = 1.44;
+/* ---------- MAPPA DEL TICINO ---------- */
+const LON0 = 8.875, LAT0 = 46.19, KY = 1.44;
 const P = (lon, lat) => new THREE.Vector2(lon - LON0, (lat - LAT0)*KY);
 const BORDER = [[8.40,46.30],[8.47,46.20],[8.60,46.13],[8.71,46.10],[8.80,46.08],[8.83,46.02],[8.86,45.97],[8.90,45.93],[8.92,45.85],[8.98,45.83],[9.04,45.82],[9.06,45.88],[9.02,45.94],[9.03,46.01],[9.10,46.06],[9.12,46.12],[9.20,46.18],[9.27,46.25],[9.35,46.27]];
 const LAKES = [
-  [[8.82,46.18],[8.76,46.13],[8.72,46.05],[8.74,46.00],[8.66,45.93],[8.58,45.90],[8.56,45.84],[8.58,45.76]],
-  [[8.86,45.965],[8.90,45.98],[8.95,46.005],[9.00,46.02],[9.08,46.03],[9.13,46.04]],
-  [[8.95,46.005],[8.96,45.96],[8.97,45.92],[8.98,45.90]],
-  [[9.30,46.13],[9.26,46.06],[9.24,46.02],[9.19,45.96],[9.12,45.87],[9.085,45.81]]
+  [[8.82,46.18],[8.76,46.13],[8.72,46.06]],
+  [[8.89,45.98],[8.95,46.005],[9.00,46.02],[9.08,46.03],[9.13,46.04]],
+  [[8.95,46.005],[8.96,45.96],[8.97,45.92],[8.98,45.90]]
 ];
-const W0 = 8.40, W1 = 9.35, S0 = 45.70, N0 = 46.56;
+const W0 = 8.40, W1 = 9.35, N0 = 46.56;
 const map = new THREE.Group(), mapInner = new THREE.Group(); map.add(mapInner); scene.add(map);
 function slab(points, color){
   const s = new THREE.Shape(points);
@@ -1012,11 +1008,12 @@ function slab(points, color){
   return grp(m, e);
 }
 const bpts = BORDER.map(([x,y]) => P(x,y));
-mapInner.add(slab([...bpts, P(W1, N0), P(W0, N0)], C.white));
-mapInner.add(slab([...bpts, P(W1, S0), P(W0, S0)], C.it));
-const base = new THREE.Mesh(new THREE.BoxGeometry(W1 - W0 + .06, (N0 - S0)*KY + .06, .08), toon(C.ink));
-base.position.set((W0 + W1)/2 - LON0, ((N0 + S0)/2 - LAT0)*KY, -.045); mapInner.add(base);
-/* confine tratteggiato */
+const chShape = [...bpts, P(W1, N0), P(W0, N0)];
+mapInner.add(slab(chShape, C.white));
+/* zoccolo nero sotto il Ticino, come un cartello */
+const baseG = new THREE.ExtrudeGeometry(new THREE.Shape(chShape), {depth:.07, bevelEnabled:false}); baseG.translate(.012, -.012, -.075);
+mapInner.add(new THREE.Mesh(baseG, toon(C.ink)));
+/* confine sud, tratteggiato */
 (function(){
   const pts = BORDER.map(([x,y]) => new THREE.Vector3(...P(x,y).toArray(), .05));
   const curve = new THREE.CatmullRomCurve3(pts, false, "catmullrom", .2);
@@ -1032,7 +1029,7 @@ function flatLabel(text, color, x, y, size){
   const m = new THREE.Mesh(new THREE.PlaneGeometry(size, size/4), new THREE.MeshBasicMaterial({map:tex, transparent:true}));
   m.position.set(x, y, .04); return m;
 }
-let labelCH, labelIT;
+let labelCH;
 /* pin */
 const pins = {};
 const ringMat = new THREE.MeshBasicMaterial({color:C.ink, transparent:true, opacity:.9});
@@ -1085,26 +1082,23 @@ function setSign(line2){
   sign.userData.face.material.map?.dispose(); sign.userData.face.material.map = t; sign.userData.face.material.needsUpdate = true;
   sign.userData.back.material.map = t; sign.userData.back.material.needsUpdate = true;
 }
-const SIGN_TIMES = {lugano:"Lugano 5 min · Como 25 min", como:"Como 5 min · Chiasso 15 min", bellinzona:"Bellinzona 5 min · Lugano 25 min", locarno:"Locarno 5 min · Ascona 10 min", chiasso:"Chiasso 5 min · Como 15 min", mendrisio:"Mendrisio 5 min · Chiasso 10 min", varese:"Varese 5 min · Mendrisio 25 min"};
+const SIGN_TIMES = {lugano:"Lugano 5 min · Bellinzona 25 min", bellinzona:"Bellinzona 5 min · Lugano 25 min", locarno:"Locarno 5 min · Ascona 10 min", chiasso:"Chiasso 5 min · Mendrisio 10 min", mendrisio:"Mendrisio 5 min · Chiasso 10 min"};
 let signKick = 0;
 addEventListener("ritrovato:sign", e => {
   const k = e.detail.place;
-  setSign(k ? (SIGN_TIMES[k] || `${PLACES[k].n} · ufficio più vicino`) : "Lugano 5 min · Como 25 min");
+  setSign(k ? (SIGN_TIMES[k] || `${PLACES[k].n} · ufficio più vicino`) : "Lugano 5 min · Bellinzona 25 min");
   signKick = 1;
 });
 
 /* testi 3D dopo il caricamento dei font */
 (async () => {
   try{ await Promise.all([document.fonts.load('900 80px Archivo'), document.fonts.load('700 60px "Atkinson Hyperlegible"')]); }catch(_){}
-  setSign("Lugano 5 min · Como 25 min");
-  labelCH = flatLabel("SVIZZERA", "#e2001a", -.05, .48, .5); mapInner.add(labelCH);
-  labelIT = flatLabel("ITALIA", "#1f8a4c", -.2, -.42, .42); mapInner.add(labelIT);
+  setSign("Lugano 5 min · Bellinzona 25 min");
+  labelCH = flatLabel("TICINO", "#e2001a", -.12, .4, .42); mapInner.add(labelCH);
   setAnnFaces();
-  const lc = flatLabel("SVIZZERA", "#ff4d5e", -1.35, -1.68, 1.5), li = flatLabel("ITALIA", "#3fc27a", 1.45, -1.68, 1.2);
-  ann.add(lc, li);
 })();
 
-/* ---------- UN SOLO ANNUNCIO, DUE LATI DEL CONFINE ---------- */
+/* ---------- UN SOLO ANNUNCIO, VISTO DA TUTTI ---------- */
 const ann = new THREE.Group(), card = new THREE.Group(); ann.add(card); scene.add(ann);
 (function(){
   const body = new THREE.Mesh(new RoundedBoxGeometry(2.6, 1.6, .06, 3, .05), toon(C.white));
@@ -1117,22 +1111,22 @@ const ann = new THREE.Group(), card = new THREE.Group(); ann.add(card); scene.ad
   card.userData.back = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 1.5), new THREE.MeshBasicMaterial({transparent:true}));
   card.userData.back.position.z = -.032; card.userData.back.rotation.y = Math.PI;
   card.add(card.userData.front, card.userData.back);
-  /* confine tratteggiato sotto l'annuncio */
-  for(let x = -2.4; x < 2.4; x += .3) ann.add(rod([x, -1.35, 0], [x + .16, -1.35, 0], .025, C.white, false));
-  /* onde: l'annuncio si vede da entrambi i lati */
+  /* onde: l'annuncio arriva a tutti */
   ann.userData.waves = [0, 1, 2].map(i => {
     const m = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.04, 64), new THREE.MeshBasicMaterial({color:C.signal, transparent:true, side:THREE.DoubleSide}));
     m.position.z = -.3; ann.add(m); return m;
   });
 })();
-function annFace(country){
-  const ch = country === "CH";
+function annFace(side){
+  const ch = side === "A";
   return textTexture(1000, 600, (ctx, w, h) => {
     ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = ch ? "#e2001a" : "#1f8a4c"; ctx.fillRect(0, 0, w, 130);
+    ctx.fillStyle = ch ? "#e2001a" : "#ffd100"; ctx.fillRect(0, 0, w, 130);
     condensed(ctx);
-    ctx.fillStyle = "#ffffff"; ctx.font = `900 82px Archivo, "Arial Narrow", sans-serif`; ctx.textBaseline = "middle";
-    ctx.fillText(ch ? "VISTO IN SVIZZERA" : "VISTO IN ITALIA", 40, 70);
+    ctx.fillStyle = ch ? "#ffffff" : "#111111"; ctx.font = `900 82px Archivo, "Arial Narrow", sans-serif`; ctx.textBaseline = "middle";
+    const head = ch ? "PUBBLICATO DALL'UFFICIO" : "VISTO DA CHI L'HA PERSO";
+    for(let fs = 82; fs > 40 && ctx.measureText(head).width > w - 80; fs -= 4) ctx.font = `900 ${fs}px Archivo, "Arial Narrow", sans-serif`;
+    ctx.fillText(head, 40, 70);
     ctx.fillStyle = "#111111"; ctx.font = `600 40px "JetBrains Mono", monospace`; ctx.fillText("TI-LUG-26-04817", 40, 205);
     ctx.fillStyle = "#e2001a"; ctx.fillRect(640, 180, 150, 50); ctx.fillStyle = "#ffffff"; ctx.font = `900 34px Archivo, sans-serif`; ctx.fillText("NUOVO", 660, 207);
     ctx.fillStyle = "#111111"; ctx.font = `900 128px Archivo, "Arial Narrow", sans-serif`; ctx.fillText("PORTAFOGLIO", 36, 320);
@@ -1143,8 +1137,8 @@ function annFace(country){
   });
 }
 function setAnnFaces(){
-  card.userData.front.material.map = annFace("CH"); card.userData.front.material.needsUpdate = true;
-  card.userData.back.material.map = annFace("IT"); card.userData.back.material.needsUpdate = true;
+  card.userData.front.material.map = annFace("A"); card.userData.front.material.needsUpdate = true;
+  card.userData.back.material.map = annFace("B"); card.userData.back.material.needsUpdate = true;
 }
 setAnnFaces();
 
