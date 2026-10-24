@@ -2,10 +2,29 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self'; font-src 'self'; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>RITROVATO</title>
+<title>RITROVATO · Oggetti smarriti e trovati in Ticino</title>
 <meta name="description" content="Perso? Trovato? Cerca gli oggetti smarriti in Ticino.">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="canonical" href="https://ritrovato.ch/">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#ffd100">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RITROVATO">
+<meta property="og:locale" content="it_CH">
+<meta property="og:title" content="RITROVATO · Oggetti smarriti e trovati in Ticino">
+<meta property="og:description" content="Perso? Trovato? Cerca gli oggetti smarriti in Ticino.">
+<meta property="og:url" content="https://ritrovato.ch/">
+<meta property="og:image" content="https://ritrovato.ch/assets/img/anteprima-social.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RITROVATO.ch, gratis in tutto il Ticino">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/fonts.css">
 <style>
 /* Layout: segnaletica stradale svizzera in 3D. Una tela WebGL fissa sta sopra gli sfondi delle sezioni e sotto i testi;
@@ -23,6 +42,9 @@
 /* Un solo tema chiaro, voluto: è il mondo della segnaletica, giallo e nero. */
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+.skip{position:fixed;left:8px;top:-60px;z-index:1000;background:var(--ink);color:var(--signal);padding:10px 14px;font-weight:700}
+.skip:focus{top:8px}
+#contenuto:focus{outline:none}
 html{scroll-behavior:auto}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;overflow-x:hidden}
 h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
@@ -334,6 +356,7 @@ dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100dvh - 4
 
 </head>
 <body>
+<a class="skip" href="#contenuto">Vai al contenuto</a>
 <canvas id="gl" aria-hidden="true"></canvas>
 <div id="objLabel" aria-hidden="true"></div>
 
@@ -352,7 +375,7 @@ dialog.vid video{display:block;width:100%;height:auto;max-height:calc(100dvh - 4
   </div>
 </header>
 
-<main>
+<main id="contenuto" tabindex="-1">
 <section class="hero" id="cerca">
   <div class="wrap hero-grid">
     <h1 id="heroTitle" aria-label="Perso? Trovato?"><span class="w">Perso?</span> <span class="w box">Trovato?</span></h1>
