@@ -161,9 +161,40 @@ nav.main a:hover::after,nav.main a:focus-visible::after{transform:scaleX(1)}
 .map-frame .mf-bot{bottom:0;align-items:flex-end;flex-wrap:wrap}
 .map-frame .here{background:var(--signal);border:2px solid var(--ink);padding:6px 10px;font-size:.95rem;max-width:100%}
 .legend{display:flex;gap:12px;align-items:center}
-.reveal-box{background:var(--signal);border:3px solid var(--ink);padding:28px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;box-shadow:8px 8px 0 var(--ink);max-width:640px}
-.reveal-box .rb-t{font-family:var(--display);font-stretch:80%;font-weight:900;text-transform:uppercase;font-size:1.6rem;line-height:1}
-.reveal-box .btn{margin-top:6px;font-size:1.1rem;padding:14px 26px}
+/* deposito chiuso: pannello scuro con nastro di cantiere e carte sfocate */
+.reveal-box{position:relative;overflow:hidden;isolation:isolate;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px;align-items:center;background:var(--ink);color:var(--white);border:3px solid var(--ink);padding:44px 44px 52px;box-shadow:10px 10px 0 var(--signal)}
+.reveal-box::before{content:"";position:absolute;inset:0 0 auto;height:14px;background:repeating-linear-gradient(-45deg,var(--signal) 0 18px,var(--ink) 18px 36px);animation:rbTape 1.6s linear infinite;z-index:-1}
+.reveal-box::after{content:"";position:absolute;inset:auto 0 0;height:14px;background:repeating-linear-gradient(45deg,var(--signal) 0 18px,var(--ink) 18px 36px);animation:rbTape 1.6s linear infinite reverse;z-index:-1}
+@keyframes rbTape{to{background-position:51px 0}}
+.rb-scan{position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,transparent 40%,rgba(255,209,0,.10) 50%,transparent 60%);background-size:250% 100%;animation:rbScan 4.5s ease-in-out infinite}
+@keyframes rbScan{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.rb-text{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.rb-eye{color:var(--signal);display:flex;align-items:center;gap:10px;margin:0}
+.rb-dot{width:10px;height:10px;border-radius:50%;background:var(--ch);box-shadow:0 0 0 0 rgba(226,0,26,.7);animation:rbPulse 1.6s infinite}
+@keyframes rbPulse{70%{box-shadow:0 0 0 12px rgba(226,0,26,0)}100%{box-shadow:0 0 0 0 rgba(226,0,26,0)}}
+.rb-big{display:flex;align-items:center;gap:16px;margin:0;font-family:var(--display);font-weight:900;font-stretch:75%;line-height:.8}
+.rb-big #rbCount{font-size:clamp(5rem,11vw,9rem);color:var(--signal);font-variant-numeric:tabular-nums;-webkit-text-stroke:0}
+.rb-big small{font-size:1rem;font-stretch:85%;text-transform:uppercase;letter-spacing:.06em;line-height:1.15;color:#cfcfcf}
+.reveal-box .rb-t{margin:6px 0 0;font-family:var(--display);font-stretch:80%;font-weight:900;text-transform:uppercase;font-size:clamp(1.5rem,2.6vw,2.2rem);line-height:1}
+.rb-p{margin:0;color:#cfcfcf;max-width:44ch}
+.rb-btn{position:relative;overflow:hidden;margin-top:12px;background:var(--signal);color:var(--ink);border-color:var(--signal);font-size:1.1rem;padding:16px 26px}
+.rb-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.65) 50%,transparent 70%);transform:translateX(-120%);animation:rbShine 2.8s ease-in-out infinite}
+@keyframes rbShine{60%,100%{transform:translateX(120%)}}
+.rb-btn svg{transition:transform .25s cubic-bezier(.7,0,.2,1)}
+.rb-btn:hover{background:var(--white);border-color:var(--white);color:var(--ink)}
+.rb-btn:hover svg{transform:translateX(6px)}
+.rb-deck{position:relative;height:340px;perspective:1100px}
+.rb-card{position:absolute;left:50%;top:50%;width:min(300px,80%);display:flex;gap:14px;align-items:center;padding:16px;background:var(--white);color:var(--ink);border:3px solid var(--ink);box-shadow:6px 6px 0 rgba(0,0,0,.45);transform:translate(-50%,-50%) translate(var(--x),var(--y)) rotate(var(--r));transition:transform .6s cubic-bezier(.2,.9,.2,1),filter .6s;filter:blur(5px) grayscale(.3);animation:rbFloat 5s ease-in-out infinite;animation-delay:var(--d)}
+.rb-card .ico{width:54px;height:54px;flex:none;background:var(--signal);border:2px solid var(--ink);display:grid;place-items:center}
+.rb-card b{font-family:var(--display);font-stretch:80%;font-weight:900;text-transform:uppercase;font-size:1.3rem;line-height:1}
+.rb-card i{display:block;font-style:normal;font-family:var(--mono);font-size:.75rem;margin-top:6px}
+@keyframes rbFloat{50%{translate:0 -8px}}
+.reveal-box:hover .rb-card{transform:translate(-50%,-50%) translate(calc(var(--x)*1.6),calc(var(--y)*1.4)) rotate(calc(var(--r)*1.7));filter:blur(3px) grayscale(.1)}
+.rb-tape{position:absolute;left:-12%;right:-12%;top:50%;z-index:20;transform:translateY(-50%) rotate(-8deg);background:var(--signal);color:var(--ink);border-block:3px solid var(--ink);font-family:var(--display);font-stretch:75%;font-weight:900;font-size:1.5rem;letter-spacing:.08em;white-space:nowrap;overflow:hidden;padding:6px 0;box-shadow:0 8px 0 rgba(0,0,0,.35)}
+.rb-tape span{display:inline-block;animation:rbMarq 12s linear infinite}
+@keyframes rbMarq{to{transform:translateX(-50%)}}
+@media (max-width:860px){.reveal-box{grid-template-columns:minmax(0,1fr);padding:36px 22px 44px}.rb-deck{height:240px;order:-1}}
+@media (prefers-reduced-motion:reduce){.reveal-box *,.reveal-box::before,.reveal-box::after{animation:none!important}}
 .res-grid.closed{grid-template-columns:minmax(0,1fr)}
 .qalert{margin-top:6px;padding:20px;background:var(--signal);border:3px solid var(--ink)}
 .qalert .qa-t{font-weight:700;font-size:1.15rem;margin-bottom:10px}
@@ -366,9 +397,15 @@ dialog{max-height:calc(100vh - 32px);overflow:auto}
     <div class="res-grid">
       <div class="list-col">
         <div class="reveal-box" id="revealBox">
-          <p class="rb-t">Gli oggetti trovati sono nascosti.</p>
-          <p>Cerca il tuo qui sopra, oppure guarda tutti quelli trovati negli ultimi 30 giorni in Ticino.</p>
-          <button class="btn mag" type="button" id="revealBtn">Mostra gli oggetti trovati</button>
+          <div class="rb-scan" aria-hidden="true"></div>
+          <div class="rb-text">
+            <p class="eyebrow rb-eye"><span class="rb-dot" aria-hidden="true"></span>Deposito · Ticino</p>
+            <p class="rb-big"><span id="rbCount">0</span><small>oggetti<br>aspettano<br>il proprietario</small></p>
+            <p class="rb-t">Sono nascosti, finché non li cerchi.</p>
+            <p class="rb-p">Cerca il tuo qui sopra, oppure apri il deposito e guarda tutti quelli trovati negli ultimi 30 giorni.</p>
+            <button class="btn rb-btn" type="button" id="revealBtn"><span>Mostra gli oggetti trovati</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+          </div>
+          <div class="rb-deck" id="rbDeck" aria-hidden="true"></div>
         </div>
         <div class="list" id="list"></div>
         <form class="qalert" id="qAlert" hidden>
@@ -573,6 +610,16 @@ function placeOf(text){
 }
 
 let current = ITEMS, lastTitle;
+const DECK = [{x:-70,y:-70,r:-9},{x:60,y:-40,r:7},{x:-40,y:30,r:4},{x:70,y:70,r:-6},{x:0,y:0,r:-2}];
+function renderDeck(items){
+  $("#rbCount").textContent = items.length;
+  $("#rbDeck").innerHTML = items.slice(0, DECK.length).map((it,i) => { const d = DECK[i];
+    return `<div class="rb-card" style="--x:${d.x}px;--y:${d.y}px;--r:${d.r}deg;--d:${-i*.9}s;z-index:${i}"><span class="ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[it.cat]||ICONS.altro}</svg></span><span><b>${esc(it.t)}</b><i>${esc(it.id)}</i></span></div>`; }).join("")
+    + `<div class="rb-tape"><span>${"NASCOSTI ✱ CERCA IL TUO ✱ ".repeat(8)}</span></div>`;
+  if(window.gsap && !REDUCE && !renderDeck.done){ renderDeck.done = true;
+    const o = {n:0}; gsap.to(o, {n:items.length, duration:1.6, ease:"power2.out", scrollTrigger:{trigger:"#revealBox", start:"top 80%"}, onUpdate:() => $("#rbCount").textContent = Math.round(o.n)});
+  }
+}
 function renderList(items, title){
   current = items;
   $("#resTitle").textContent = title || "▼ Ultimi oggetti trovati";
@@ -592,6 +639,7 @@ function renderList(items, title){
     </button>`;
   }).join("") : `<div class="empty"><b>Nessun oggetto trovato con questa descrizione.</b><br>Prova con una parola più semplice, per esempio “portafoglio” o “chiavi”.</div>`;
   const open = !!UI.revealed;
+  if(!open) renderDeck(items);
   $("#revealBox").hidden = open; $("#list").hidden = !open; $("#mapFrame").hidden = !open; $("#resCount").hidden = !open; $("#hideBtn").hidden = !open;
   $(".res-grid").classList.toggle("closed", !open);
   lastTitle = title;
@@ -817,7 +865,15 @@ renderList(ITEMS);
 $("#hideBtn").addEventListener("click", () => {
   UI.revealed = false; renderList(current, lastTitle); scrollToEl("#risultati");
 });
-$("#revealBtn").addEventListener("click", () => {
+$("#revealBtn").addEventListener("click", async () => {
+  if(window.gsap && !REDUCE){
+    const cards = $$("#rbDeck .rb-card");
+    await gsap.timeline()
+      .to("#rbDeck .rb-tape", {scaleX:0, opacity:0, duration:.3, ease:"power2.in"})
+      .to(cards, {x:i => (i % 2 ? 1 : -1) * (300 + i*40), y:i => -200 - i*30, rotation:i => (i % 2 ? 40 : -40), opacity:0, filter:"blur(0px)", duration:.6, ease:"power3.in", stagger:.06}, "<.1")
+      .to("#revealBox", {clipPath:"inset(0 0 100% 0)", duration:.45, ease:"expo.inOut"}, "-=.25");
+    gsap.set("#revealBox", {clearProps:"clipPath"});
+  }
   UI.revealed = true; renderList(current, lastTitle);
   if(window.gsap && !REDUCE) gsap.from("#list .tag", {y:40, rotateX:-25, opacity:0, duration:.7, ease:"expo.out", stagger:.05, clearProps:"transform,opacity"});
 });
